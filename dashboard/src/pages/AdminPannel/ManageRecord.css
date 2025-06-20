@@ -1,0 +1,82 @@
+.ManageRecord-dashboard {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.RecordContent {
+  display: flex;
+  flex-direction: row;
+  width: 166vh;
+  padding: 30px;
+  gap: 30px;
+  overflow: auto;
+}
+
+.RecordTableList {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  width: 154vh;
+}
+.MuiTableHead-root {
+  background-color: #1c444d;
+}
+
+.MuiTableCell-head {
+  background-color: #1c444d !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  text-align: center;
+}
+.RecordTableList h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.MoreInfoCard {
+  flex: 2;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(28, 68, 77, 0.4); /* updated shadow color */
+  height: fit-content;
+  max-height: 85vh;
+  overflow-y: auto;
+  width: 5vh;
+}
+.ClickableRow {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ClickableRow:hover {
+  background-color: #e9f5ff;
+}
+
+.RecordImage {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+/* Custom button colors */
+.MuiButton-contained {
+  background-color: #1c444d !important;
+  color: white !important;
+  box-shadow: none;
+}
+
+.MuiButton-outlined {
+  color: #1c444d !important;
+  border-color: #1c444d !important;
+  background-color: white !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: #f0f4f5 !important;
+  border-color: #1c444d !important;
+}

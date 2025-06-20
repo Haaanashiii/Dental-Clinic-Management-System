@@ -1,0 +1,86 @@
+.LoginMain {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #1c444d, #ffffff, #1c444d);
+  background-size: 400% 400%;
+  animation: moveBackground 15s ease infinite;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.LoginMain .LoginContent {
+  width: 400px;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
+  z-index: 1;
+  position: relative;
+}
+
+.LoginMain .LoginContent h2 {
+  margin-bottom: 20px;
+  color: #1c444d;
+  font-weight: 600;
+}
+
+.LoginMain .MuiTextField-root,
+.LoginMain .MuiFormControl-root {
+  margin-bottom: 15px;
+}
+
+.LoginMain .LoginContent a {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #1c444d;
+  text-decoration: none;
+}
+
+.LoginMain .LoginContent a:hover {
+  text-decoration: underline;
+}
+
+.LoginMain .MuiButton-root {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  background-color: #1c444d !important;
+  transition: background-color 0.3s ease;
+  color: white;
+}
+
+.LoginMain .MuiButton-root:hover {
+  background-color: #16363f !important;
+}
+
+/* Parallax animation */
+@keyframes moveBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Fade in content */
+@keyframes fadeIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

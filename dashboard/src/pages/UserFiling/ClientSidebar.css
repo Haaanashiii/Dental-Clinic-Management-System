@@ -1,0 +1,52 @@
+.ClientSidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background-color: #1C444D !important;
+  transition: width 0.2s ease;
+}
+
+/* Menu background and text */
+.ClientSidebar .ant-menu {
+  background-color: #1C444D !important;
+  color: #fff;
+  border-right: none;
+}
+
+.ClientSidebar .ant-menu-item {
+  color: #fff;
+}
+
+.ClientSidebar .ant-menu-item:hover,
+.ClientSidebar .ant-menu-item-active {
+  background-color: #16363f !important;
+  color: #ffffff !important;
+}
+
+.ClientSidebar .ant-menu-item-selected {
+  background-color: #ffffff !important;
+  color: #1C444D !important;
+  font-weight: bold;
+}
+
+.ClientSidebar .ant-menu-item-selected .ant-menu-item-icon {
+  color: #1C444D !important;
+}
+
+.ClientSidebar .ant-menu-item-icon {
+  color: #ffffff !important;
+}
+
+.ClientSidebar .ant-menu-title-content {
+  color: #ffffff;
+}
+
+
+.ClientSidebar.collapsed {
+  width: 80px !important;
+}
+
+.ClientSidebar .ant-layout-sider-trigger {
+  background-color: #16363f;
+  color: #ffffff;
+}
