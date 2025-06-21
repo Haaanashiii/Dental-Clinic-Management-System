@@ -91,8 +91,13 @@ exports.editProfile = async (req, res) => {
     let profileImagePath = existingProfile.profileImage;
 
     if (profileImage && profileImage.startsWith('data:image')) {
+      // Delete previous image if it exists
       if (profileImagePath && fs.existsSync(profileImagePath)) {
-        fs.unlinkSync(profileImagePath);
+        try {
+          fs.unlinkSync(profileImagePath);
+        } catch (err) {
+          console.error("Error deleting previous image:", err);
+        }
       }
 
       const base64Data = profileImage.replace(/^data:image\/\w+;base64,/, '');
@@ -141,6 +146,15 @@ exports.deleteProfile = async (req, res) => {
     const deleted = await Patient.findOneAndDelete({ userId });
     if (!deleted) {
       return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Delete profile image from server if it exists
+    if (deleted.profileImage && fs.existsSync(deleted.profileImage)) {
+      try {
+        fs.unlinkSync(deleted.profileImage);
+      } catch (err) {
+        console.error("Error deleting profile image:", err);
+      }
     }
 
     res.status(200).json({ success: true, message: "Profile deleted successfully" });

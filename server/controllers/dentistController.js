@@ -93,8 +93,13 @@ exports.editProfile = async (req, res) => {
     let profileImagePath = existingProfile.profileImage;
 
     if (profileImage && profileImage.startsWith('data:image')) {
+      // Delete previous image if exists
       if (profileImagePath && fs.existsSync(profileImagePath)) {
-        fs.unlinkSync(profileImagePath);
+        try {
+          fs.unlinkSync(profileImagePath);
+        } catch (err) {
+          console.error("Error deleting previous image:", err);
+        }
       }
 
       const base64Data = profileImage.replace(/^data:image\/\w+;base64,/, '');
@@ -135,17 +140,6 @@ exports.editProfile = async (req, res) => {
   }
 };
 
-// Get all dentists
-exports.getAllDentists = async (req, res) => {
-  try {
-    const dentists = await Dentist.find();
-    res.status(200).json(dentists);
-  } catch (err) {
-    console.error("Error fetching dentists:", err);
-    res.status(500).json({ message: "Error fetching dentists", error: err.message });
-  }
-};
-
 // Delete profile
 exports.deleteProfile = async (req, res) => {
   const { userId } = req.params;
@@ -157,12 +151,33 @@ exports.deleteProfile = async (req, res) => {
       return res.status(404).json({ message: "Profile not found" });
     }
 
+    // Delete profile image from server if exists
+    if (deleted.profileImage && fs.existsSync(deleted.profileImage)) {
+      try {
+        fs.unlinkSync(deleted.profileImage);
+      } catch (err) {
+        console.error("Error deleting profile image:", err);
+      }
+    }
+    
     res.status(200).json({ success: true, message: "Profile deleted successfully" });
   } catch (err) {
     console.error("Error deleting profile:", err);
     res.status(500).json({ message: "Error deleting profile", error: err.message });
   }
 };
+// Get all dentists
+exports.getAllDentists = async (req, res) => {
+  try {
+    const dentists = await Dentist.find();
+    res.status(200).json(dentists);
+  } catch (err) {
+    console.error("Error fetching dentists:", err);
+    res.status(500).json({ message: "Error fetching dentists", error: err.message });
+  }
+};
+
+
 
 // Get by dentistId
 exports.getDentistByDentistId = async (req, res) => {

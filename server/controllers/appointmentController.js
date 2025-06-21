@@ -1,6 +1,6 @@
   const Appointments = require('../models/appointment.models');
 
-  // Create new appointment
+  
   exports.createAppointment = async (req, res) => {
     try {
       const { patientId, dentistId, appointmentDate, appointmentTime, status, remarks } = req.body;

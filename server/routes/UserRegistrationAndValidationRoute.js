@@ -6,9 +6,9 @@ const {
   getUserById,
   getAllUsersByRole,
   deleteUser,
-} = require("../controllers/loginNRegisterController.js");
+} = require("../controllers/UserRegistrationAndValidationController.js");
 
-const authenticateUser = require("../middleware/authMiddleware");
+const authenticateUser = require("../middleware/authMiddleware.js");
 
 const router = express.Router();
 
