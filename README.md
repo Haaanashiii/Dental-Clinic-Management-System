@@ -1,19 +1,3 @@
-cd dashboard
-npm install
+To initialize the project, run `npm install` in both the `dashboard` and `server` directories.
 
-npm install @mui/material @emotion/react @emotion/styled
-npm install @mui/icons-material
-npm install @mui/x-date-pickers@next
-npm install dayjs
-npm i antd
-
-npm install axios
-
-cd ..
-cd server
-npm install -g nodemon
-npm i file-server
-npm i mongoose
-npm install express express-openid-connect --save
-npm install dotenv
-npm install uuid
+Update the `.env` file inside the `dashboard` folder to set your own VITE_API_BASE_URL (IP address or domain) as needed for your environment.
