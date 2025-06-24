@@ -19,13 +19,13 @@ const ManageProfilePage = () => {
 
       try {
         // Get user info
-        const userRes = await axios.get(`http://localhost:1337/auth/user/${userId}`, {
+        const userRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserDetails(userRes.data);
 
         // Get profile based on role
-        const profileUrl = `http://localhost:1337/${role}/profile/user/${userId}`;
+        const profileUrl = `${import.meta.env.VITE_API_BASE_URL}/${role}/profile/user/${userId}`;
         const profileRes = await axios.get(profileUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -171,11 +171,11 @@ const EditProfileForm = ({ profile, setProfile, userId, role, onClose }) => {
     const token = sessionStorage.getItem("authToken");
     const endpointCheck =
       role === "dentist"
-        ? `http://localhost:1337/dentist/profile/user/${userId}`
+        ? `${import.meta.env.VITE_API_BASE_URL}/dentist/profile/user/${userId}`
         : role === "patient"
-        ? `http://localhost:1337/patient/profile/${userId}`
+        ? `${import.meta.env.VITE_API_BASE_URL}/patient/profile/${userId}`
         : role === "staff"
-        ? `http://localhost:1337/staff/profile/${userId}`
+        ? `${import.meta.env.VITE_API_BASE_URL}/staff/profile/${userId}`
         : null;
 
 
@@ -187,7 +187,7 @@ const EditProfileForm = ({ profile, setProfile, userId, role, onClose }) => {
 
       const method = exists ? "PUT" : "POST";
       const url = method === "POST"
-        ? `http://localhost:1337/${role}/create`
+        ? `${import.meta.env.VITE_API_BASE_URL}/${role}/create`
         : endpointCheck;
 
       const base64Data = formData.profilePicture?.startsWith("data:image")
@@ -257,7 +257,7 @@ const EditUserForm = ({ userDetails, setUserDetails, userId, onClose }) => {
     if (!formData.password) delete payload.password;
 
     try {
-      const res = await axios.put("http://localhost:1337/auth/user/edit", payload, {
+      const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
