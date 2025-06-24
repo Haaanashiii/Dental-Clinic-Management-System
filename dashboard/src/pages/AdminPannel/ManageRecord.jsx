@@ -36,8 +36,8 @@ function ManageRecord() {
   const fetchRecords = useCallback(async () => {
     try {
       const url = filterStatus
-        ? `http://localhost:1337/record/list?status=${filterStatus}`
-        : `http://localhost:1337/record/list`;
+        ? `${import.meta.env.VITE_API_BASE_URL}/record/list?status=${filterStatus}`
+        : `${import.meta.env.VITE_API_BASE_URL}/record/list`;
 
       const response = await axios.get(url);
       const data = response.data.data || [];
@@ -48,14 +48,14 @@ function ManageRecord() {
           let dentistName = "Unknown";
 
           try {
-            const resPatient = await axios.get(`http://localhost:1337/patient/name/${record.patientId}`);
+            const resPatient = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/name/${record.patientId}`);
             patientName = resPatient.data?.name ?? "Unknown";
           } catch (e) {
             console.warn("❗ Could not fetch patient", e);
           }
 
           try {
-            const resDentist = await axios.get(`http://localhost:1337/dentist/name/${record.dentistId}`);
+            const resDentist = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${record.dentistId}`);
             dentistName = resDentist.data?.name ?? "Unknown";
           } catch (e) {
             console.warn("❗ Could not fetch dentist", e);
@@ -87,7 +87,7 @@ function ManageRecord() {
 
   const markAsPaid = async (recordId) => {
     try {
-      await axios.put(`http://localhost:1337/record/pay/${recordId}`);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/record/pay/${recordId}`);
       alert("Marked as paid");
       fetchRecords();
     } catch {

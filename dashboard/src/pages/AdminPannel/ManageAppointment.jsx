@@ -95,10 +95,10 @@ function ManageAppointment() {
       let res;
       if (role === 'staff') {
         res = status === 'all'
-          ? await axios.get('http://localhost:1337/appointment/getall')
-          : await axios.get(`http://localhost:1337/appointment/status/${status}`);
+          ? await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/getall`)
+          : await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}`);
       } else if (role === 'dentist' && loadedDentistId) {
-        res = await axios.get(`http://localhost:1337/appointment/status/${status}/dentist/${loadedDentistId}`);
+        res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/dentist/${loadedDentistId}`);
       }
 
       const appointmentsWithProfiles = await Promise.all(res.data.map(async (appointment) => {
@@ -106,14 +106,14 @@ function ManageAppointment() {
         let patientName = "Unknown";
 
         try {
-          const resPatient = await axios.get(`http://localhost:1337/patient/name/${appointment.patientId}`);
+          const resPatient = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/name/${appointment.patientId}`);
           patientName = resPatient.data?.name ?? "Unknown";
         } catch (e) {
           console.warn("❗ Could not fetch patient", e);
         }
 
         try {
-          const resDentist = await axios.get(`http://localhost:1337/dentist/name/${appointment.dentistId}`);
+          const resDentist = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${appointment.dentistId}`);
           dentistName = resDentist.data?.name ?? "Unknown";
         } catch (e) {
           console.warn("❗ Could not fetch dentist", e);
@@ -134,7 +134,7 @@ function ManageAppointment() {
       setLoading(true);
       if (role === 'dentist') {
         try {
-          const res = await axios.get(`http://localhost:1337/dentist/profile/user/${userId}`);
+          const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile/user/${userId}`);
           if (res.data.dentistId) {
             setDentistId(res.data.dentistId);
             await fetchAppointments(statusFilter, res.data.dentistId);
@@ -152,7 +152,7 @@ function ManageAppointment() {
 
   const handleCancelAppointment = async (id) => {
     try {
-      await axios.put(`http://localhost:1337/appointment/cancel/${id}`);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/cancel/${id}`);
       alert("Appointment cancelled.");
       fetchAppointments(statusFilter);
     } catch {
@@ -162,7 +162,7 @@ function ManageAppointment() {
 
   const handleApproveAppointment = async (id) => {
     try {
-      await axios.put(`http://localhost:1337/appointment/confirm/${id}`, { status: 'confirmed' });
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/confirm/${id}`, { status: 'confirmed' });
       alert("Appointment approved.");
       fetchAppointments(statusFilter);
     } catch {
@@ -172,7 +172,7 @@ function ManageAppointment() {
 
   const handleDeleteAppointment = async (id) => {
     try {
-      await axios.delete(`http://localhost:1337/appointment/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/appointment/delete/${id}`);
       alert("Appointment deleted.");
       fetchAppointments(statusFilter);
     } catch {
@@ -213,8 +213,8 @@ function ManageAppointment() {
         visitDate: selectedAppointment.appointmentDate,
       };
 
-      await axios.post('http://localhost:1337/record/create', recordData);
-      await axios.put(`http://localhost:1337/appointment/complete/${selectedAppointment.appointmentId}`, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/record/create`, recordData);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/complete/${selectedAppointment.appointmentId}`, {
         remark,
       });
       alert('Record created and appointment marked as completed.');

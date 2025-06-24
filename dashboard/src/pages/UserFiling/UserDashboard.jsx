@@ -79,7 +79,7 @@ function UserDashboard() {
   useEffect(() => {
     const fetchPatientProfile = async () => {
       try {
-        const res = await axios.get(`http://localhost:1337/patient/profile/user/${userId}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`);
         if (res.data.patientId) {
           setPatientId(res.data.patientId);
         } else {
@@ -92,7 +92,7 @@ function UserDashboard() {
 
     const fetchDentists = async () => {
       try {
-        const res = await axios.get("http://localhost:1337/dentist/profile");
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile`);
         setDentists(res.data);
       } catch (err) {
         console.error("Error fetching dentists:", err);
@@ -105,9 +105,9 @@ function UserDashboard() {
 
   const fetchAppointments = async (status) => {
     try {
-      const res = await axios.get(`http://localhost:1337/appointment/status/${status}/patient/${patientId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/patient/${patientId}`);
       const appointmentsWithDentists = await Promise.all(res.data.map(async (appointment) => {
-        const dentistRes = await axios.get(`http://localhost:1337/dentist/profile/dentist/${appointment.dentistId}`);
+        const dentistRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile/dentist/${appointment.dentistId}`);
         const dentistName = dentistRes.data.name;
         return { ...appointment, dentistName };
       }));
@@ -190,7 +190,7 @@ function UserDashboard() {
         appointmentTime: appointmentTime.format("HH:mm"),
         status: "pending",
       };
-      await axios.post("http://localhost:1337/appointment/create", payload);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointment/create`, payload);
       alert("Appointment created successfully!");
       handleClose();
       fetchAppointments('pending');
@@ -202,7 +202,7 @@ function UserDashboard() {
 
   const handleCancelAppointment = async (appointmentId) => {
     try {
-      await axios.put(`http://localhost:1337/appointment/cancel/${appointmentId}`);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/cancel/${appointmentId}`);
       alert("Appointment cancelled successfully!");
       fetchAppointments(statusFilter);
     } catch (err) {

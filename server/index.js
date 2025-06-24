@@ -3,6 +3,8 @@ require("express-async-errors");
 
 const express = require("express");
 const cors = require("cors");
+const os = require("os");
+
 const errorHandler = require("./middleware/errorHandler.js");
 
 const userRoute = require("./routes/userRoute.js");
@@ -25,21 +27,38 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Connect to MongoDB
 connectDB();
 
-//  Mount all routes
+// Mount routes
 app.use("/user", userRoute);
 app.use("/dentist", dentistRoute);
 app.use("/staff", staffRoute);
 app.use("/patient", patientRoute);
 app.use("/appointment", appointmentRoute);
 app.use("/record", recordRoute);
-app.use("/auth", UserRegistrationAndValidation); 
+app.use("/auth", UserRegistrationAndValidation);
 
-// Error handler middleware
+// Error handler
 app.use(errorHandler);
 
-// Start the server
-const PORT = process.env.PORT || 1337;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running at http://192.168.0.130:${PORT}`);
-});
+// Function to get local LAN IP
+function getLocalIP() {
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === "IPv4" && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return "localhost";
+}
 
+// Start server
+const PORT = process.env.PORT || 1337;
+const IP = getLocalIP();
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running at:`);
+  console.log(`   ▶ Local:    http://localhost:${PORT}`);
+  console.log(`   ▶ Network:  http://${IP}:${PORT}`);
+});
+  

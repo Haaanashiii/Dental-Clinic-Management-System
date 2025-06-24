@@ -61,7 +61,7 @@ export default function ManageStaff() {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:1337/auth/user?role=staff");
+      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user?role=staff`);
       setUsers(data);
       console.log("Fetched users:", data);
     } catch (error) {
@@ -115,10 +115,10 @@ export default function ManageStaff() {
 
     if (isEditing) {
       // Send PUT request to update user profile
-      await axios.put("http://localhost:1337/auth/user/edit", updateData);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
     } else {
       // Send POST request to create new user
-      await axios.post("http://localhost:1337/auth/signup", updateData);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
     }
 
     // Reload users list and close modal
@@ -133,8 +133,8 @@ export default function ManageStaff() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`http://localhost:1337/auth/delete/${userId}`);
-      await axios.delete(`http://localhost:1337/staff/delete/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/staff/delete/${userId}`);
       fetchUsers();
     } catch (error) {
       console.error("ERROR deleting user:", error);

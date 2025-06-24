@@ -24,11 +24,14 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     const isEmail = emailOrUsername.includes("@");
 
     try {
-      const response = await axios.post("http://192.168.0.130:1337/auth/login", {
+      const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+      {
         email: isEmail ? emailOrUsername.toLowerCase().trim() : "",
         username: !isEmail ? emailOrUsername.trim() : "",
         password,
-      });
+      }
+    );
 
       if (response.data.message === "Login successful") {
         const { authToken, role, userId, email } = response.data;

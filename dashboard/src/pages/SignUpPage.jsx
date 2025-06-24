@@ -27,10 +27,10 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
     try {
       const userFormWithRole = { ...userForm, role: "patient" };
 
-      const signUpResponse = await axios.post("http://192.168.0.130:1337/auth/signup", userFormWithRole);
+      const signUpResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, userFormWithRole);
 
       if (signUpResponse.data.success) {
-        const loginResponse = await axios.post("http://192.168.0.130:1337/auth/login", {
+        const loginResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
           email: userForm.email,
           password: userForm.password,
         });

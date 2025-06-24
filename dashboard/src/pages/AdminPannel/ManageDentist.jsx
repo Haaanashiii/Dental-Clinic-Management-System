@@ -61,7 +61,7 @@ export default function ManageDentist() {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:1337/auth/user?role=dentist");
+      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user?role=dentist`);
       setUsers(data);
       console.log("Fetched users:", data);
     } catch (error) {
@@ -114,9 +114,9 @@ export default function ManageDentist() {
     }
 
     if (isEditing) {
-      await axios.put("http://localhost:1337/auth/user/edit", updateData);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
     } else {
-      await axios.post("http://localhost:1337/auth/signup", updateData);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
     }
 
 
@@ -131,8 +131,8 @@ export default function ManageDentist() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`http://localhost:1337/auth/delete/${userId}`);
-      await axios.delete(`http://localhost:1337/dentist/delete/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/dentist/delete/${userId}`);
       fetchUsers();
     } catch (error) {
       console.error("ERROR deleting user:", error);
