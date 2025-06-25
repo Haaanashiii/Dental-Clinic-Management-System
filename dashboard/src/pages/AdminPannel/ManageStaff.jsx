@@ -3,11 +3,19 @@ import React, { useEffect, useState } from "react";
 import ClientSidebar from "../UserFiling/ClientSidebar";
 import {
   Box, Button, Modal, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TablePagination, TableRow, TextField,tableCellClasses 
+  TableContainer, TableHead, TablePagination, TableRow, TextField,
+  tableCellClasses, Typography, Card, CardContent, Chip, IconButton,
+  Fade, Backdrop, CircularProgress, Snackbar, Alert, Avatar,
+  Tooltip, useTheme, alpha
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 import "./ManageDentist.css";
 

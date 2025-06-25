@@ -9,6 +9,8 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import BlockIcon from "@mui/icons-material/Block";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./ManageDentist.css";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -50,6 +52,7 @@ export default function ManageUser() {
       setUsers(data);
     } catch (error) {
       console.error("ERROR fetching users:", error);
+      toast.error("Failed to fetch users");
     }
   };
 
@@ -57,8 +60,10 @@ export default function ManageUser() {
     try {
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/status/${userId}`, { status });
       fetchUsers();
+      toast.success(`User status changed to ${status} successfully!`);
     } catch (error) {
       console.error("ERROR changing status:", error);
+      toast.error("Failed to change user status");
     }
   };
 
@@ -67,8 +72,10 @@ export default function ManageUser() {
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
       fetchUsers();
+      toast.success("User deleted successfully!");
     } catch (error) {
       console.error("ERROR deleting user:", error);
+      toast.error("Failed to delete user");
     }
   };
 
@@ -84,7 +91,7 @@ export default function ManageUser() {
       <ClientSidebar />
       <div className="ManageDentist-content">
         <h1>Manage User Accounts</h1>
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: "40px" }}>
           <Button
             variant={roleFilter === "patient" ? "contained" : "outlined"}
             onClick={() => setRoleFilter("patient")}
@@ -169,6 +176,29 @@ export default function ManageUser() {
           />
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{
+          backgroundColor: "#1c444d",
+          color: "#ffffff",
+          fontFamily: "inherit"
+        }}
+        progressStyle={{
+          backgroundColor: "#f2fafa"
+        }}
+        style={{
+          fontSize: "14px"
+        }}
+      />
     </div>
   );
 }
