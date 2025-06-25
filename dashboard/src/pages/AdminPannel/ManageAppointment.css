@@ -13,19 +13,17 @@
 .ManageAppointment-table {
     position: relative;
     max-height: 100%; 
-    width: 1500px;         
+    width: 166vh;         
     margin: auto;   
     margin-top: -25px; 
 }
 .MuiTableContainer-root {
     width: 100%; 
-    
 }
 
 /* Table Header */
 .ManageAppointment-table .MuiTableHead-root {
-    background-color: #000;  
-    
+    background-color: #000;   
 }
 
 .ManageAppointment-table .MuiTableCell-head {

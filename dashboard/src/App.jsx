@@ -44,7 +44,7 @@ useEffect(() => {
         <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}/>
         <Route path="/" element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/login" />} />
         <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
-        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ProfilePage /> : <Navigate to="/login" />} />
+        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/login" />} />
 
         
         {/* Admin Panel */}

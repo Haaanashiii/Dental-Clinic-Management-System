@@ -13,9 +13,9 @@
   border-right: none;
 }
 
-.ClientSidebar .ant-menu-item {
+/* .ClientSidebar .ant-menu-item {
   color: #fff;
-}
+} */
 
 .ClientSidebar .ant-menu-item:hover,
 .ClientSidebar .ant-menu-item-active {
@@ -29,7 +29,7 @@
   font-weight: bold;
 }
 
-.ClientSidebar .ant-menu-item-selected .ant-menu-item-icon {
+/* .ClientSidebar .ant-menu-item-selected .ant-menu-item-icon {
   color: #1C444D !important;
 }
 
@@ -39,13 +39,68 @@
 
 .ClientSidebar .ant-menu-title-content {
   color: #ffffff;
-}
-
+} */
 
 .ClientSidebar.collapsed {
   width: 80px !important;
 }
 
+.logo-container {
+  padding: 16px;
+  text-align: center;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+/* If you want to add a divider between logo and menu */
+.logo-container:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar content wrapper to allow for flex layout */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 80px); /* Adjust based on your logo container height */
+  position: relative;
+}
+
+/* Menu should take available space */
+.ClientSidebar .ant-menu {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Logout button container */
+.logout-button-container {
+  padding: 16px;
+  margin-bottom: 48px; /* Space for the collapse trigger */
+}
+
+.logout-button {
+  width: 100%;
+  text-align: left;
+  color: #fff !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 8px 16px;
+}
+
+.logout-button:hover {
+  background-color: #16363f !important;
+}
+
+/* Style for the ant layout sider trigger button */
 .ClientSidebar .ant-layout-sider-trigger {
   background-color: #16363f;
   color: #ffffff;

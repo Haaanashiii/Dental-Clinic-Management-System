@@ -30,6 +30,8 @@ function ManageRecord() {
   const [searchDentist, setSearchDentist] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [zoomImage, setZoomImage] = useState(null);
+  // Add a new state to control the record details modal
+  const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
 
@@ -107,6 +109,17 @@ function ManageRecord() {
 
   const paginatedRecords = filteredRecords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+  // Add a function to handle record selection and modal opening
+  const handleRecordSelect = (record) => {
+    setSelectedRecord(record);
+    setRecordModalOpen(true);
+  };
+
+  // Add a function to close the record details modal
+  const handleCloseRecordModal = () => {
+    setRecordModalOpen(false);
+  };
+
   return (
     <div className="ManageRecord-dashboard">
       <ClientSidebar />
@@ -143,7 +156,11 @@ function ManageRecord() {
               </TableHead>
               <TableBody>
                 {paginatedRecords.length > 0 ? paginatedRecords.map((record) => (
-                  <StyledTableRow key={record._id} onClick={() => setSelectedRecord(record)} className="ClickableRow">
+                  <StyledTableRow 
+                    key={record._id} 
+                    onClick={() => handleRecordSelect(record)} 
+                    className="ClickableRow"
+                  >
                     <TableCell>{record.patientName}</TableCell>
                     <TableCell>{record.dentistName}</TableCell>
                     <TableCell>{record.treatment}</TableCell>
@@ -170,8 +187,31 @@ function ManageRecord() {
             rowsPerPageOptions={[]}
           />
         </div>
+      </div>
 
-        <div className='MoreInfoCard'>
+      {/* Record Details Modal */}
+      <Modal 
+        open={recordModalOpen} 
+        onClose={handleCloseRecordModal}
+        aria-labelledby="record-details-modal"
+      >
+        <Box 
+          className="RecordModalContent"
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500,
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            overflow: 'auto'
+          }}
+        >
           {selectedRecord ? (
             <div>
               <Typography variant="h5" gutterBottom>Complete Information</Typography>
@@ -186,31 +226,46 @@ function ManageRecord() {
               {selectedRecord.images?.length > 0 && (
                 <>
                   <p><strong>Images:</strong></p>
-                  {selectedRecord.images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`Record ${i}`}
-                      className="RecordImage"
-                      style={{ cursor: 'pointer', maxWidth: '100px', marginRight: '8px' }}
-                      onClick={() => setZoomImage(img)}
-                    />
-                  ))}
+                  <div className="ImageGallery">
+                    {selectedRecord.images.map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`Record ${i}`}
+                        className="RecordImage"
+                        style={{ cursor: 'pointer', maxWidth: '100px', marginRight: '8px' }}
+                        onClick={() => setZoomImage(img)}
+                      />
+                    ))}
+                  </div>
                 </>
               )}
 
               {selectedRecord.fineStatus === "unpaid" && (
-                <Button variant="contained" color="success" onClick={() => markAsPaid(selectedRecord._id)} sx={{ mt: 2 }}>
+                <Button 
+                  variant="contained" 
+                  color="success" 
+                  onClick={() => markAsPaid(selectedRecord._id)} 
+                  sx={{ mt: 2, mr: 1 }}
+                >
                   Mark as Paid
                 </Button>
               )}
+              <Button 
+                variant="outlined"
+                onClick={handleCloseRecordModal}
+                sx={{ mt: 2 }}
+              >
+                Close
+              </Button>
             </div>
           ) : (
-            <Typography variant="body1" color="text.secondary">Select a record to view more details</Typography>
+            <Typography variant="body1" color="text.secondary">No record selected</Typography>
           )}
-        </div>
-      </div>
+        </Box>
+      </Modal>
 
+      {/* Image Zoom Modal - keep this one */}
       <Modal open={!!zoomImage} onClose={() => setZoomImage(null)}>
         <Box sx={{
           position: 'absolute', top: '50%', left: '50%',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 import {
   UserOutlined,
   HomeOutlined,
@@ -8,6 +8,7 @@ import {
   LogoutOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
+import logo from '../../assets/LogoMolar.png';
 import './ClientSidebar.css'; 
 
 const { Sider } = Layout;
@@ -25,6 +26,7 @@ function ClientDashboard() {
     navigate('/login');
   };
 
+  // Remove the logout from regular menu items
   const items = [
     {
       key: '1',
@@ -74,12 +76,6 @@ function ClientDashboard() {
       onClick: () => navigate('/ManageRecord'),
       hidden: role !== 'staff' && role !== 'dentist',
     },
-    {
-      key: '8',
-      icon: <LogoutOutlined />,
-      label: 'Logout',
-      onClick: handleLogout,
-    },
   ];
 
   return (
@@ -91,15 +87,43 @@ function ClientDashboard() {
         className="ClientSidebar"
         width={200}
       >
-        <Menu theme="dark" mode="inline">
-          {items
-            .filter(item => !item.hidden)
-            .map(item => (
-              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                {item.label}
-              </Menu.Item>
-            ))}
-        </Menu>
+        {/* Logo container */}
+        <div className="logo-container" style={{ cursor: 'pointer' }}>
+          <img 
+            src={logo} 
+            alt="Dental Clinic Logo" 
+            style={{
+              width: collapsed ? '40px' : '120px',
+              margin: collapsed ? '10px auto' : '20px auto',
+              display: 'block',
+              transition: 'all 0.2s'
+            }}
+          />
+        </div>
+
+        <div className="sidebar-content">
+          <Menu theme="dark" mode="inline">
+            {items
+              .filter(item => !item.hidden)
+              .map(item => (
+                <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+                  {item.label}
+                </Menu.Item>
+              ))}
+          </Menu>
+          
+          {/* Logout button positioned above the collapse control */}
+          <div className="logout-button-container">
+            <Button 
+              type="text"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+              className="logout-button"
+            >
+              {!collapsed && "Logout"}
+            </Button>
+          </div>
+        </div>
       </Sider>
     </Layout>
   );
