@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
         type: String, 
         enum: ['patient', 'dentist', 'staff'],
         required: true 
+    },
+    status: {
+        type: String,
+        enum: ['Active', 'Deactivated', 'Pending'],
+        default: 'pending'
     }
 });
 

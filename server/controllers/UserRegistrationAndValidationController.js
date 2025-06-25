@@ -30,7 +30,8 @@ exports.registerUser = async (req, res) => {
       email: email.toLowerCase().trim(),
       username: username.trim(),
       password: hashedPassword,  
-      role
+      role: role.trim(),
+      status: "Pending" 
     });
 
     await newUser.save();
@@ -58,6 +59,14 @@ exports.loginUser = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check account status
+    if (user.status === "Pending") {
+      return res.status(403).json({ message: "Pending account" });
+    }
+    if (user.status !== "Active") {
+      return res.status(403).json({ message: `Account status: ${user.status}` });
     }
 
     // Compare the password with the stored hashed password
@@ -171,5 +180,32 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     console.error("Delete user error:", err);
     res.status(500).json({ message: "Error deleting user", error: err.message });
+  }
+};
+
+
+// Change user account status
+exports.changeStatusUser = async (req, res) => {
+  const { userId } = req.params;
+  const { status } = req.body; 
+
+  if (!status) {
+    return res.status(400).json({ message: "Status is required in the request body" });
+  }
+
+  try {
+    const user = await User.findOne({ userId });    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.status === status) {
+      return res.status(400).json({ message: `User account is already ${status}` });
+    }
+    user.status = status;
+    await user.save();
+    res.status(200).json({ message: `User account status changed to ${status}` });
+  } catch (err) {
+    console.error("Change status user error:", err);
+    res.status(500).json({ message: "Error changing user status", error: err.message });
   }
 };

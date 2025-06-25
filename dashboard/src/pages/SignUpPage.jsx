@@ -30,29 +30,12 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
       const signUpResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, userFormWithRole);
 
       if (signUpResponse.data.success) {
-        const loginResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
-          email: userForm.email,
-          password: userForm.password,
-        });
-
-        if (loginResponse.data.authToken) {
-          sessionStorage.setItem("authToken", loginResponse.data.authToken);
-          sessionStorage.setItem("userId", loginResponse.data.userId);
-          sessionStorage.setItem("email", loginResponse.data.email);
-          sessionStorage.setItem("role", loginResponse.data.role);
-
-          setIsAuthenticated(true);
-          setUserRole(loginResponse.data.role);
-
-          navigate("/ManageProfilePage");
-        } else {
-          setError("Login failed after signup.");
-        }
+        navigate("/login");
       } else {
         setError(signUpResponse.data.message || "Signup failed.");
       }
     } catch (err) {
-      console.error("Signup/Login error:", err);
+      console.error("Signup error:", err);
       setError(err.response?.data?.message || "An error occurred. Please try again.");
     }
   };

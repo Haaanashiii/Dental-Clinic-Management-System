@@ -6,6 +6,7 @@ const {
   getUserById,
   getAllUsersByRole,
   deleteUser,
+  changeStatusUser,
 } = require("../controllers/UserRegistrationAndValidationController.js");
 
 const authenticateUser = require("../middleware/authMiddleware.js");
@@ -20,6 +21,7 @@ router.post("/signup", registerUser);
 router.get("/user", getAllUsersByRole); // ?role=staff
 router.get("/user/:userId", authenticateUser, getUserById);
 router.put("/user/edit", editUser);
-router.delete("/delete/:userId", deleteUser); // DELETE route
+router.delete("/delete/:userId", deleteUser); 
+router.put("/status/:userId", changeStatusUser); 
 
 module.exports = router;

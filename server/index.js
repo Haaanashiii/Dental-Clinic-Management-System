@@ -57,8 +57,8 @@ const PORT = process.env.PORT || 1337;
 const IP = getLocalIP();
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running at:`);
-  console.log(`   ▶ Local:    http://localhost:${PORT}`);
-  console.log(`   ▶ Network:  http://${IP}:${PORT}`);
+  console.log(` Server running at:`);
+  console.log(`    Local:    http://localhost:${PORT}`);
+  console.log(`    Network:  http://${IP}:${PORT}`);
 });
   

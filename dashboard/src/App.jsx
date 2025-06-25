@@ -11,8 +11,8 @@ import ManageDentist from "./pages/AdminPannel/ManageDentist";
 import ManageStaff from "./pages/AdminPannel/ManageStaff";
 import ManageRecord from "./pages/AdminPannel/ManageRecord";
 import ManageAppointment from "./pages/AdminPannel/ManageAppointment";
+import ManageUser from "./pages/AdminPannel/ManageUser";
 //Main imports
-import PorfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 
@@ -44,7 +44,7 @@ useEffect(() => {
         <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}/>
         <Route path="/" element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/login" />} />
         <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
-        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <PorfilePage /> : <Navigate to="/login" />} />
+        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ProfilePage /> : <Navigate to="/login" />} />
 
         
         {/* Admin Panel */}
@@ -60,8 +60,16 @@ useEffect(() => {
         <Route
           path="/ManageStaff"
           element={
-            isAuthenticated && ( userRole === "dentist")
+            isAuthenticated && (userRole === "dentist")
               ? <ManageStaff />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/ManageUser"
+          element={
+            isAuthenticated && (userRole === "dentist")
+              ? <ManageUser />
               : <Navigate to="/login" />
           }
         />
@@ -82,6 +90,7 @@ useEffect(() => {
           }
         />
         {/* Redirect to login if not authenticated */}
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
