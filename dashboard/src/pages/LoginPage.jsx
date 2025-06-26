@@ -45,9 +45,21 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
         setIsAuthenticated(true);
 
         if (role === "patient") {
-          navigate("/");
+          try {
+            const token = sessionStorage.getItem("authToken");
+            const profileRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (profileRes.data && profileRes.data.userId) {
+              navigate("/"); 
+            } else {
+              navigate("/ManageProfilePage"); 
+            }
+          } catch (err) {
+            navigate("/ManageProfilePage"); 
+          }
         } else {
-          navigate("/ManageAppointment");
+          navigate("/ManageUser");
         }
       } else {
         setError(response.data.message || "Invalid login");

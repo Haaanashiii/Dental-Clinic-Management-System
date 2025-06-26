@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import ClientSidebar from "../UserFiling/ClientSidebar";
+import ClientSidebar from "../UserPannel/ClientSidebar";
 import {
   Box, Button, Modal, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TablePagination, TableRow, TextField,

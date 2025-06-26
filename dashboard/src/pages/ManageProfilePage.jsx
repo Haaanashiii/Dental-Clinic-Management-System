@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Typography, TextField, Button, Avatar, Modal } from "@mui/material";
-import ClientSidebar from "./UserFiling/ClientSidebar";
+import ClientSidebar from "./UserPannel/ClientSidebar";
 import "./ManageProfilePage.css";
 
 const ManageProfilePage = () => {
@@ -169,39 +169,50 @@ const EditProfileForm = ({ profile, setProfile, userId, role, onClose }) => {
 
   const handleSave = async () => {
     const token = sessionStorage.getItem("authToken");
-    const endpointCheck =
-      role === "dentist"
-        ? `${import.meta.env.VITE_API_BASE_URL}/dentist/profile/user/${userId}`
-        : role === "patient"
-        ? `${import.meta.env.VITE_API_BASE_URL}/patient/profile/${userId}`
-        : role === "staff"
-        ? `${import.meta.env.VITE_API_BASE_URL}/staff/profile/${userId}`
-        : null;
+    const endpointCheck = `${import.meta.env.VITE_API_BASE_URL}/${role}/profile/user/${userId}`;
 
 
     try {
       // Check if profile exists
-      const exists = await axios.get(endpointCheck, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then(() => true).catch(() => false);
+      let exists = false;
+      try {
+        await axios.get(endpointCheck, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        exists = true;
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          exists = false;
+        } else {
+          throw err; // Other errors should be thrown
+        }
+      }
 
       const method = exists ? "PUT" : "POST";
       const url = method === "POST"
         ? `${import.meta.env.VITE_API_BASE_URL}/${role}/create`
-        : endpointCheck;
+        : `${import.meta.env.VITE_API_BASE_URL}/${role}/profile/${userId}`;
 
       const base64Data = formData.profilePicture?.startsWith("data:image")
         ? formData.profilePicture.replace(/^data:image\/\w+;base64,/, "")
         : "";
 
-      const payload = {
-        userId,
-        name: formData.name,
-        birthdate: formData.birthdate,
-        address: formData.address,
-        contactNumber: formData.contactNumber,
-        profileImage: base64Data ? `data:image/png;base64,${base64Data}` : "",
-      };
+      const payload = method === "POST"
+        ? {
+            userId,
+            name: formData.name,
+            birthdate: formData.birthdate,
+            address: formData.address,
+            contactNumber: formData.contactNumber,
+            profileImage: base64Data ? `data:image/png;base64,${base64Data}` : "",
+          }
+        : {
+            name: formData.name,
+            birthdate: formData.birthdate,
+            address: formData.address,
+            contactNumber: formData.contactNumber,
+            profileImage: base64Data ? `data:image/png;base64,${base64Data}` : "",
+          };
 
       const res = await axios({
         method,

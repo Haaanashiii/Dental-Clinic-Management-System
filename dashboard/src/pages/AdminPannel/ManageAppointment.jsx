@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import ClientSidebar from "../UserFiling/ClientSidebar";
+import ClientSidebar from "../UserPannel/ClientSidebar";
 import { styled } from '@mui/material/styles';
 import {
   Table, TableBody, TableCell, tableCellClasses,

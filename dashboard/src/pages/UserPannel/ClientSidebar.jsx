@@ -76,6 +76,13 @@ function ClientDashboard() {
       onClick: () => navigate('/ManageRecord'),
       hidden: role !== 'staff' && role !== 'dentist',
     },
+     {
+      key: '8',
+      icon: <FileTextOutlined />,
+      label: 'User Records',
+      onClick: () => navigate('/UserRecords'),
+      hidden: role !== 'patient',
+    },
   ];
 
   return (
@@ -88,7 +95,7 @@ function ClientDashboard() {
         width={200}
       >
         {/* Logo container */}
-        <div className="logo-container" style={{ cursor: 'pointer' }}>
+        <div className="logo-container">
           <img 
             src={logo} 
             alt="Dental Clinic Logo" 

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import ClientSidebar from "../UserFiling/ClientSidebar";
+import ClientSidebar from "../UserPannel/ClientSidebar";
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';

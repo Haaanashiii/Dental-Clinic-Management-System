@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // User imports
-import UserDashboard from "./pages/UserFiling/UserDashboard";
+import UserDashboard from "./pages/UserPannel/UserDashboard";
 import ManageProfilePage from "./pages/ManageProfilePage";
-
+import UserRecords from "./pages/UserPannel/UserRecords";
 // Admin imports
 import AdminDashboard from "./pages/AdminPannel/AdminDashboard";
 import ManageDentist from "./pages/AdminPannel/ManageDentist";
@@ -45,8 +45,8 @@ useEffect(() => {
         <Route path="/" element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/login" />} />
         <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
         <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/login" />} />
+        <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/login" />} />
 
-        
         {/* Admin Panel */}
         <Route
           path="/AdminDashboard"
