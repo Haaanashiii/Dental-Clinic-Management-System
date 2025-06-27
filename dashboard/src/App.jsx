@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // User imports
-import UserDashboard from "./pages/UserPannel/UserDashboard";
+import UserDashboard from "./pages/UserFiling/UserDashboard";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import UserRecords from "./pages/UserPannel/UserRecords";
 // Admin imports
@@ -20,29 +20,31 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(""); 
   
-useEffect(() => {
-  const token = sessionStorage.getItem("authToken");
-  const storedRole = sessionStorage.getItem("role");
+  useEffect(() => {
+    const token = sessionStorage.getItem("authToken");
+    const storedRole = sessionStorage.getItem("role");
 
-  if (token && storedRole) {
-    setUserRole(storedRole);
-    setIsAuthenticated(true);
-  } else {
-    setIsAuthenticated(false);
-  }
-}, []);
+    if (token && storedRole) {
+      setUserRole(storedRole);
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
   
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* User Panel */}
+        {/* Landing page always visible at root */}
+        <Route path="/" element={<UserDashboard />} />
+        {/* Login and signup routes */}
         <Route path="/login" element={<LoginPage
         setIsAuthenticated={setIsAuthenticated}
         setUserRole={setUserRole} 
        />} />
         <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}/>
-        <Route path="/" element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/login" />} />
+        {/* Authenticated routes */}
         <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
         <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/login" />} />
         <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/login" />} />
@@ -89,8 +91,8 @@ useEffect(() => {
               : <Navigate to="/login" />
           }
         />
-        {/* Redirect to login if not authenticated */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* Redirect to landing if not found */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
