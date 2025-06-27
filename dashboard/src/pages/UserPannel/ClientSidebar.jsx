@@ -16,7 +16,7 @@ const { Sider } = Layout;
 function ClientDashboard() {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebarCollapsed');
-    return stored ? stored === 'true' : false;
+    // return stored ? stored === 'true' : false;
   });
   const navigate = useNavigate();
   const role = sessionStorage.getItem('role');
