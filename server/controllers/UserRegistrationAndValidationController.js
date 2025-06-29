@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
+const nodemailer = require('nodemailer');
 const User = require("../models/user.models.js");
 
 // Register a new user
@@ -203,6 +204,29 @@ exports.changeStatusUser = async (req, res) => {
     }
     user.status = status;
     await user.save();
+
+    // Send email notification about status change
+    if (user.email) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'alipintester1234@gmail.com', // your Gmail address
+          pass: 'bqac gxeo igjq dyve',   // your Gmail App Password
+        },
+      });
+      const mailOptions = {
+        from: 'alipintester1234@gmail.com',
+        to: user.email,
+        subject: 'Account Status Update',
+        text: `Hello ${user.username || ''},\n\nYour account status has been changed to: ${status.toUpperCase()}.\n\nIf you have questions, please contact +63 977 641 4655/+63 921 355 3335.`,
+      };
+      try {
+        await transporter.sendMail(mailOptions);
+      } catch (mailErr) {
+        console.error('Error sending status email:', mailErr);
+      }
+    }
+
     res.status(200).json({ message: `User account status changed to ${status}` });
   } catch (err) {
     console.error("Change status user error:", err);

@@ -1,6 +1,7 @@
   const Appointments = require('../models/appointment.models');
+  const nodemailer = require('nodemailer');
+  const User = require('../models/user.models');
 
-  
   exports.createAppointment = async (req, res) => {
     try {
       const { patientId, dentistId, appointmentDate, appointmentTime, status, remarks } = req.body;
@@ -142,26 +143,58 @@
   };
 
   // Confirm appointment by appointmentId
-  exports.confirmAppointment = async (req, res) => {
-    const { appointmentId } = req.params;
+exports.confirmAppointment = async (req, res) => {
+  const { appointmentId } = req.params;
 
-    try {
-      const updatedAppointment = await Appointments.findOneAndUpdate(
-        { appointmentId }, 
-        { status: 'confirmed' },
-        { new: true }
-      );
+  try {
+    const updatedAppointment = await Appointments.findOneAndUpdate(
+      { appointmentId }, 
+      { status: 'confirmed' },
+      { new: true }
+    );
 
-      if (!updatedAppointment) {
-        return res.status(404).json({ message: "Appointment not found" });
-      }
-
-      res.status(200).json(updatedAppointment);
-    } catch (err) {
-      console.error("Error confirming appointment:", err);
-      res.status(500).json({ message: "Error confirming appointment", error: err.message });
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
     }
-  };
+
+    // Find patient by patientId
+    const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    // Find user by userId to get email
+    const user = await User.findOne({ userId: patient.userId });
+    if (!user || !user.email) {
+      return res.status(404).json({ message: "User email not found" });
+    }
+
+    // Set up nodemailer transporter (replace with your Gmail and App Password)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'alipintester1234@gmail.com', // your Gmail address
+        pass: 'bqac gxeo igjq dyve',   // your Gmail App Password
+      },
+    });
+
+    // Email content
+    const mailOptions = {
+      from: 'alipintester1234@gmail.com', // your Gmail address
+      to: user.email,
+      subject: 'Appointment Confirmed',
+      text: `Dear ${patient.name || 'Patient'},\n\nYour appointment has been confirmed for ${updatedAppointment.appointmentDate} at ${updatedAppointment.appointmentTime}.\n\nThank you!`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json(updatedAppointment);
+  } catch (err) {
+    console.error("Error confirming appointment:", err);
+    res.status(500).json({ message: "Error confirming appointment", error: err.message });
+  }
+};
 
 
   // Get all appointments by status and patient ID
