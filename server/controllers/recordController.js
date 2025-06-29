@@ -41,12 +41,70 @@ exports.createRecord = async (req, res) => {
     });
 
     await newRecord.save();
+
+    try {
+      const Patient = require('../models/patient.models');
+      const User = require('../models/user.models');
+      const Dentist = require('../models/dentist.models');
+      const nodemailer = require('nodemailer');
+
+      const patient = await Patient.findOne({ patientId });
+      const patientName = patient?.name || 'Patient';
+      const userId = patient?.userId;
+
+      let userEmail = '';
+      if (userId) {
+        const user = await User.findOne({ userId });
+        userEmail = user?.email || '';
+      }
+
+      let dentistName = dentistId;
+      if (dentistId) {
+        const dentist = await Dentist.findOne({ dentistId });
+        if (dentist && dentist.name) dentistName = dentist.name;
+      }
+
+      if (userEmail) {
+        let formattedVisitDate = visitDate;
+        try {
+          const dateObj = new Date(visitDate);
+          formattedVisitDate = dateObj.toLocaleString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Singapore'
+          });
+        } catch (e) { /* fallback to raw */ }
+
+        
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'alipintester1234@gmail.com',
+            pass: 'bqac gxeo igjq dyve',
+          },
+        });
+
+        // Email content
+        const mailOptions = {
+          from: 'alipintester1234@gmail.com',
+          to: userEmail,
+          subject: 'Dental Visit Record & Fine Details',
+          text: `Dear ${patientName},\n\nYour dental visit record has been created.\n\nDentist: ${dentistName}\nVisit Date: ${formattedVisitDate}\nDiagnosis: ${diagnosis || 'N/A'}\nTreatment: ${treatment || 'N/A'}\nFine: $${fine || 0} (${fine > 0 ? 'Unpaid' : 'Paid'})\n\nThank you for visiting!`,
+        };
+
+        await transporter.sendMail(mailOptions);
+      }
+    } catch (emailErr) {
+      console.error('Error sending record email:', emailErr);
+    }
+
     res.status(201).json({ message: 'Record created successfully', record: newRecord });
   } catch (err) {
     console.error("Error creating record:", err);
     res.status(500).json({ message: "Failed to create record", error: err.message });
   }
 };
+
+
 exports.getFilteredRecords = async (req, res) => {
   try {
     const { status } = req.query;
