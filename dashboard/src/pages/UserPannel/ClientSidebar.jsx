@@ -16,7 +16,7 @@ const { Sider } = Layout;
 function ClientDashboard() {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebarCollapsed');
-    // return stored ? stored === 'true' : false;
+    return stored ? stored === 'true' : false;
   });
   const navigate = useNavigate();
   const role = sessionStorage.getItem('role');
@@ -86,6 +86,13 @@ function ClientDashboard() {
       icon: <FileTextOutlined />,
       label: 'User Records',
       onClick: () => navigate('/UserRecords'),
+      hidden: role !== 'patient',
+    },
+    {
+      key: '9',
+      icon: <FileTextOutlined />,
+      label: 'Other Platforms',
+      onClick: () => navigate('/OtherPlatform'),
       hidden: role !== 'patient',
     },
   ];

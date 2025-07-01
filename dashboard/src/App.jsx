@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import UserDashboard from "./pages/UserFiling/UserDashboard";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import UserRecords from "./pages/UserPannel/UserRecords";
+import OtherPlatform from "./pages/UserPannel/OtherPlatform";
 // Admin imports
 import AdminDashboard from "./pages/AdminPannel/AdminDashboard";
 import ManageDentist from "./pages/AdminPannel/ManageDentist";
@@ -48,6 +49,7 @@ function App() {
         <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
         <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/login" />} />
         <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/login" />} />
+        <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform /> : <Navigate to="/login" />} />
 
         {/* Admin Panel */}
         <Route
