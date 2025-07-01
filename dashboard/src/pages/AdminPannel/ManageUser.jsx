@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ClientSidebar from "../UserPannel/ClientSidebar";
 import {
   Box, Button, Paper, Table, TableBody, TableCell, TableContainer,
@@ -35,6 +36,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
+
+// Content animation variants
+const contentVariants = {
+  initial: { opacity: 0, x: 20, y: 10 },
+  animate: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: -20, y: 10 }
+};
 
 export default function ManageUser() {
   const [users, setUsers] = useState([]);
@@ -89,9 +97,28 @@ export default function ManageUser() {
   return (
     <div className="ManageDentist-dashboard">
       <ClientSidebar />
-      <div className="ManageDentist-content">
-        <h1>Manage User Accounts</h1>
-        <div style={{ marginBottom: "40px" }}>
+      <motion.div 
+        className="ManageDentist-content"
+        variants={contentVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          Manage User Accounts
+        </motion.h1>
+        
+        <motion.div 
+          style={{ marginBottom: "40px" }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           <Button
             variant={roleFilter === "patient" ? "contained" : "outlined"}
             onClick={() => setRoleFilter("patient")}
@@ -112,8 +139,14 @@ export default function ManageUser() {
           >
             Show Dentists
           </Button>
-        </div>
-        <div className="ManageDentist-table">
+        </motion.div>
+        
+        <motion.div 
+          className="ManageDentist-table"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <TableContainer component={Paper}>
             <Table stickyHeader>
               <TableHead>
@@ -174,8 +207,8 @@ export default function ManageUser() {
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[]}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
       <ToastContainer
         position="top-right"
         autoClose={3000}
