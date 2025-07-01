@@ -6,6 +6,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import UserRecords from "./pages/UserPannel/UserRecords";
 import LandingPage from "./pages/UserFiling/landingPage";
+import UserDashboard from "./pages/UserPannel/UserDashboard";
+import OtherPlatform from "./pages/UserPannel/OtherPlatform";
 // Admin imports
 import AdminDashboard from "./pages/AdminPannel/AdminDashboard";
 import ManageDentist from "./pages/AdminPannel/ManageDentist";
@@ -154,7 +156,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
         } />
         
         {/* Redirect to landing if not found */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/LandingPage" />} />
       </Routes>
     </AnimatePresence>
   );
@@ -180,7 +182,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Landing page always visible at root */}
-        <Route path="/" element={<UserDashboard />} />
+        <Route path="/LandingPage" element={<LandingPage />} />
+        
         {/* Login and signup routes */}
         <Route path="/login" element={<LoginPage
         setIsAuthenticated={setIsAuthenticated}
@@ -188,18 +191,21 @@ function App() {
        />} />
         <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}/>
         {/* Authenticated routes */}
-        <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/login" />)}/>
-        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/login" />} />
-        <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/login" />} />
-        <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform /> : <Navigate to="/login" />} />
-
+        <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/LandingPage" />)}/>
+        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/LandingPage" />} />
+        <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/LandingPage" />} />
+        <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform /> : <Navigate to="/LandingPage" />} />
+        <Route
+          path="/UserDashboard"
+          element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/LandingPage" />}
+        />
         {/* Admin Panel */}
         <Route
           path="/AdminDashboard"
           element={
             isAuthenticated && (userRole === "staff" || userRole === "dentist")
               ? <AdminDashboard />
-              : <Navigate to="/login" />
+              : <Navigate to="/LandingPage" />
           }
         />
         <Route path="/ManageDentist" element={isAuthenticated && userRole === "dentist" ? <ManageDentist /> : <Navigate to="/login" />} />
@@ -208,7 +214,7 @@ function App() {
           element={
             isAuthenticated && (userRole === "dentist")
               ? <ManageStaff />
-              : <Navigate to="/login" />
+              : <Navigate to="/LandingPage" />
           }
         />
         <Route
@@ -216,7 +222,7 @@ function App() {
           element={
             isAuthenticated && (userRole === "dentist")
               ? <ManageUser />
-              : <Navigate to="/login" />
+              : <Navigate to="/LandingPage" />
           }
         />
         <Route
@@ -224,7 +230,7 @@ function App() {
           element={
             isAuthenticated && (userRole === "staff" || userRole === "dentist")
               ? <ManageRecord />
-              : <Navigate to="/login" />
+              : <Navigate to="/LandingPage" />
           }
         />
         <Route
@@ -232,11 +238,11 @@ function App() {
           element={
             isAuthenticated && (userRole === "staff" || userRole === "dentist")
               ? <ManageAppointment />
-              : <Navigate to="/login" />
+              : <Navigate to="/LandingPage" />
           }
         />
         {/* Redirect to landing if not found */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/LandingPage" />} />
       </Routes>
     </BrowserRouter>
   );

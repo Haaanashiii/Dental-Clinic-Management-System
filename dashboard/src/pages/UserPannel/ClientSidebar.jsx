@@ -47,7 +47,7 @@ function ClientDashboard() {
 
   const handleLogout = () => {
     sessionStorage.clear();
-    navigate('/login');
+    navigate('/LandingPage');
   };
 
   // Get current user info
