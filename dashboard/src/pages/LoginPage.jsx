@@ -34,13 +34,13 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     );
 
       if (response.data.message === "Login successful") {
-        const { authToken, role, userId, email } = response.data;
+        const { authToken, role, userId, email, username } = response.data;
 
         sessionStorage.setItem("authToken", authToken);
         sessionStorage.setItem("userId", userId);
         sessionStorage.setItem("email", email);
         sessionStorage.setItem("role", role);
-
+        sessionStorage.setItem("username", username); 
         setUserRole(role);
         setIsAuthenticated(true);
 

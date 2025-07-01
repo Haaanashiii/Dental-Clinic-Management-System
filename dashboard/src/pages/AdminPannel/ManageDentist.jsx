@@ -1,13 +1,22 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ClientSidebar from "../UserPannel/ClientSidebar";
 import {
   Box, Button, Modal, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TablePagination, TableRow, TextField,tableCellClasses 
+  TableContainer, TableHead, TablePagination, TableRow, TextField,
+  tableCellClasses, Typography, Card, CardContent, Chip, IconButton,
+  Fade, Backdrop, CircularProgress, Snackbar, Alert, Avatar,
+  Tooltip, useTheme, alpha
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 import "./ManageDentist.css";
 
@@ -34,12 +43,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%", left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400, bgcolor: "background.paper",
-  boxShadow: 24, p: 4,
+// Content animation variants
+const contentVariants = {
+  initial: { opacity: 0, x: 20, y: 10 },
+  animate: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: -20, y: 10 }
 };
 
 export default function ManageDentist() {
@@ -146,20 +154,46 @@ export default function ManageDentist() {
   return (
     <div className="ManageDentist-dashboard">
       <ClientSidebar />
-      <div className="ManageDentist-content">
-        <h1>Manage Dentist Users</h1>
-        <div className="BTNADD">
+      <motion.div 
+        className="ManageDentist-content"
+        variants={contentVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          Manage Dentist Users
+        </motion.h1>
+        
+        <motion.div 
+          className="BTNADD"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           <Button variant="contained" onClick={() => handleOpenModal()} sx={{ mb: 2 }}>
             Add Dentist
           </Button>
-        </div>
-        <div className="ManageDentist-table">
+        </motion.div>
+        
+        <motion.div 
+          className="ManageDentist-table"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <TableContainer component={Paper}>
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <StyledTableCell>Username</StyledTableCell>
                   <StyledTableCell>Email</StyledTableCell>
+                  <StyledTableCell>Specialization</StyledTableCell>
                   <StyledTableCell>Role</StyledTableCell>
                   <StyledTableCell align="center">Actions</StyledTableCell>
                 </TableRow>
@@ -169,6 +203,7 @@ export default function ManageDentist() {
                   <StyledTableRow key={user.userId}>
                     <StyledTableCell>{user.username}</StyledTableCell>
                     <StyledTableCell>{user.email}</StyledTableCell>
+                    <StyledTableCell>{user.specialization}</StyledTableCell>
                     <StyledTableCell>{user.role}</StyledTableCell>
                     <StyledTableCell align="center">
                       <EditIcon sx={{ cursor: "pointer" }} onClick={() => handleOpenModal(user)} />
@@ -187,40 +222,86 @@ export default function ManageDentist() {
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[]}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box sx={modalStyle}>
-          <h2>{isEditing ? "Edit Dentist" : "Add Dentist"}</h2>
-          <TextField
-            label="Username"
-            fullWidth
-            margin="dense"
-            value={userForm.username}
-            onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
-          />
-          <TextField
-            label="Email"
-            fullWidth
-            margin="dense"
-            value={userForm.email}
-            onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            margin="dense"
-            value={userForm.password}
-            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-          />
-          <Button variant="contained" onClick={handleSubmit}>
-            {isEditing ? "Save Changes" : "Add Dentist"}
-          </Button>
-          <Button variant="outlined" sx={{ ml: 1 }} onClick={handleCloseModal}>Cancel</Button>
-        </Box>
-      </Modal>
+      {/* Modal animations */}
+      <AnimatePresence>
+        {openModal && (
+          <Modal open={openModal} onClose={handleCloseModal}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Box className="professional-modal">
+                <div className="modal-header">
+                  <h2>{isEditing ? "Edit Dentist" : "Add New Dentist"}</h2>
+                </div>
+                
+                <div className="modal-body">
+                  <TextField
+                    label="Username"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.username}
+                    onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
+                    className="modal-text-field"
+                  />
+                  <TextField
+                    label="Email Address"
+                    type="email"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.email}
+                    onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                    className="modal-text-field"
+                  />
+                  <TextField
+                    label="Specialization"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.specialization}
+                    onChange={(e) => setUserForm({ ...userForm, specialization: e.target.value })}
+                    className="modal-text-field"
+                  />
+                  <TextField
+                    label={isEditing ? "New Password (leave blank to keep current)" : "Password"}
+                    type="password"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.password}
+                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                    helperText={isEditing ? "Only fill this if you want to change the password" : ""}
+                  />
+                </div>
+                
+                <div className="modal-footer">
+                  <Button 
+                    variant="outlined" 
+                    onClick={handleCloseModal}
+                    className="modal-cancel-btn"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    onClick={handleSubmit}
+                    className="modal-submit-btn"
+                  >
+                    {isEditing ? "Save Changes" : "Add Dentist"}
+                  </Button>
+                </div>
+              </Box>
+            </motion.div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
 import ClientSidebar from "../UserPannel/ClientSidebar";
 import { styled } from '@mui/material/styles';
 import {
@@ -8,6 +9,10 @@ import {
   TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
   Modal, Box, TextField, MenuItem
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import imageCompression from 'browser-image-compression';
@@ -46,6 +51,13 @@ const modalStyle = {
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
+};
+
+// Content animation variants
+const contentVariants = {
+  initial: { opacity: 0, x: 20, y: 10 },
+  animate: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: -20, y: 10 }
 };
 
 const diagnosisTreatmentMap = {
@@ -188,7 +200,7 @@ function ManageAppointment() {
     setRemark('');
     setImageFiles([]);
     if (role === 'staff') {
-      setDentistId(appointment.dentistId); // 👈 Important fix for staff
+      setDentistId(appointment.dentistId);
     }
     setOpenModal(true);
   };
@@ -205,7 +217,7 @@ function ManageAppointment() {
       const recordData = {
         appointmentId: selectedAppointment.appointmentId,
         patientId: selectedAppointment.patientId,
-        dentistId: selectedAppointment.dentistId || dentistId, // 👈 Ensures correct ID
+        dentistId: selectedAppointment.dentistId || dentistId,
         diagnosis,
         treatment,
         fine: fineAmount ? Number(fineAmount) : 0,
@@ -235,19 +247,48 @@ function ManageAppointment() {
   return (
     <div className="ManageAppointment-dashboard">
       <ClientSidebar />
-      <div className="ManageAppointment-content">
-        <h1>Manage Appointments</h1>
+      <motion.div 
+        className="ManageAppointment-content"
+        variants={contentVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          Manage Appointments
+        </motion.h1>
 
-        <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+        <motion.div 
+          style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           <Button variant={statusFilter === 'confirmed' ? 'contained' : 'outlined'} color="success" onClick={() => setStatusFilter('confirmed')}>Confirmed</Button>
           <Button variant={statusFilter === 'pending' ? 'contained' : 'outlined'} color="warning" onClick={() => setStatusFilter('pending')}>Pending</Button>
           <Button variant={statusFilter === 'cancelled' ? 'contained' : 'outlined'} color="error" onClick={() => setStatusFilter('cancelled')}>Cancelled</Button>
-        </div>
+        </motion.div>
 
         {loading ? (
-          <p>Loading appointments...</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            Loading appointments...
+          </motion.p>
         ) : (
-          <div className='ManageAppointment-table'>
+          <motion.div 
+            className='ManageAppointment-table'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
             <TableContainer component={Paper}>
               <Table stickyHeader>
                 <TableHead>
@@ -270,16 +311,76 @@ function ManageAppointment() {
                       <StyledTableCell>{appointment.status}</StyledTableCell>
                       <StyledTableCell>
                         {statusFilter === 'pending' && (
-                          <>
-                            <Button color="success" onClick={() => handleApproveAppointment(appointment.appointmentId)}>Approve</Button>
-                            <Button color="error" onClick={() => handleCancelAppointment(appointment.appointmentId)}>Cancel</Button>
-                          </>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <Button 
+                              variant="contained"
+                              size="small"
+                              startIcon={<CheckIcon />}
+                              sx={{
+                                backgroundColor: '#4caf50',
+                                color: 'white',
+                                minWidth: '100px',
+                                '&:hover': {
+                                  backgroundColor: '#45a049'
+                                }
+                              }}
+                              onClick={() => handleApproveAppointment(appointment.appointmentId)}
+                            >
+                              Approve
+                            </Button>
+                            <Button 
+                              variant="contained"
+                              size="small"
+                              startIcon={<CancelIcon />}
+                              sx={{
+                                backgroundColor: '#f44336',
+                                color: 'white',
+                                minWidth: '90px',
+                                '&:hover': {
+                                  backgroundColor: '#d32f2f'
+                                }
+                              }}
+                              onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
                         )}
                         {statusFilter === 'confirmed' && (
-                          <Button color="primary" onClick={() => handleReviewAppointment(appointment)}>Review</Button>
+                          <Button 
+                            variant="contained"
+                            size="small"
+                            startIcon={<RateReviewIcon />}
+                            sx={{
+                              backgroundColor: '#2196f3',
+                              color: 'white',
+                              minWidth: '100px',
+                              '&:hover': {
+                                backgroundColor: '#1976d2'
+                              }
+                            }}
+                            onClick={() => handleReviewAppointment(appointment)}
+                          >
+                            Review
+                          </Button>
                         )}
                         {statusFilter === 'cancelled' && (
-                          <Button color="error" onClick={() => handleDeleteAppointment(appointment.appointmentId)}>Delete</Button>
+                          <Button 
+                            variant="contained"
+                            size="small"
+                            startIcon={<DeleteIcon />}
+                            sx={{
+                              backgroundColor: '#f44336',
+                              color: 'white',
+                              minWidth: '90px',
+                              '&:hover': {
+                                backgroundColor: '#d32f2f'
+                              }
+                            }}
+                            onClick={() => handleDeleteAppointment(appointment.appointmentId)}
+                          >
+                            Delete
+                          </Button>
                         )}
                       </StyledTableCell>
                     </StyledTableRow>
@@ -295,77 +396,112 @@ function ManageAppointment() {
               onPageChange={handleChangePage}
               rowsPerPageOptions={[]}
             />
-          </div>
+          </motion.div>
         )}
 
-        <Modal open={openModal} onClose={() => setOpenModal(false)}>
-          <Box sx={modalStyle}>
-            <h2>Review Appointment</h2>
-            <TextField
-              select
-              label="Diagnosis"
-              fullWidth
-              margin="normal"
-              value={diagnosis}
-              onChange={(e) => {
-                setDiagnosis(e.target.value);
-                setTreatment('');
-              }}
-            >
-              {Object.keys(diagnosisTreatmentMap).map((option, index) => (
-                <MenuItem key={index} value={option}>{option}</MenuItem>
-              ))}
-            </TextField>
+        {/* Modal animations */}
+        <AnimatePresence>
+          {openModal && (
+            <Modal open={openModal} onClose={() => setOpenModal(false)}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Box sx={modalStyle}>
+                  <div className="modal-header">
+                    <h2>Review Appointment</h2>
+                  </div>
+                  
+                  <div className="modal-body">
+                    <TextField
+                      select
+                      label="Diagnosis"
+                      fullWidth
+                      margin="normal"
+                      value={diagnosis}
+                      onChange={(e) => {
+                        setDiagnosis(e.target.value);
+                        setTreatment('');
+                      }}
+                      className="modal-text-field"
+                    >
+                      {Object.keys(diagnosisTreatmentMap).map((option, index) => (
+                        <MenuItem key={index} value={option}>{option}</MenuItem>
+                      ))}
+                    </TextField>
 
-            <TextField
-              select
-              label="Treatment"
-              fullWidth
-              margin="normal"
-              value={treatment}
-              onChange={(e) => setTreatment(e.target.value)}
-              disabled={!diagnosis}
-            >
-              {diagnosis && diagnosisTreatmentMap[diagnosis]?.map((option, index) => (
-                <MenuItem key={index} value={option}>{option}</MenuItem>
-              ))}
-            </TextField>
+                    <TextField
+                      select
+                      label="Treatment"
+                      fullWidth
+                      margin="normal"
+                      value={treatment}
+                      onChange={(e) => setTreatment(e.target.value)}
+                      disabled={!diagnosis}
+                      className="modal-text-field"
+                    >
+                      {diagnosis && diagnosisTreatmentMap[diagnosis]?.map((option, index) => (
+                        <MenuItem key={index} value={option}>{option}</MenuItem>
+                      ))}
+                    </TextField>
 
-            <TextField
-              label="Fine (₱)"
-              type="number"
-              fullWidth
-              margin="normal"
-              value={fineAmount}
-              onChange={(e) => setFineAmount(e.target.value)}
-              inputProps={{ min: 0 }}
-            />
+                    <TextField
+                      label="Fine (₱)"
+                      type="number"
+                      fullWidth
+                      margin="normal"
+                      value={fineAmount}
+                      onChange={(e) => setFineAmount(e.target.value)}
+                      inputProps={{ min: 0 }}
+                      className="modal-text-field"
+                    />
 
-            <TextField
-              label="Remark"
-              multiline
-              rows={3}
-              fullWidth
-              margin="normal"
-              value={remark}
-              onChange={(e) => setRemark(e.target.value)}
-              placeholder="Add any notes or summary here..."
-            />
+                    <TextField
+                      label="Remark"
+                      multiline
+                      rows={3}
+                      fullWidth
+                      margin="normal"
+                      value={remark}
+                      onChange={(e) => setRemark(e.target.value)}
+                      placeholder="Add any notes or summary here..."
+                      className="modal-text-field"
+                    />
 
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => setImageFiles(Array.from(e.target.files))}
-              style={{ marginTop: '1rem' }}
-            />
-
-            <Button variant="contained" color="primary" onClick={handleSubmitRecord} sx={{ mt: 2 }}>
-              Submit Record
-            </Button>
-          </Box>
-        </Modal>
-      </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => setImageFiles(Array.from(e.target.files))}
+                      style={{ marginTop: '1rem' }}
+                    />
+                  </div>
+                  
+                  <div className="modal-footer">
+                    <Button 
+                      variant="outlined" 
+                      onClick={() => setOpenModal(false)}
+                      className="modal-cancel-btn"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      onClick={handleSubmitRecord}
+                      className="modal-submit-btn"
+                    >
+                      Submit Record
+                    </Button>
+                  </div>
+                </Box>
+              </motion.div>
+            </Modal>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

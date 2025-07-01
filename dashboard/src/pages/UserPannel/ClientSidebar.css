@@ -19,8 +19,9 @@
 
 .ClientSidebar .ant-menu-item:hover,
 .ClientSidebar .ant-menu-item-active {
-  background-color: #16363f !important;
-  color: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #1C444D !important;
+  font-weight: bold;
 }
 
 .ClientSidebar .ant-menu-item-selected {
@@ -53,6 +54,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
+  margin-top:16px;
 }
 
 /* If you want to add a divider between logo and menu */
@@ -96,11 +98,45 @@
 }
 
 .logout-button:hover {
-  background-color: #16363f !important;
+  background-color:  #8d021f!important;
+  color: #ffffff;
+  font-weight: bold;
 }
 
 /* Style for the ant layout sider trigger button */
 .ClientSidebar .ant-layout-sider-trigger {
   background-color: #16363f;
   color: #ffffff;
+}
+
+/* User info container */
+.user-info-container {
+  background-color: #ffffff;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  text-align: center;
+}
+
+.username {
+  font-weight: bold;
+  color: #1C444D;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.user-role {
+  color: #666;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+/* Adjust logout button container spacing */
+.logout-button-container {
+  padding: 16px;
+  margin-bottom: 48px;
 }
