@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button } from 'antd';
 import {
@@ -14,19 +14,24 @@ import './ClientSidebar.css';
 const { Sider } = Layout;
 
 function ClientDashboard() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    const stored = localStorage.getItem('sidebarCollapsed');
+    // return stored ? stored === 'true' : false;
+  });
   const navigate = useNavigate();
   const role = sessionStorage.getItem('role');
+  
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', collapsed);
+  }, [collapsed]);
 
+  
   const handleLogout = () => {
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('email');
-    sessionStorage.removeItem('role');
+    sessionStorage.clear();
     navigate('/login');
   };
 
-  // Remove the logout from regular menu items
+ 
   const items = [
     {
       key: '1',
