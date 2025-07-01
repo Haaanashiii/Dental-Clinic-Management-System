@@ -37,7 +37,7 @@ exports.createAppointment = async (req, res) => {
       readableDateTime = dateObj.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
     } catch (e) {  }
 
-    // Send notification email to admin/yourself
+    //email==-
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -50,7 +50,8 @@ exports.createAppointment = async (req, res) => {
       from: 'alipintester1234@gmail.com',
       to: 'alipintester1234@gmail.com',
       subject: 'New Appointment Created',
-      text: `A new appointment has been created.\n\nPatient: ${patientName}\nDentist: ${dentistName}\nDate & Time: ${readableDateTime}\nStatus: ${status}`,
+      text: `A new appointment has been created.\n\nPatient:
+       ${patientName}\nDentist: ${dentistName}\nDate & Time: ${readableDateTime}\nStatus: ${status}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
