@@ -1,0 +1,17 @@
+.mint-navbar-btn {
+  color: #000 !important;
+  font-weight: 500;
+  text-transform: none;
+  font-size: 0.95rem;
+  padding-left: 8px;
+  padding-right: 8px;
+  min-width: 0;
+  background: transparent;
+  transition: color 0.2s;
+  border-radius: 0;
+  box-shadow: none;
+}
+.mint-navbar-btn:hover, .mint-navbar-btn:focus {
+  color: #fff !important;
+  background: transparent !important;
+}

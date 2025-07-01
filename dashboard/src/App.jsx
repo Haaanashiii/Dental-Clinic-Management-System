@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // User imports
-import UserDashboard from "./pages/UserFiling/UserDashboard";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import UserRecords from "./pages/UserPannel/UserRecords";
+import LandingPage from "./pages/UserFiling/landingPage";
 // Admin imports
 import AdminDashboard from "./pages/AdminPannel/AdminDashboard";
 import ManageDentist from "./pages/AdminPannel/ManageDentist";
@@ -37,7 +37,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Landing page always visible at root */}
-        <Route path="/" element={<UserDashboard />} />
+        <Route path="/" element={<LandingPage />} />
         {/* Login and signup routes */}
         <Route path="/login" element={<LoginPage
         setIsAuthenticated={setIsAuthenticated}
