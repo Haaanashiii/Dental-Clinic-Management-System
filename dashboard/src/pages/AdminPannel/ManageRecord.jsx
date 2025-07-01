@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
 import ClientSidebar from "../UserPannel/ClientSidebar";
 import {
   Typography, Stack, Button, TextField,
@@ -23,6 +24,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// Content animation variants
+const contentVariants = {
+  initial: { opacity: 0, x: 20, y: 10 },
+  animate: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: -20, y: 10 }
+};
+
 function ManageRecord() {
   const [records, setRecords] = useState([]);
   const [filterStatus, setFilterStatus] = useState("");
@@ -30,7 +38,6 @@ function ManageRecord() {
   const [searchDentist, setSearchDentist] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [zoomImage, setZoomImage] = useState(null);
-  // Add a new state to control the record details modal
   const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
@@ -109,13 +116,11 @@ function ManageRecord() {
 
   const paginatedRecords = filteredRecords.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  // Add a function to handle record selection and modal opening
   const handleRecordSelect = (record) => {
     setSelectedRecord(record);
     setRecordModalOpen(true);
   };
 
-  // Add a function to close the record details modal
   const handleCloseRecordModal = () => {
     setRecordModalOpen(false);
   };
@@ -123,322 +128,419 @@ function ManageRecord() {
   return (
     <div className="ManageRecord-dashboard">
       <ClientSidebar />
-      <div className='RecordContent'>
-        <div className='RecordTableList'>
-          <h1>Record List</h1>
-          <Stack direction="row" spacing={2} mb={2}>
-            <Button variant={filterStatus === "paid" ? "contained" : "outlined"} onClick={() => setFilterStatus("paid")}>Paid</Button>
-            <Button variant={filterStatus === "unpaid" ? "contained" : "outlined"} onClick={() => setFilterStatus("unpaid")}>Unpaid</Button>
-            <Button variant={filterStatus === "" ? "contained" : "outlined"} onClick={() => setFilterStatus("")}>All</Button>
-          </Stack>
-
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={6}>
-              <TextField label="Search by patient name" fullWidth value={searchPatient} onChange={handleSearchPatient} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField label="Search by dentist name" fullWidth value={searchDentist} onChange={handleSearchDentist} />
-            </Grid>
-          </Grid>
-
-          <TableContainer component={Paper}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Patient</StyledTableCell>
-                  <StyledTableCell>Dentist</StyledTableCell>
-                  <StyledTableCell>Treatment</StyledTableCell>
-                  <StyledTableCell>Diagnosis</StyledTableCell>
-                  <StyledTableCell>Fine</StyledTableCell>
-                  <StyledTableCell>Visit Date</StyledTableCell>
-                  <StyledTableCell>Status</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedRecords.length > 0 ? paginatedRecords.map((record) => (
-                  <StyledTableRow 
-                    key={record._id} 
-                    onClick={() => handleRecordSelect(record)} 
-                    className="ClickableRow"
-                  >
-                    <TableCell>{record.patientName}</TableCell>
-                    <TableCell>{record.dentistName}</TableCell>
-                    <TableCell>{record.treatment}</TableCell>
-                    <TableCell>{record.diagnosis}</TableCell>
-                    <TableCell>{parseFloat(record.fine?.$numberDecimal ?? 0).toFixed(2)}</TableCell>
-                    <TableCell>{new Date(record.visitDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{record.fineStatus}</TableCell>
-                  </StyledTableRow>
-                )) : (
-                  <TableRow>
-                    <TableCell colSpan={7} align="center">No records found.</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <TablePagination
-            component="div"
-            count={filteredRecords.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[]}
-          />
-        </div>
-      </div>
-
-      {/* Record Details Modal */}
-      <Modal 
-        open={recordModalOpen} 
-        onClose={handleCloseRecordModal}
-        aria-labelledby="record-details-modal"
+      <motion.div 
+        className='RecordContent'
+        variants={contentVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        <Box 
-          className="RecordModalContent"
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 700,
-            maxWidth: '95vw',
-            maxHeight: '90vh',
-            bgcolor: 'background.paper',
-            borderRadius: 3,
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-            overflow: 'hidden'
-          }}
+        <motion.div 
+          className='RecordTableList'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
-          {selectedRecord ? (
-            <div>
+          <motion.h1
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            Record List
+          </motion.h1>
 
-              <Box sx={{ 
-                bgcolor: '#1c444d', 
-                color: 'white', 
-                p: 3,
-                borderBottom: '1px solid #e0e0e0'
-              }}>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  Medical Record Details
-                </Typography>
-              </Box>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <Stack direction="row" spacing={2} mb={2}>
+              <Button variant={filterStatus === "paid" ? "contained" : "outlined"} onClick={() => setFilterStatus("paid")}>Paid</Button>
+              <Button variant={filterStatus === "unpaid" ? "contained" : "outlined"} onClick={() => setFilterStatus("unpaid")}>Unpaid</Button>
+              <Button variant={filterStatus === "" ? "contained" : "outlined"} onClick={() => setFilterStatus("")}>All</Button>
+            </Stack>
+          </motion.div>
 
-              <Box sx={{ p: 3, maxHeight: '60vh', overflow: 'auto' }}>
-                {/* Patient & Dentist Info */}
-                <Grid container spacing={3} sx={{ mb: 3 }}>
-                  <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                      <Typography variant="h6" color="#1c444d" gutterBottom>
-                        Patient Information
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {selectedRecord.patientName}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                      <Typography variant="h6" color="#1c444d" gutterBottom>
-                        Attending Dentist
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {selectedRecord.dentistName}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                </Grid>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+          >
+            <Grid container spacing={2} mb={2}>
+              <Grid item xs={6}>
+                <TextField label="Search by patient name" fullWidth value={searchPatient} onChange={handleSearchPatient} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField label="Search by dentist name" fullWidth value={searchDentist} onChange={handleSearchDentist} />
+              </Grid>
+            </Grid>
+          </motion.div>
 
-                <Paper sx={{ p: 3, mb: 3, border: '1px solid #e9ecef' }}>
-                  <Typography variant="h6" color="#1c444d" gutterBottom sx={{ mb: 2 }}>
-                    Medical Details
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                          TREATMENT
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
-                          {selectedRecord.treatment}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                          DIAGNOSIS
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
-                          {selectedRecord.diagnosis}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                          VISIT DATE
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
-                          {new Date(selectedRecord.visitDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                          STATUS
-                        </Typography>
-                        <Box sx={{ mt: 0.5 }}>
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              display: 'inline-block',
-                              px: 2, 
-                              py: 0.5, 
-                              borderRadius: 1,
-                              fontWeight: 500,
-                              bgcolor: selectedRecord.fineStatus === 'paid' ? '#e8f5e8' : '#fff3cd',
-                              color: selectedRecord.fineStatus === 'paid' ? '#2e7d32' : '#856404',
-                              textTransform: 'uppercase',
-                              fontSize: '0.75rem'
-                            }}
-                          >
-                            {selectedRecord.fineStatus}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Paper>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+          >
+            <TableContainer component={Paper}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Patient</StyledTableCell>
+                    <StyledTableCell>Dentist</StyledTableCell>
+                    <StyledTableCell>Treatment</StyledTableCell>
+                    <StyledTableCell>Diagnosis</StyledTableCell>
+                    <StyledTableCell>Fine</StyledTableCell>
+                    <StyledTableCell>Visit Date</StyledTableCell>
+                    <StyledTableCell>Status</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedRecords.length > 0 ? paginatedRecords.map((record, index) => (
+                    <motion.tr
+                      key={record._id}
+                      component={StyledTableRow}
+                      onClick={() => handleRecordSelect(record)}
+                      className="ClickableRow"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      whileHover={{ scale: 1.01 }}
+                    >
+                      <TableCell>{record.patientName}</TableCell>
+                      <TableCell>{record.dentistName}</TableCell>
+                      <TableCell>{record.treatment}</TableCell>
+                      <TableCell>{record.diagnosis}</TableCell>
+                      <TableCell>{parseFloat(record.fine?.$numberDecimal ?? 0).toFixed(2)}</TableCell>
+                      <TableCell>{new Date(record.visitDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{record.fineStatus}</TableCell>
+                    </motion.tr>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">No records found.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                <Paper sx={{ p: 3, mb: 3, border: '1px solid #e9ecef' }}>
-                  <Typography variant="h6" color="#1c444d" gutterBottom>
-                    Financial Information
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      AMOUNT:
-                    </Typography>
-                    <Typography variant="h6" color="#1c444d" sx={{ fontWeight: 600 }}>
-                      ₱{parseFloat(selectedRecord.fine?.$numberDecimal ?? 0).toFixed(2)}
-                    </Typography>
-                  </Box>
-                </Paper>
+            <TablePagination
+              component="div"
+              count={filteredRecords.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[]}
+            />
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
-
-                {selectedRecord.images?.length > 0 && (
-                  <Paper sx={{ p: 3, border: '1px solid #e9ecef' }}>
-                    <Typography variant="h6" color="#1c444d" gutterBottom sx={{ mb: 2 }}>
-                      Medical Images ({selectedRecord.images.length})
-                    </Typography>
+      {/* Record Details Modal with animations */}
+      <AnimatePresence>
+        {recordModalOpen && (
+          <Modal 
+            open={recordModalOpen} 
+            onClose={handleCloseRecordModal}
+            aria-labelledby="record-details-modal"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Box 
+                className="RecordModalContent"
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 700,
+                  maxWidth: '95vw',
+                  maxHeight: '90vh',
+                  bgcolor: 'background.paper',
+                  borderRadius: 3,
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                  overflow: 'hidden'
+                }}
+              >
+                {selectedRecord ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                  >
                     <Box sx={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', 
-                      gap: 2 
+                      bgcolor: '#1c444d', 
+                      color: 'white', 
+                      p: 3,
+                      borderBottom: '1px solid #e0e0e0'
                     }}>
-                      {selectedRecord.images.map((img, i) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            position: 'relative',
-                            cursor: 'pointer',
-                            borderRadius: 2,
-                            overflow: 'hidden',
-                            border: '2px solid #e0e0e0',
-                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                      <Typography variant="h4" fontWeight="bold" gutterBottom>
+                        Medical Record Details
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ p: 3, maxHeight: '60vh', overflow: 'auto' }}>
+                      {/* Patient & Dentist Info */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                      >
+                        <Grid container spacing={3} sx={{ mb: 3 }}>
+                          <Grid item xs={12} md={6}>
+                            <Paper sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                              <Typography variant="h6" color="#1c444d" gutterBottom>
+                                Patient Information
+                              </Typography>
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                {selectedRecord.patientName}
+                              </Typography>
+                            </Paper>
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Paper sx={{ p: 2, bgcolor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                              <Typography variant="h6" color="#1c444d" gutterBottom>
+                                Attending Dentist
+                              </Typography>
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                {selectedRecord.dentistName}
+                              </Typography>
+                            </Paper>
+                          </Grid>
+                        </Grid>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                      >
+                        <Paper sx={{ p: 3, mb: 3, border: '1px solid #e9ecef' }}>
+                          <Typography variant="h6" color="#1c444d" gutterBottom sx={{ mb: 2 }}>
+                            Medical Details
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                              <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                  TREATMENT
+                                </Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
+                                  {selectedRecord.treatment}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                  DIAGNOSIS
+                                </Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
+                                  {selectedRecord.diagnosis}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                  VISIT DATE
+                                </Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
+                                  {new Date(selectedRecord.visitDate).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  })}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                  STATUS
+                                </Typography>
+                                <Box sx={{ mt: 0.5 }}>
+                                  <Typography 
+                                    variant="body2" 
+                                    sx={{ 
+                                      display: 'inline-block',
+                                      px: 2, 
+                                      py: 0.5, 
+                                      borderRadius: 1,
+                                      fontWeight: 500,
+                                      bgcolor: selectedRecord.fineStatus === 'paid' ? '#e8f5e8' : '#fff3cd',
+                                      color: selectedRecord.fineStatus === 'paid' ? '#2e7d32' : '#856404',
+                                      textTransform: 'uppercase',
+                                      fontSize: '0.75rem'
+                                    }}
+                                  >
+                                    {selectedRecord.fineStatus}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.4 }}
+                      >
+                        <Paper sx={{ p: 3, mb: 3, border: '1px solid #e9ecef' }}>
+                          <Typography variant="h6" color="#1c444d" gutterBottom>
+                            Financial Information
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="subtitle2" color="text.secondary">
+                              AMOUNT:
+                            </Typography>
+                            <Typography variant="h6" color="#1c444d" sx={{ fontWeight: 600 }}>
+                              ₱{parseFloat(selectedRecord.fine?.$numberDecimal ?? 0).toFixed(2)}
+                            </Typography>
+                          </Box>
+                        </Paper>
+                      </motion.div>
+
+                      {selectedRecord.images?.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.5 }}
+                        >
+                          <Paper sx={{ p: 3, border: '1px solid #e9ecef' }}>
+                            <Typography variant="h6" color="#1c444d" gutterBottom sx={{ mb: 2 }}>
+                              Medical Images ({selectedRecord.images.length})
+                            </Typography>
+                            <Box sx={{ 
+                              display: 'grid', 
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', 
+                              gap: 2 
+                            }}>
+                              {selectedRecord.images.map((img, i) => (
+                                <motion.div
+                                  key={i}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.2, delay: i * 0.1 }}
+                                  whileHover={{ scale: 1.05 }}
+                                >
+                                  <Box
+                                    sx={{
+                                      position: 'relative',
+                                      cursor: 'pointer',
+                                      borderRadius: 2,
+                                      overflow: 'hidden',
+                                      border: '2px solid #e0e0e0',
+                                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                      '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                                      }
+                                    }}
+                                    onClick={() => setZoomImage(img)}
+                                  >
+                                    <img
+                                      src={img}
+                                      alt={`Medical record ${i + 1}`}
+                                      style={{ 
+                                        width: '100%', 
+                                        height: '120px', 
+                                        objectFit: 'cover',
+                                        display: 'block'
+                                      }}
+                                    />
+                                  </Box>
+                                </motion.div>
+                              ))}
+                            </Box>
+                          </Paper>
+                        </motion.div>
+                      )}
+                    </Box>
+
+                    <Box sx={{ 
+                      p: 3, 
+                      borderTop: '1px solid #e0e0e0',
+                      bgcolor: '#f8f9fa',
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      gap: 2
+                    }}>
+                      <Button 
+                        variant="outlined"
+                        onClick={handleCloseRecordModal}
+                        sx={{ 
+                          minWidth: 100,
+                          color: '#6c757d',
+                          borderColor: '#6c757d',
+                          '&:hover': {
+                            borderColor: '#5a6268',
+                            bgcolor: 'transparent'
+                          }
+                        }}
+                      >
+                        Close
+                      </Button>
+                      {selectedRecord.fineStatus === "unpaid" && (
+                        <Button 
+                          variant="contained" 
+                          onClick={() => {
+                            markAsPaid(selectedRecord._id);
+                            handleCloseRecordModal();
+                          }}
+                          sx={{ 
+                            minWidth: 120,
+                            bgcolor: '#28a745',
                             '&:hover': {
-                              transform: 'scale(1.05)',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                              bgcolor: '#218838'
                             }
                           }}
-                          onClick={() => setZoomImage(img)}
                         >
-                          <img
-                            src={img}
-                            alt={`Medical record ${i + 1}`}
-                            style={{ 
-                              width: '100%', 
-                              height: '120px', 
-                              objectFit: 'cover',
-                              display: 'block'
-                            }}
-                          />
-                        </Box>
-                      ))}
+                          Mark as Paid
+                        </Button>
+                      )}
                     </Box>
-                  </Paper>
+                  </motion.div>
+                ) : (
+                  <Box sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="body1" color="text.secondary">
+                      No record selected
+                    </Typography>
+                  </Box>
                 )}
               </Box>
+            </motion.div>
+          </Modal>
+        )}
+      </AnimatePresence>
 
-              <Box sx={{ 
-                p: 3, 
-                borderTop: '1px solid #e0e0e0',
-                bgcolor: '#f8f9fa',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: 2
+      {/* Image Zoom Modal with animations */}
+      <AnimatePresence>
+        {zoomImage && (
+          <Modal open={!!zoomImage} onClose={() => setZoomImage(null)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Box sx={{
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)', bgcolor: 'background.paper',
+                boxShadow: 24, p: 2, borderRadius: 2
               }}>
-                <Button 
-                  variant="outlined"
-                  onClick={handleCloseRecordModal}
-                  sx={{ 
-                    minWidth: 100,
-                    color: '#6c757d',
-                    borderColor: '#6c757d',
-                    '&:hover': {
-                      borderColor: '#5a6268',
-                      bgcolor: 'transparent'
-                    }
-                  }}
-                >
-                  Close
-                </Button>
-                {selectedRecord.fineStatus === "unpaid" && (
-                  <Button 
-                    variant="contained" 
-                    onClick={() => {
-                      markAsPaid(selectedRecord._id);
-                      handleCloseRecordModal();
-                    }}
-                    sx={{ 
-                      minWidth: 120,
-                      bgcolor: '#28a745',
-                      '&:hover': {
-                        bgcolor: '#218838'
-                      }
-                    }}
-                  >
-                    Mark as Paid
-                  </Button>
-                )}
+                <img src={zoomImage} alt="Zoomed" style={{ maxWidth: '100%', maxHeight: '80vh' }} />
               </Box>
-            </div>
-          ) : (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.secondary">
-                No record selected
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Modal>
-
-      {/* Image Zoom Modal - keep this one */}
-      <Modal open={!!zoomImage} onClose={() => setZoomImage(null)}>
-        <Box sx={{
-          position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)', bgcolor: 'background.paper',
-          boxShadow: 24, p: 2, borderRadius: 2
-        }}>
-          <img src={zoomImage} alt="Zoomed" style={{ maxWidth: '100%', maxHeight: '80vh' }} />
-        </Box>
-      </Modal>
+            </motion.div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
