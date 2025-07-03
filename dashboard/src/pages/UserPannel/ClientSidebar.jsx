@@ -129,7 +129,7 @@ function ClientDashboard() {
       icon: <FileTextOutlined />,
       label: 'Other Platforms',
       onClick: () => navigate('/OtherPlatform'),
-      hidden: role !== 'patient',
+      hidden: role !== 'patient' && role !== 'staff' && role !== 'dentist',
     },
   ];
 
