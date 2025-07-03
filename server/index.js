@@ -14,6 +14,7 @@ const recordRoute = require("./routes/recordRoute.js");
 const appointmentRoute = require("./routes/appointmentRoute.js");
 const UserRegistrationAndValidation = require("./routes/UserRegistrationAndValidationRoute.js");
 const patientRoute = require("./routes/patientRoute.js");
+const otpRoute = require("./routes/otpRoute.js");
 
 const connectDB = require("./config/connection.js");
 
@@ -35,6 +36,7 @@ app.use("/patient", patientRoute);
 app.use("/appointment", appointmentRoute);
 app.use("/record", recordRoute);
 app.use("/auth", UserRegistrationAndValidation);
+app.use("/otp", otpRoute);
 
 // Error handler
 app.use(errorHandler);
@@ -61,4 +63,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`    Local:    http://localhost:${PORT}`);
   console.log(`    Network:  http://${IP}:${PORT}`);
 });
-  

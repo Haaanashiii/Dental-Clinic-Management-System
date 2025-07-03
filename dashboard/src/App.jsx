@@ -49,8 +49,6 @@ const AnimatedContent = ({ children, hasSidebar = false }) => {
     );
   }
   
-  // For pages with sidebar, don't animate the whole page
-  // The individual page components should handle content animation
   return children;
 };
 
@@ -155,6 +153,11 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
           ) : <Navigate to="/login" />
         } />
         
+        <Route path="/LandingPage" element={
+            <AnimatedContent hasSidebar={true}>
+              <LandingPage />
+            </AnimatedContent>
+        } />
         {/* Redirect to landing if not found */}
         <Route path="*" element={<Navigate to="/LandingPage" />} />
       </Routes>
@@ -181,9 +184,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Landing page always visible at root */}
+        {/* Home page (user dashboard) always visible at root */}
+        <Route path="/" element={<UserDashboard />} />
         <Route path="/LandingPage" element={<LandingPage />} />
-        
         {/* Login and signup routes */}
         <Route path="/login" element={<LoginPage
         setIsAuthenticated={setIsAuthenticated}
@@ -195,10 +198,6 @@ function App() {
         <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/LandingPage" />} />
         <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/LandingPage" />} />
         <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform /> : <Navigate to="/LandingPage" />} />
-        <Route
-          path="/UserDashboard"
-          element={isAuthenticated && userRole === "patient" ? <UserDashboard /> : <Navigate to="/LandingPage" />}
-        />
         {/* Admin Panel */}
         <Route
           path="/AdminDashboard"

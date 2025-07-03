@@ -35,6 +35,7 @@ function ClientDashboard() {
     if (path.includes('ManageAppointment')) return '6';
     if (path.includes('ManageRecord')) return '7';
     if (path.includes('UserRecords')) return '8';
+    if (path.includes('OtherPlatform')) return '9';
 
     return '';
   };
