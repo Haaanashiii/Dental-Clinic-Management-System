@@ -43,12 +43,12 @@ exports.requestOtp = async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'alipintester1234@gmail.com',
-      pass: 'bqac gxeo igjq dyve',
+      user: 'alipintester1245@gmail.com',
+      pass: 'knrq hevi pszd hofd',
     },
   });
   await transporter.sendMail({
-    from: 'alipintester1234@gmail.com',
+    from: 'alipintester1245@gmail.com',
     to: email,
     subject: 'Your OTP for Password Reset',
     text: `Your OTP is: ${otp}. It will expire in 5 minutes.`,

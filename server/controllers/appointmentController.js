@@ -41,14 +41,14 @@ exports.createAppointment = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'alipintester1234@gmail.com',
-        pass: 'bqac gxeo igjq dyve',
+        user: 'alipintester1245@gmail.com',
+        pass: 'knrq hevi pszd hofd',
       },
     });
 
     const mailOptions = {
-      from: 'alipintester1234@gmail.com',
-      to: 'alipintester1234@gmail.com',
+      from: 'alipintester1245@gmail.com',
+      to: 'alipintester1245@gmail.com',
       subject: 'New Appointment Created',
       text: `A new appointment has been created.\n\nPatient:
        ${patientName}\nDentist: ${dentistName}\nDate & Time: ${readableDateTime}\nStatus: ${status}`,
@@ -214,8 +214,8 @@ exports.confirmAppointment = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'alipintester1234@gmail.com',
-        pass: 'bqac gxeo igjq dyve',   
+        user: 'alipintester1245@gmail.com',
+        pass: 'knrq hevi pszd hofd',   
       },
     });
 
@@ -240,7 +240,7 @@ exports.confirmAppointment = async (req, res) => {
     } catch (e) { /* fallback to raw */ }
 
     const mailOptions = {
-      from: 'alipintester1234@gmail.com', // your Gmail address
+      from: 'alipintester1245@gmail.com', // your Gmail address
       to: user.email,
       subject: 'Appointment Confirmed',
       text: `Dear ${patient.name || 'Patient'},\n\nYour appointment has been confirmed for ${formattedDateTime}.\n\nThank you!`,
