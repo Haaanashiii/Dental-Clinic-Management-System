@@ -7,7 +7,6 @@ const os = require("os");
 
 const errorHandler = require("./middleware/errorHandler.js");
 
-const userRoute = require("./routes/userRoute.js");
 const dentistRoute = require("./routes/dentistRoute.js");
 const staffRoute = require("./routes/staffRoute.js");
 const recordRoute = require("./routes/recordRoute.js");
@@ -29,7 +28,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 connectDB();
 
 // Mount routes
-app.use("/user", userRoute);
 app.use("/dentist", dentistRoute);
 app.use("/staff", staffRoute);
 app.use("/patient", patientRoute);

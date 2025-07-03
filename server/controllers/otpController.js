@@ -83,3 +83,13 @@ exports.verifyOtp = async (req, res) => {
   delete otpStore[key];
   res.json({ message: "Password reset successful" });
 };
+
+// Check if new password is same as old password
+exports.checkPassword = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ message: "Email and password required" });
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const isSame = await bcrypt.compare(password, user.password);
+  res.json({ isSame });
+};

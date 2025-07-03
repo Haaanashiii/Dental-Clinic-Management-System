@@ -15,6 +15,7 @@ import "./LoginPage.css";
 
 const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
   const [userForm, setUserForm] = useState({
+    name: "",
     username: "",
     email: "",
     password: "",
@@ -45,6 +46,15 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
       <div className="LoginContent">
         <h2>Sign Up</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <TextField
+          label="Name"
+          variant="outlined"
+          fullWidth
+          margin="dense"
+          value={userForm.name}
+          onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+        />
 
         <TextField
           label="Username"

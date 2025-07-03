@@ -7,9 +7,9 @@ const User = require("../models/user.models.js");
 // Register a new user
 exports.registerUser = async (req, res) => {
   try {
-    const { email, username, password, role } = req.body;
+    const { email,name, username, password, role } = req.body;
 
-    if (!email || !username || !password || !role) {
+    if (!email || !name || !username || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -28,6 +28,7 @@ exports.registerUser = async (req, res) => {
     // Create new user with hashed password
     const newUser = new User({
       userId: uuidv4(),
+      name: name.trim(),
       email: email.toLowerCase().trim(),
       username: username.trim(),
       password: hashedPassword,  
@@ -91,6 +92,7 @@ exports.loginUser = async (req, res) => {
       role: user.role,
       userId: user.userId,
       email: user.email,
+      name: user.name,
       username: user.username 
     };
 
@@ -103,7 +105,7 @@ exports.loginUser = async (req, res) => {
 
 // Edit user
 exports.editUser = async (req, res) => {
-  const { userId, username, role, password } = req.body;
+  const { userId, name, username, role, password } = req.body;
 
   try {
     const user = await User.findOne({ userId });
@@ -113,14 +115,15 @@ exports.editUser = async (req, res) => {
     }
 
     // Update user fields if provided
+    if (name && name !== user.name) {
+      user.name = name;
+    }
     if (username && username !== user.username) {
       user.username = username;
     }
-
     if (role && role !== user.role) {
       user.role = role;
     }
-
     if (password) {
       user.password = await bcrypt.hash(password, 10); // Hash the new password
     }
@@ -205,6 +208,29 @@ exports.changeStatusUser = async (req, res) => {
     }
     user.status = status;
     await user.save();
+
+    // Auto-create profile on approval
+    if (status === "Active") {
+      if (user.role === "patient") {
+        const Patient = require("../models/patient.models.js");
+        const existing = await Patient.findOne({ userId: user.userId });
+        if (!existing) {
+          await Patient.create({ userId: user.userId, name: user.name });
+        }
+      } else if (user.role === "staff") {
+        const Staff = require("../models/staff.models.js");
+        const existing = await Staff.findOne({ userId: user.userId });
+        if (!existing) {
+          await Staff.create({ userId: user.userId, name: user.name });
+        }
+      } else if (user.role === "dentist") {
+        const Dentist = require("../models/dentist.models.js");
+        const existing = await Dentist.findOne({ userId: user.userId });
+        if (!existing) {
+          await Dentist.create({ userId: user.userId, name: user.name });
+        }
+      }
+    }
 
     // Send email notification about status change
     if (user.email) {

@@ -49,9 +49,9 @@ exports.createProfile = async (req, res) => {
     const newProfile = new Patient({
       userId,
       name,
-      birthdate,
-      contactNumber,
-      address,
+      birthdate: birthdate || undefined,
+      contactNumber: contactNumber || undefined,
+      address: address || undefined,
       profileImage: profileImagePath,
     });
 
@@ -106,15 +106,16 @@ exports.editProfile = async (req, res) => {
       fs.writeFileSync(profileImagePath, buffer);
     }
 
+    // Only update fields if provided (optional fields)
+    const updateFields = { name };
+    if (typeof birthdate !== 'undefined') updateFields.birthdate = birthdate;
+    if (typeof address !== 'undefined') updateFields.address = address;
+    if (typeof contactNumber !== 'undefined') updateFields.contactNumber = contactNumber;
+    updateFields.profileImage = profileImagePath;
+
     const updatedProfile = await Patient.findOneAndUpdate(
       { userId },
-      {
-        name,
-        birthdate,
-        address,
-        contactNumber,
-        profileImage: profileImagePath,
-      },
+      updateFields,
       { new: true }
     );
 

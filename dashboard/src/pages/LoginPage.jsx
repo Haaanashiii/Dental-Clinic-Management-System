@@ -37,6 +37,9 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotOtpTimer, setForgotOtpTimer] = useState(0);
   const [forgotBlockTimer, setForgotBlockTimer] = useState(0);
+  const [isSamePassword, setIsSamePassword] = useState(false);
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
 
   // Timer for OTP and block
   React.useEffect(() => {
@@ -49,6 +52,20 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     }
     return () => clearTimeout(timer);
   }, [forgotOtpTimer, forgotBlockTimer]);
+
+  // Check if new password is same as old password
+  React.useEffect(() => {
+    if (forgotStep === 2 && forgotNewPassword && forgotEmail) {
+      axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/check-password`, {
+        email: forgotEmail,
+        password: forgotNewPassword,
+      })
+        .then(res => setIsSamePassword(res.data.isSame))
+        .catch(() => setIsSamePassword(false));
+    } else {
+      setIsSamePassword(false);
+    }
+  }, [forgotNewPassword, forgotStep, forgotEmail]);
 
   const handleLogin = async () => {
     const { emailOrUsername, password } = userForm;
@@ -65,13 +82,14 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     );
 
       if (response.data.message === "Login successful") {
-        const { authToken, role, userId, email, username } = response.data;
+        const { authToken, role, userId, email, username,name } = response.data;
 
         sessionStorage.setItem("authToken", authToken);
         sessionStorage.setItem("userId", userId);
         sessionStorage.setItem("email", email);
         sessionStorage.setItem("role", role);
         sessionStorage.setItem("username", username); 
+        sessionStorage.setItem("name", name);
         setUserRole(role);
         setIsAuthenticated(true);
 
@@ -285,24 +303,52 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
           )}
           {forgotStep === 2 && (
             <>
-              <TextField
-                label="New Password"
-                type="password"
-                fullWidth
-                margin="dense"
-                value={forgotNewPassword}
-                onChange={e => setForgotNewPassword(e.target.value)}
-                disabled={forgotLoading}
-              />
-              <TextField
-                label="Confirm Password"
-                type="password"
-                fullWidth
-                margin="dense"
-                value={forgotConfirmPassword}
-                onChange={e => setForgotConfirmPassword(e.target.value)}
-                disabled={forgotLoading}
-              />
+              <FormControl fullWidth margin="dense" variant="outlined">
+                <InputLabel htmlFor="forgot-new-password">New Password</InputLabel>
+                <OutlinedInput
+                  id="forgot-new-password"
+                  type={showForgotNewPassword ? "text" : "password"}
+                  value={forgotNewPassword}
+                  onChange={e => setForgotNewPassword(e.target.value)}
+                  disabled={forgotLoading}
+                  error={isSamePassword}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowForgotNewPassword(v => !v)}
+                        edge="end"
+                        tabIndex={-1}
+                      >
+                        {showForgotNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="New Password"
+                />
+                {isSamePassword && <span style={{ color: 'red', fontSize: 12 }}>New password must be different from the old password.</span>}
+              </FormControl>
+              <FormControl fullWidth margin="dense" variant="outlined">
+                <InputLabel htmlFor="forgot-confirm-password">Confirm Password</InputLabel>
+                <OutlinedInput
+                  id="forgot-confirm-password"
+                  type={showForgotConfirmPassword ? "text" : "password"}
+                  value={forgotConfirmPassword}
+                  onChange={e => setForgotConfirmPassword(e.target.value)}
+                  disabled={forgotLoading}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowForgotConfirmPassword(v => !v)}
+                        edge="end"
+                        tabIndex={-1}
+                      >
+                        {showForgotConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Confirm Password"
+                />
+              </FormControl>
               {forgotError && <p style={{ color: 'red' }}>{forgotError}</p>}
             </>
           )}
@@ -320,7 +366,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
             </Button>
           )}
           {forgotStep === 2 && (
-            <Button onClick={handleForgotNext} disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword}>
+            <Button onClick={handleForgotNext} disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword || isSamePassword}>
               {forgotLoading ? <CircularProgress size={20} /> : "Proceed"}
             </Button>
           )}

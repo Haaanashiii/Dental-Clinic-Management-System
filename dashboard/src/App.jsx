@@ -114,7 +114,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
         } />
         
         <Route path="/ManageDentist" element={
-          isAuthenticated && userRole === "dentist" ? (
+          isAuthenticated && (userRole === "dentist" || userRole === "staff") ? (
             <AnimatedContent hasSidebar={true}>
               <ManageDentist />
             </AnimatedContent>
@@ -122,7 +122,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
         } />
         
         <Route path="/ManageStaff" element={
-          isAuthenticated && (userRole === "dentist") ? (
+          isAuthenticated && (userRole === "dentist" || userRole === "staff") ? (
             <AnimatedContent hasSidebar={true}>
               <ManageStaff />
             </AnimatedContent>
@@ -130,7 +130,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
         } />
         
         <Route path="/ManageUser" element={
-          isAuthenticated && (userRole === "dentist") ? (
+          isAuthenticated && (userRole === "dentist" || userRole === "staff") ? (
             <AnimatedContent hasSidebar={true}>
               <ManageUser />
             </AnimatedContent>
@@ -165,82 +165,51 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
   );
 }
 
+// Add logout handler
+function handleLogout(setIsAuthenticated, setUserRole) {
+  sessionStorage.removeItem("authToken");
+  sessionStorage.removeItem("role");
+  sessionStorage.removeItem("userId");
+  sessionStorage.removeItem("email");
+  sessionStorage.removeItem("username");
+  setIsAuthenticated(false);
+  setUserRole("");
+}
+
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState(""); 
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!sessionStorage.getItem("authToken"));
+  const [userRole, setUserRole] = useState(() => sessionStorage.getItem("role") || "");
+
   useEffect(() => {
     const token = sessionStorage.getItem("authToken");
     const storedRole = sessionStorage.getItem("role");
-
     if (token && storedRole) {
       setUserRole(storedRole);
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
+      setUserRole("");
     }
   }, []);
 
+  // Pass handleLogout to sidebar pages as needed
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home page (user dashboard) always visible at root */}
-        <Route path="/" element={<UserDashboard />} />
+        <Route path="/" element={isAuthenticated ? <UserDashboard onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
         <Route path="/LandingPage" element={<LandingPage />} />
-        {/* Login and signup routes */}
-        <Route path="/login" element={<LoginPage
-        setIsAuthenticated={setIsAuthenticated}
-        setUserRole={setUserRole} 
-       />} />
-        <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}/>
-        {/* Authenticated routes */}
-        <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage /> ) : ( <Navigate to="/LandingPage" />)}/>
-        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage /> : <Navigate to="/LandingPage" />} />
-        <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords /> : <Navigate to="/LandingPage" />} />
-        <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform /> : <Navigate to="/LandingPage" />} />
-        {/* Admin Panel */}
-        <Route
-          path="/AdminDashboard"
-          element={
-            isAuthenticated && (userRole === "staff" || userRole === "dentist")
-              ? <AdminDashboard />
-              : <Navigate to="/LandingPage" />
-          }
-        />
-        <Route path="/ManageDentist" element={isAuthenticated && userRole === "dentist" ? <ManageDentist /> : <Navigate to="/login" />} />
-        <Route
-          path="/ManageStaff"
-          element={
-            isAuthenticated && (userRole === "dentist")
-              ? <ManageStaff />
-              : <Navigate to="/LandingPage" />
-          }
-        />
-        <Route
-          path="/ManageUser"
-          element={
-            isAuthenticated && (userRole === "dentist")
-              ? <ManageUser />
-              : <Navigate to="/LandingPage" />
-          }
-        />
-        <Route
-          path="/ManageRecord"
-          element={
-            isAuthenticated && (userRole === "staff" || userRole === "dentist")
-              ? <ManageRecord />
-              : <Navigate to="/LandingPage" />
-          }
-        />
-        <Route
-          path="/ManageAppointment"
-          element={
-            isAuthenticated && (userRole === "staff" || userRole === "dentist")
-              ? <ManageAppointment />
-              : <Navigate to="/LandingPage" />
-          }
-        />
-        {/* Redirect to landing if not found */}
+        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+        <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+        <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> ) : ( <Navigate to="/LandingPage" />)}/>
+        <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/OtherPlatform" element={isAuthenticated && userRole === "patient" ? <OtherPlatform onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/AdminDashboard" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <AdminDashboard onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ManageDentist" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageDentist onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ManageStaff" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageStaff onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
         <Route path="*" element={<Navigate to="/LandingPage" />} />
       </Routes>
     </BrowserRouter>
