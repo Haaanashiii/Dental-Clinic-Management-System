@@ -18,6 +18,8 @@ import {
   Step,
   StepLabel,
   Box,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./LoginPage.css";
@@ -40,6 +42,12 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
   const [isSamePassword, setIsSamePassword] = useState(false);
   const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
   const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [otpDialogOpen, setOtpDialogOpen] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [pendingLogin, setPendingLogin] = useState(null); // store login info for OTP step
 
   // Timer for OTP and block
   React.useEffect(() => {
@@ -70,29 +78,38 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
   const handleLogin = async () => {
     const { emailOrUsername, password } = userForm;
     const isEmail = emailOrUsername.includes("@");
-
     try {
       const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
-      {
-        email: isEmail ? emailOrUsername.toLowerCase().trim() : "",
-        username: !isEmail ? emailOrUsername.trim() : "",
-        password,
-      }
-    );
-
+        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+        {
+          email: isEmail ? emailOrUsername.toLowerCase().trim() : "",
+          username: !isEmail ? emailOrUsername.trim() : "",
+          password,
+        }
+      );
       if (response.data.message === "Login successful") {
-        const { authToken, role, userId, email, username,name } = response.data;
-
+        const { authToken, role, userId, email, username, name, isFirstLogin } = response.data;
+        // Check rememberMe flag in localStorage
+        const rememberKey = `rememberMe_${email || username}`;
+        const isRemembered = localStorage.getItem(rememberKey) === "true";
+        if ((typeof isFirstLogin !== 'undefined' && isFirstLogin === true) || !isRemembered) {
+          // Require OTP only, not password reset
+          setPendingLogin({ authToken, role, userId, email, username, name });
+          setOtpDialogOpen(true);
+          // Send OTP to user
+          await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email: email || username });
+          return;
+        }
+        // No OTP needed, proceed
         sessionStorage.setItem("authToken", authToken);
         sessionStorage.setItem("userId", userId);
         sessionStorage.setItem("email", email);
         sessionStorage.setItem("role", role);
-        sessionStorage.setItem("username", username); 
+        sessionStorage.setItem("username", username);
         sessionStorage.setItem("name", name);
         setUserRole(role);
         setIsAuthenticated(true);
-
+        if (rememberMe) localStorage.setItem(rememberKey, "true");
         if (role === "patient") {
           try {
             const token = sessionStorage.getItem("authToken");
@@ -100,12 +117,12 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
               headers: { Authorization: `Bearer ${token}` },
             });
             if (profileRes.data && profileRes.data.userId) {
-              navigate("/"); 
+              navigate("/");
             } else {
-              navigate("/ManageProfilePage"); 
+              navigate("/ManageProfilePage");
             }
           } catch (err) {
-            navigate("/ManageProfilePage"); 
+            navigate("/ManageProfilePage");
           }
         } else {
           navigate("/ManageUser");
@@ -116,6 +133,55 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || "An error occurred. Please try again.");
+    }
+  };
+
+  // OTP dialog handlers
+  const handleOtpVerify = async () => {
+    setOtpLoading(true);
+    setOtpError("");
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
+        email: pendingLogin?.email || pendingLogin?.username,
+        otp: otpValue,
+        checkOnly: true, // Only verify OTP, do not reset password
+      });
+      // OTP success, finish login
+      const { authToken, role, userId, email, username, name } = pendingLogin;
+      sessionStorage.setItem("authToken", authToken);
+      sessionStorage.setItem("userId", userId);
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("role", role);
+      sessionStorage.setItem("username", username);
+      sessionStorage.setItem("name", name);
+      setUserRole(role);
+      setIsAuthenticated(true);
+      const rememberKey = `rememberMe_${email || username}`;
+      if (rememberMe) localStorage.setItem(rememberKey, "true");
+      setOtpDialogOpen(false);
+      setOtpValue("");
+      setPendingLogin(null);
+      if (role === "patient") {
+        try {
+          const token = sessionStorage.getItem("authToken");
+          const profileRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (profileRes.data && profileRes.data.userId) {
+            navigate("/");
+          } else {
+            navigate("/ManageProfilePage");
+          }
+        } catch (err) {
+          navigate("/ManageProfilePage");
+        }
+      } else {
+        navigate("/ManageUser");
+      }
+    } catch (err) {
+      setOtpError(err.response?.data?.message || "Invalid OTP.");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -197,7 +263,6 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
       <div className="LoginContent">
         <h2>Login</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
-
         <TextField
           label="Email or Username"
           variant="outlined"
@@ -213,7 +278,6 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
             )
           }}
         />
-
         <FormControl fullWidth margin="dense" variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
           <OutlinedInput
@@ -236,7 +300,11 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
             label="Password"
           />
         </FormControl>
-
+        <FormControlLabel
+          control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} color="primary" />}
+          label="Remember Me"
+          style={{ marginTop: 8 }}
+        />
         <a href="/SignUpPage" style={{ display: 'block', marginTop: 8, color: '#1976d2', textAlign: 'center', textDecoration: 'none' }}>
           No account? Click here to Sign up!
         </a>
@@ -254,6 +322,27 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
           Login
         </Button>
       </div>
+      {/* OTP Dialog for login */}
+      <Dialog open={otpDialogOpen} onClose={() => setOtpDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Enter OTP</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="OTP"
+            fullWidth
+            margin="dense"
+            value={otpValue}
+            onChange={e => setOtpValue(e.target.value)}
+            disabled={otpLoading}
+          />
+          {otpError && <p style={{ color: 'red' }}>{otpError}</p>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOtpDialogOpen(false)} disabled={otpLoading}>Cancel</Button>
+          <Button onClick={handleOtpVerify} disabled={otpLoading || !otpValue}>
+            {otpLoading ? <CircularProgress size={20} /> : "Verify OTP"}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Forgot Password Modal (All Steps) */}
       <Dialog open={forgotOpen} onClose={handleForgotClose} maxWidth="xs" fullWidth PaperProps={{ style: { minHeight: 380 } }}>
         <DialogTitle>

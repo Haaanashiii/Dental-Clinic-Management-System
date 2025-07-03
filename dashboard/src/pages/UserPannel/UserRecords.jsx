@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Typography, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Modal, Box, Button
+  TableHead, TableRow, Paper, Modal, Box, Button, TextField, Alert, Snackbar
 } from "@mui/material";
 import axios from "axios";
 import Sidebar from "../UserPannel/ClientSidebar"; // adjust if needed
@@ -16,6 +16,12 @@ function UserRecords() {
   const [patientName, setPatientName] = useState("");
   const [modalDentistName, setModalDentistName] = useState("");
   const [dentistNames, setDentistNames] = useState({}); // Map dentistId to dentist name
+  const [payModalOpen, setPayModalOpen] = useState(false);
+  const [payingRecord, setPayingRecord] = useState(null);
+  const [payForm, setPayForm] = useState({ fromAccountNumber: "", details: "" });
+  const [payLoading, setPayLoading] = useState(false);
+  const [payError, setPayError] = useState("");
+  const [paySuccess, setPaySuccess] = useState("");
 
   // Use sessionStorage for userId for consistency
   const userId = sessionStorage.getItem("userId");
@@ -89,10 +95,40 @@ function UserRecords() {
 
   const closeRecordModal = () => setSelectedRecord(null);
 
-  // Online Pay handler
-  const handleOnlinePay = async (recordId) => {
-    // Placeholder: Replace with your payment integration logic
-    alert("Online payment for record " + recordId + " is not yet implemented.");
+  // Online Pay handler (open modal)
+  const handleOnlinePay = (record) => {
+    setPayingRecord(record);
+    setPayForm({ fromAccountNumber: "", details: "" });
+    setPayModalOpen(true);
+    setPayError("");
+    setPaySuccess("");
+  };
+
+  // Submit payment to bank API
+  const handlePaySubmit = async () => {
+    setPayLoading(true);
+    setPayError("");
+    setPaySuccess("");
+    try {
+      const response = await axios.post(
+        'http://192.168.9.23:4000/api/Philippine-National-Bank/business-integration/customer/pay-business',
+        {
+          fromAccountNumber: payForm.fromAccountNumber,
+          toBusinessAccount: "<BUSINESS_ACCOUNT_NUMBER>", // TODO: Replace with your business account number
+          amount: parseFloat(payingRecord.fine?.$numberDecimal || 0),
+          details: payForm.details || `Payment for record ${payingRecord._id}`,
+        }
+      );
+      setPaySuccess("Payment successful!");
+      setPayModalOpen(false);
+      setPayingRecord(null);
+      setPayForm({ fromAccountNumber: "", details: "" });
+      fetchRecords(); // Refresh records
+    } catch (err) {
+      setPayError(err.response?.data?.message || "Payment failed. Please try again.");
+    } finally {
+      setPayLoading(false);
+    }
   };
 
   return (
@@ -128,6 +164,7 @@ function UserRecords() {
                   <TableCell sx={{ width: '15%', fontWeight: 'bold', color: '#fff' }} align="center">Status</TableCell>
                   <TableCell sx={{ width: '15%', fontWeight: 'bold', color: '#fff' }} align="center">Fine</TableCell>
                   <TableCell sx={{ width: '15%', fontWeight: 'bold', color: '#fff' }} align="center">Dentist</TableCell>
+                  <TableCell sx={{ width: '15%', fontWeight: 'bold', color: '#fff' }} align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -135,8 +172,11 @@ function UserRecords() {
                   <TableRow
                     key={record._id}
                     className="ClickableRow"
-                    onClick={() => openRecordModal(record)}
-                    
+                    onClick={e => {
+                      // Only open modal if not clicking the pay button
+                      if (e.target.closest('.PayBtn')) return;
+                      openRecordModal(record);
+                    }}
                   >
                     <TableCell sx={{ width: '15%' }} align="center">{new Date(record.visitDate).toLocaleDateString()}</TableCell>
                     <TableCell sx={{ width: '20%' }} align="center">{record.diagnosis}</TableCell>
@@ -144,10 +184,23 @@ function UserRecords() {
                     <TableCell sx={{ width: '15%' }} align="center">{record.fineStatus}</TableCell>
                     <TableCell sx={{ width: '15%' }} align="center">₱{parseFloat(record.fine?.$numberDecimal || 0).toFixed(2)}</TableCell>
                     <TableCell sx={{ width: '15%' }} align="center">{dentistNames[record.dentistId] || '-'}</TableCell>
+                    <TableCell sx={{ width: '15%' }} align="center">
+                      {record.fineStatus === 'unpaid' && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          className="PayBtn"
+                          onClick={e => { e.stopPropagation(); handleOnlinePay(record); }}
+                        >
+                          Online Pay
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">No records found.</TableCell>
+                    <TableCell colSpan={7} align="center">No records found.</TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -268,7 +321,7 @@ function UserRecords() {
                           variant="contained"
                           color="primary"
                           sx={{ mt: 2, fontWeight: 'bold' }}
-                          onClick={() => handleOnlinePay(selectedRecord._id)}
+                          onClick={() => handleOnlinePay(selectedRecord)}
                         >
                           Online Pay
                         </Button>
@@ -302,6 +355,58 @@ function UserRecords() {
               <img src={zoomImage} alt="Zoom" style={{ maxWidth: '100%', maxHeight: '80vh' }} />
             </Box>
           </Modal>
+
+          {/* Payment Modal */}
+          <Modal open={payModalOpen} onClose={() => setPayModalOpen(false)}>
+            <Box sx={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)', p: 4,
+              bgcolor: 'background.paper', boxShadow: 24, borderRadius: 2,
+              minWidth: 350, maxWidth: 400
+            }}>
+              <Typography variant="h6" gutterBottom>Online Payment</Typography>
+              <TextField
+                label="Your Account Number"
+                fullWidth
+                margin="normal"
+                value={payForm.fromAccountNumber}
+                onChange={e => setPayForm({ ...payForm, fromAccountNumber: e.target.value })}
+                disabled={payLoading}
+              />
+              <TextField
+                label="Amount"
+                fullWidth
+                margin="normal"
+                value={payingRecord ? parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2) : ''}
+                disabled
+              />
+              <TextField
+                label="Details (optional)"
+                fullWidth
+                margin="normal"
+                value={payForm.details}
+                onChange={e => setPayForm({ ...payForm, details: e.target.value })}
+                disabled={payLoading}
+              />
+              {payError && <Alert severity="error" sx={{ mt: 2 }}>{payError}</Alert>}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Button onClick={() => setPayModalOpen(false)} disabled={payLoading} sx={{ mr: 1 }}>Cancel</Button>
+                <Button variant="contained" color="primary" onClick={handlePaySubmit} disabled={payLoading || !payForm.fromAccountNumber}>
+                  {payLoading ? 'Processing...' : 'Pay Now'}
+                </Button>
+              </Box>
+            </Box>
+          </Modal>
+          <Snackbar
+            open={!!paySuccess}
+            autoHideDuration={4000}
+            onClose={() => setPaySuccess("")}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          >
+            <Alert onClose={() => setPaySuccess("")} severity="success" sx={{ width: '100%' }}>
+              {paySuccess}
+            </Alert>
+          </Snackbar>
         </div>
       </div>
     </div>
