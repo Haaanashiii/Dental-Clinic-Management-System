@@ -237,12 +237,12 @@ exports.changeStatusUser = async (req, res) => {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'alipintester1245@gmail.com', // your Gmail address
-          pass: 'knrq hevi pszd hofd', // new app password
+          user: 'molarrecord0@gmail.com',
+          pass: 'sgzg nnup buqa onqt',   
         },
       });
       const mailOptions = {
-        from: 'alipintester1245@gmail.com',
+        from: 'molarrecord0@gmail.com',
         to: user.email,
         subject: 'Account Status Update',
         text: `Hello ${user.username || ''},\n\nYour account status has been changed to: ${status.toUpperCase()}.\n\nIf you have questions, please contact +63 977 641 4655/+63 921 355 3335.`,

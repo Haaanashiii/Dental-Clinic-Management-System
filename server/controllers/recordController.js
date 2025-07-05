@@ -78,14 +78,14 @@ exports.createRecord = async (req, res) => {
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: 'alipintester1245@gmail.com',
-            pass: 'knrq hevi pszd hofd',
+            user: 'molarrecord0@gmail.com',
+            pass: 'sgzg nnup buqa onqt',   
           },
         });
 
         // Email content
         const mailOptions = {
-          from: 'alipintester1245@gmail.com',
+          from: 'molarrecord0@gmail.com',
           to: userEmail,
           subject: 'Dental Visit Record & Fine Details',
           text: `Dear ${patientName},\n\nYour dental visit record has been created.\n\nDentist: ${dentistName}\nVisit Date: ${formattedVisitDate}\nDiagnosis: ${diagnosis || 'N/A'}\nTreatment: ${treatment || 'N/A'}\nFine: $${fine || 0} (${fine > 0 ? 'Unpaid' : 'Paid'})\n\nThank you for visiting!`,

@@ -96,8 +96,14 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
           // Require OTP only, not password reset
           setPendingLogin({ authToken, role, userId, email, username, name });
           setOtpDialogOpen(true);
-          // Send OTP to user
-          await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email: email || username });
+          // Send OTP to user (only if email is present)
+          if (email) {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email });
+          } else {
+            setError("OTP can only be sent to a valid email address. Please use your email to log in.");
+            setOtpDialogOpen(false);
+            return;
+          }
           return;
         }
         // No OTP needed, proceed
@@ -141,8 +147,14 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     setOtpLoading(true);
     setOtpError("");
     try {
+      // Only verify OTP using email
+      if (!pendingLogin?.email) {
+        setOtpError("OTP verification requires a valid email.");
+        setOtpLoading(false);
+        return;
+      }
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
-        email: pendingLogin?.email || pendingLogin?.username,
+        email: pendingLogin.email,
         otp: otpValue,
         checkOnly: true, // Only verify OTP, do not reset password
       });

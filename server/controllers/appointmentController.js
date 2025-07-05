@@ -214,8 +214,8 @@ exports.confirmAppointment = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'alipintester1245@gmail.com',
-        pass: 'knrq hevi pszd hofd',   
+        user: 'molarrecord0@gmail.com',
+        pass: 'sgzg nnup buqa onqt',   
       },
     });
 
@@ -240,7 +240,7 @@ exports.confirmAppointment = async (req, res) => {
     } catch (e) { /* fallback to raw */ }
 
     const mailOptions = {
-      from: 'alipintester1245@gmail.com', // your Gmail address
+      from: 'molarrecord0@gmail.com', // your Gmail address
       to: user.email,
       subject: 'Appointment Confirmed',
       text: `Dear ${patient.name || 'Patient'},\n\nYour appointment has been confirmed for ${formattedDateTime}.\n\nThank you!`,
