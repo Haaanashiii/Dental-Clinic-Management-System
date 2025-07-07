@@ -21,8 +21,9 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, EmailOutlined, LockOutlined, KeyOutlined, VpnKeyOutlined } from "@mui/icons-material";
 import "./LoginPage.css";
+import LogoColored from "../assets/LOGO-COLORED.png";
 
 function LoginPage({ setIsAuthenticated, setUserRole }) {
   const navigate = useNavigate();
@@ -273,137 +274,243 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
   return (
     <div className="LoginMain">
       <div className="LoginContent">
-        <h2>Login</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <TextField
-          label="Email or Username"
-          variant="outlined"
-          fullWidth
-          margin="dense"
-          value={userForm.emailOrUsername}
-          onChange={(e) => setUserForm({ ...userForm, emailOrUsername: e.target.value })}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <span role="img" aria-label="user">👤</span>
-              </InputAdornment>
-            )
-          }}
-        />
-        <FormControl fullWidth margin="dense" variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-password"
-            type={showPassword ? "text" : "password"}
-            value={userForm.password}
-            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-            startAdornment={
-              <InputAdornment position="start">
-                <span role="img" aria-label="lock">🔒</span>
-              </InputAdornment>
-            }
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Password"
-          />
-        </FormControl>
-        <FormControlLabel
-          control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} color="primary" />}
-          label="Remember Me"
-          style={{ marginTop: 8 }}
-        />
-        <a href="/SignUpPage" style={{ display: 'block', marginTop: 8, color: '#1976d2', textAlign: 'center', textDecoration: 'none' }}>
-          No account? Click here to Sign up!
-        </a>
-        <a
-          href="#"
-          style={{ display: 'block', marginTop: 8, color: '#1976d2', textAlign: 'center', textDecoration: 'none' }}
-          onClick={e => {
-            e.preventDefault();
-            handleForgotOpen();
-          }}
-        >
-          Forgot password? Click here to reset
-        </a>
-        <Button variant="contained" color="primary" fullWidth onClick={handleLogin}>
-          Login
-        </Button>
+        {/* Left Panel - Form */}
+        <div className="login-form-panel">
+          <div className="login-header">
+            <img src={LogoColored} alt="Dental Logo" className="login-logo" />
+            <h2>Hello!</h2>
+            <p className="login-subtitle">Sign in to your account</p>
+          </div>
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <div className="input-group">
+            <TextField
+              variant="outlined"
+              fullWidth
+              value={userForm.emailOrUsername}
+              onChange={(e) => setUserForm({ ...userForm, emailOrUsername: e.target.value })}
+              placeholder="Email or Username"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="user" className="input-icon">👤</span>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
+          
+          <div className="input-group">
+            <FormControl fullWidth variant="outlined">
+              <OutlinedInput
+                type={showPassword ? "text" : "password"}
+                value={userForm.password}
+                onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                placeholder="Password"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="lock" className="input-icon">🔒</span>
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+          
+          <div className="remember-forgot">
+            <FormControlLabel
+              control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />}
+              label="Remember Me"
+              className="remember-me"
+            />
+            <a
+              href="#"
+              className="forgot-link"
+              onClick={e => {
+                e.preventDefault();
+                handleForgotOpen();
+              }}
+            >
+              Forgot password?
+            </a>
+          </div>
+          
+          <Button variant="contained" className="login-button" onClick={handleLogin}>
+            LOGIN
+          </Button>
+          
+          <div className="links-container">
+            <span>Don't have an account? </span>
+            <a href="/SignUpPage" className="signup-link">Sign up</a>
+          </div>
+        </div>
+        
+        {/* Right Panel - Welcome */}
+        <div className="welcome-panel">
+          <div className="welcome-content">
+            <h1>Welcome Back!</h1>
+            <p>Access your dental records and appointments from anywhere.</p>
+          </div>
+        </div>
       </div>
-      {/* OTP Dialog for login */}
-      <Dialog open={otpDialogOpen} onClose={() => setOtpDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Enter OTP</DialogTitle>
-        <DialogContent>
+      
+      {/* Enhanced OTP Dialog for login verification */}
+      <Dialog 
+        open={otpDialogOpen} 
+        onClose={() => setOtpDialogOpen(false)} 
+        maxWidth="xs" 
+        fullWidth 
+        className="auth-dialog"
+      >
+        <DialogTitle className="dialog-header">
+          <h2 className="dialog-title">Security Verification</h2>
+        </DialogTitle>
+        <DialogContent className="dialog-content">
+          <div className="dialog-icon">
+            <div className="icon-circle">
+              <VpnKeyOutlined />
+            </div>
+          </div>
+          <p className="dialog-subtitle">
+            Please enter the verification code sent to 
+            <strong> {pendingLogin?.email}</strong>
+          </p>
           <TextField
-            label="OTP"
+            label="Verification Code"
             fullWidth
-            margin="dense"
+            variant="outlined"
             value={otpValue}
             onChange={e => setOtpValue(e.target.value)}
             disabled={otpLoading}
+            placeholder="Enter 6-digit code"
+            inputProps={{ maxLength: 6 }}
           />
-          {otpError && <p style={{ color: 'red' }}>{otpError}</p>}
+          {otpError && <div className="dialog-error">{otpError}</div>}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOtpDialogOpen(false)} disabled={otpLoading}>Cancel</Button>
-          <Button onClick={handleOtpVerify} disabled={otpLoading || !otpValue}>
-            {otpLoading ? <CircularProgress size={20} /> : "Verify OTP"}
+        <DialogActions className="dialog-actions">
+          <Button onClick={() => setOtpDialogOpen(false)} disabled={otpLoading} className="dialog-cancel">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleOtpVerify} 
+            disabled={otpLoading || !otpValue} 
+            className="dialog-action"
+          >
+            {otpLoading ? <CircularProgress size={20} /> : "Verify"}
           </Button>
         </DialogActions>
       </Dialog>
-      {/* Forgot Password Modal (All Steps) */}
-      <Dialog open={forgotOpen} onClose={handleForgotClose} maxWidth="xs" fullWidth PaperProps={{ style: { minHeight: 380 } }}>
-        <DialogTitle>
-          <Box sx={{ width: '100%', mb: 1 }}>
-            <Stepper activeStep={forgotStep} alternativeLabel>
-              <Step key={0}><StepLabel>Email</StepLabel></Step>
-              <Step key={1}><StepLabel>OTP</StepLabel></Step>
-              <Step key={2}><StepLabel>New Password</StepLabel></Step>
-            </Stepper>
-          </Box>
+      
+      {/* Enhanced Forgot Password Dialog */}
+      <Dialog 
+        open={forgotOpen} 
+        onClose={handleForgotClose} 
+        maxWidth="xs" 
+        fullWidth 
+        className="auth-dialog"
+      >
+        <DialogTitle className="dialog-header">
+          <h2 className="dialog-title">Forgot Password</h2>
+          <div className="stepper-container">
+            <div className="custom-stepper">
+              <div className={`step-item ${forgotStep >= 0 ? 'active' : ''}`}>
+                <div className="step-number">{forgotStep > 0 ? '✓' : '1'}</div>
+                <div className="step-label">Email</div>
+              </div>
+              <div className="step-line"></div>
+              <div className={`step-item ${forgotStep >= 1 ? 'active' : ''}`}>
+                <div className="step-number">{forgotStep > 1 ? '✓' : '2'}</div>
+                <div className="step-label">Verification</div>
+              </div>
+              <div className="step-line"></div>
+              <div className={`step-item ${forgotStep >= 2 ? 'active' : ''}`}>
+                <div className="step-number">3</div>
+                <div className="step-label">New Password</div>
+              </div>
+            </div>
+          </div>
         </DialogTitle>
-        <DialogContent sx={{ minHeight: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+
+        <DialogContent className="dialog-content">
           {forgotStep === 0 && (
             <>
+              <div className="dialog-icon">
+                <div className="icon-circle">
+                  <EmailOutlined />
+                </div>
+              </div>
+              <p className="dialog-subtitle">
+                Enter your email address to receive a verification code
+              </p>
               <TextField
-                label="Email"
+                label="Email Address"
                 type="email"
                 fullWidth
-                margin="dense"
+                variant="outlined"
                 value={forgotEmail}
                 onChange={e => setForgotEmail(e.target.value)}
+                placeholder="Enter your email"
                 disabled={forgotLoading || forgotBlockTimer > 0}
               />
               {forgotBlockTimer > 0 && (
-                <p style={{ color: 'red' }}>Too many attempts. Try again in {forgotBlockTimer}s.</p>
+                <div className="dialog-timer">
+                  <span className="timer-icon">⏱</span> 
+                  Too many attempts. Try again in {forgotBlockTimer}s
+                </div>
               )}
-              {forgotError && <p style={{ color: 'red' }}>{forgotError}</p>}
+              {forgotError && <div className="dialog-error">{forgotError}</div>}
             </>
           )}
+
           {forgotStep === 1 && (
             <>
+              <div className="dialog-icon">
+                <div className="icon-circle">
+                  <VpnKeyOutlined />
+                </div>
+              </div>
+              <p className="dialog-subtitle">
+                Enter the verification code sent to <strong>{forgotEmail}</strong>
+              </p>
               <TextField
-                label="OTP"
+                label="Verification Code"
                 fullWidth
-                margin="dense"
+                variant="outlined"
                 value={forgotOtp}
                 onChange={e => setForgotOtp(e.target.value)}
+                placeholder="Enter 6-digit code"
+                inputProps={{ maxLength: 6 }}
                 disabled={forgotLoading || forgotOtpTimer <= 0}
               />
               {forgotOtpTimer > 0 ? (
-                <p>OTP expires in {forgotOtpTimer}s</p>
+                <div className="dialog-timer">
+                  <span className="timer-icon">⏱</span> 
+                  Code expires in {forgotOtpTimer}s
+                </div>
               ) : (
-                <p style={{ color: 'red' }}>OTP expired. Please request again.</p>
+                <div className="dialog-error">Code expired. Please request again.</div>
               )}
-              {forgotError && <p style={{ color: 'red' }}>{forgotError}</p>}
+              {forgotError && <div className="dialog-error">{forgotError}</div>}
             </>
           )}
+
           {forgotStep === 2 && (
             <>
+              <div className="dialog-icon">
+                <div className="icon-circle">
+                  <LockOutlined />
+                </div>
+              </div>
+              <p className="dialog-subtitle">
+                Create a new password for your account
+              </p>
               <FormControl fullWidth margin="dense" variant="outlined">
                 <InputLabel htmlFor="forgot-new-password">New Password</InputLabel>
                 <OutlinedInput
@@ -426,9 +533,9 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
                   }
                   label="New Password"
                 />
-                {isSamePassword && <span style={{ color: 'red', fontSize: 12 }}>New password must be different from the old password.</span>}
+                {isSamePassword && <span className="password-error">New password must be different from the old password.</span>}
               </FormControl>
-              <FormControl fullWidth margin="dense" variant="outlined">
+              <FormControl fullWidth margin="dense" variant="outlined" sx={{ mt: 2 }}>
                 <InputLabel htmlFor="forgot-confirm-password">Confirm Password</InputLabel>
                 <OutlinedInput
                   id="forgot-confirm-password"
@@ -450,25 +557,40 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
                   label="Confirm Password"
                 />
               </FormControl>
-              {forgotError && <p style={{ color: 'red' }}>{forgotError}</p>}
+              {forgotError && <div className="dialog-error">{forgotError}</div>}
             </>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleForgotClose} disabled={forgotLoading}>Cancel</Button>
+
+        <DialogActions className="dialog-actions">
+          <Button onClick={handleForgotClose} disabled={forgotLoading} className="dialog-cancel">
+            Cancel
+          </Button>
           {forgotStep === 0 && (
-            <Button onClick={handleForgotNext} disabled={forgotLoading || !forgotEmail || forgotBlockTimer > 0}>
-              {forgotLoading ? <CircularProgress size={20} /> : "Send OTP"}
+            <Button 
+              onClick={handleForgotNext} 
+              disabled={forgotLoading || !forgotEmail || forgotBlockTimer > 0} 
+              className="dialog-action"
+            >
+              {forgotLoading ? <CircularProgress size={20} /> : "Send Code"}
             </Button>
           )}
           {forgotStep === 1 && (
-            <Button onClick={handleForgotNext} disabled={forgotLoading || !forgotOtp || forgotOtpTimer <= 0}>
-              {forgotLoading ? <CircularProgress size={20} /> : "Verify OTP"}
+            <Button 
+              onClick={handleForgotNext} 
+              disabled={forgotLoading || !forgotOtp || forgotOtpTimer <= 0} 
+              className="dialog-action"
+            >
+              {forgotLoading ? <CircularProgress size={20} /> : "Verify"}
             </Button>
           )}
           {forgotStep === 2 && (
-            <Button onClick={handleForgotNext} disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword || isSamePassword}>
-              {forgotLoading ? <CircularProgress size={20} /> : "Proceed"}
+            <Button 
+              onClick={handleForgotNext} 
+              disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword || isSamePassword} 
+              className="dialog-action"
+            >
+              {forgotLoading ? <CircularProgress size={20} /> : "Reset Password"}
             </Button>
           )}
         </DialogActions>

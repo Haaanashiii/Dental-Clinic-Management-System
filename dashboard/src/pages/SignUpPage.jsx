@@ -11,7 +11,8 @@ import {
   IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import "./LoginPage.css";
+import LogoColored from "../assets/LOGO-COLORED.png";
+import "./SignUpPage.css";
 
 const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
   const [userForm, setUserForm] = useState({
@@ -44,58 +45,107 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
   return (
     <div className="LoginMain">
       <div className="LoginContent">
-        <h2>Sign Up</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {/* Left Panel - Sign Up Form */}
+        <div className="login-form-panel">
+          <div className="login-header">
+            <img src={LogoColored} alt="Dental Logo" className="login-logo" />
+            <h2>Sign Up</h2>
+            <p className="login-subtitle">Create your account to get started</p>
+          </div>
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <div className="input-group">
+            <TextField
+              variant="outlined"
+              fullWidth
+              placeholder="Name"
+              value={userForm.name}
+              onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="user" className="input-icon">👤</span>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
 
-        <TextField
-          label="Name"
-          variant="outlined"
-          fullWidth
-          margin="dense"
-          value={userForm.name}
-          onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-        />
+          <div className="input-group">
+            <TextField
+              variant="outlined"
+              fullWidth
+              placeholder="Username"
+              value={userForm.username}
+              onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="id" className="input-icon">🆔</span>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
 
-        <TextField
-          label="Username"
-          variant="outlined"
-          fullWidth
-          margin="dense"
-          value={userForm.username}
-          onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
-        />
-
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          margin="dense"
-          value={userForm.email}
-          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-        />
-
-        <FormControl fullWidth margin="dense" variant="outlined">
-          <InputLabel htmlFor="signup-password">Password</InputLabel>
-          <OutlinedInput
-            id="signup-password"
-            type={showPassword ? "text" : "password"}
-            value={userForm.password}
-            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Password"
-          />
-        </FormControl>
-
-        <Button variant="contained" color="primary" fullWidth onClick={handleSignUp}>
-          Sign Up
-        </Button>
-        <a href="/login">Already have an account? Login here!</a>
+          <div className="input-group">
+            <TextField
+              variant="outlined"
+              fullWidth
+              placeholder="Email"
+              value={userForm.email}
+              onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="email" className="input-icon">✉️</span>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
+          
+          <div className="input-group">
+            <FormControl fullWidth variant="outlined">
+              <OutlinedInput
+                type={showPassword ? "text" : "password"}
+                value={userForm.password}
+                onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                placeholder="Password"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <span role="img" aria-label="lock" className="input-icon">🔒</span>
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+          
+          <Button variant="contained" className="login-button" onClick={handleSignUp}>
+            SIGN UP
+          </Button>
+          
+          <div className="links-container">
+            <span>Already have an account? </span>
+            <a href="/login" className="signup-link">Login here</a>
+          </div>
+        </div>
+        
+        {/* Right Panel - Welcome */}
+        <div className="welcome-panel">
+          <div className="welcome-content">
+            <h1>Join Us Today!</h1>
+            <p>Create an account to manage your dental appointments and records conveniently.</p>
+          </div>
+        </div>
       </div>
     </div>
   );

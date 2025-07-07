@@ -17,6 +17,8 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import imageCompression from 'browser-image-compression';
 import './ManageAppointment.css';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -80,6 +82,67 @@ const diagnosisTreatmentMap = {
   'TMD': ['Mouth Guard', 'TMD Therapy'],
   'Bruxism': ['Mouth Guard', 'Botox (optional)'],
   'Oral Cancer / Suspicious Lesions': ['Biopsy', 'Referral to Oncologist'],
+};
+
+const StatusBadge = ({ status }) => {
+  const getStatusStyle = () => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return {
+          backgroundColor: 'rgba(255, 152, 0, 0.15)',
+          color: '#f57c00',
+          borderColor: 'rgba(255, 152, 0, 0.5)'
+        };
+      case 'confirmed':
+        return {
+          backgroundColor: 'rgba(76, 175, 80, 0.15)',
+          color: '#388e3c',
+          borderColor: 'rgba(76, 175, 80, 0.5)'
+        };
+      case 'cancelled':
+        return {
+          backgroundColor: 'rgba(244, 67, 54, 0.15)',
+          color: '#d32f2f',
+          borderColor: 'rgba(244, 67, 54, 0.5)'
+        };
+      case 'completed':
+        return {
+          backgroundColor: 'rgba(33, 150, 243, 0.15)',
+          color: '#1976d2',
+          borderColor: 'rgba(33, 150, 243, 0.5)'
+        };
+      default:
+        return {
+          backgroundColor: 'rgba(158, 158, 158, 0.15)',
+          color: '#757575',
+          borderColor: 'rgba(158, 158, 158, 0.5)'
+        };
+    }
+  };
+
+  const style = getStatusStyle();
+  
+  return (
+    <div 
+      className="status-badge"
+      style={{
+        ...style,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '4px 12px',
+        borderRadius: '16px',
+        fontWeight: 500,
+        fontSize: '0.75rem',
+        textTransform: 'capitalize',
+        border: '1px solid',
+        minWidth: '80px',
+        margin: '0 auto'
+      }}
+    >
+      {status}
+    </div>
+  );
 };
 
 function ManageAppointment() {
@@ -248,90 +311,153 @@ function ManageAppointment() {
     <div className="ManageAppointment-dashboard">
       <ClientSidebar />
       <motion.div 
-        className="ManageAppointment-content"
+        className="profile-container" // Changed from ManageAppointment-content
         variants={contentVariants}
         initial="initial"
         animate="animate"
         exit="exit"
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-        >
-          Manage Appointments
-        </motion.h1>
-
+        {/* Header Section with gradient background */}
         <motion.div 
-          style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
+          className="profile-header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Button variant={statusFilter === 'confirmed' ? 'contained' : 'outlined'} color="success" onClick={() => setStatusFilter('confirmed')}>Confirmed</Button>
-          <Button variant={statusFilter === 'pending' ? 'contained' : 'outlined'} color="warning" onClick={() => setStatusFilter('pending')}>Pending</Button>
-          <Button variant={statusFilter === 'cancelled' ? 'contained' : 'outlined'} color="error" onClick={() => setStatusFilter('cancelled')}>Cancelled</Button>
-        </motion.div>
-
-        {loading ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Loading appointments...
-          </motion.p>
-        ) : (
-          <motion.div 
-            className='ManageAppointment-table'
-            initial={{ opacity: 0, y: 20 }}
+          <motion.h1 
+            className="profile-welcome"
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <TableContainer component={Paper}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Appointment Date</StyledTableCell>
-                    <StyledTableCell>Appointment Time</StyledTableCell>
-                    <StyledTableCell>Patient Name</StyledTableCell>
-                    <StyledTableCell>Dentist Name</StyledTableCell>
-                    <StyledTableCell>Status</StyledTableCell>
-                    <StyledTableCell>Action</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {displayedRecords.map((appointment) => (
-                    <StyledTableRow key={appointment.appointmentId}>
-                      <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
-                      <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
-                      <StyledTableCell>{appointment.patientName || "Unknown"}</StyledTableCell>
-                      <StyledTableCell>{appointment.dentistName || "Unknown"}</StyledTableCell>
-                      <StyledTableCell>{appointment.status}</StyledTableCell>
-                      <StyledTableCell>
-                        {statusFilter === 'pending' && (
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            Manage Appointments
+          </motion.h1>
+          <motion.p 
+            className="profile-date"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            Review, approve and manage patient appointments
+          </motion.p>
+        </motion.div>
+
+        {/* Main Content Area */}
+        <motion.div 
+          className="profile-content"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <motion.div 
+            style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <Button variant={statusFilter === 'confirmed' ? 'contained' : 'outlined'} color="success" onClick={() => setStatusFilter('confirmed')}>Confirmed</Button>
+            <Button variant={statusFilter === 'pending' ? 'contained' : 'outlined'} color="warning" onClick={() => setStatusFilter('pending')}>Pending</Button>
+            <Button variant={statusFilter === 'cancelled' ? 'contained' : 'outlined'} color="error" onClick={() => setStatusFilter('cancelled')}>Cancelled</Button>
+          </motion.div>
+
+          {loading ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              Loading appointments...
+            </motion.p>
+          ) : (
+            <motion.div 
+              className='ManageAppointment-table'
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              <TableContainer component={Paper}>
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell>Appointment Date</StyledTableCell>
+                      <StyledTableCell>Appointment Time</StyledTableCell>
+                      <StyledTableCell>Patient Name</StyledTableCell>
+                      <StyledTableCell>Dentist Name</StyledTableCell>
+                      <StyledTableCell>Status</StyledTableCell>
+                      <StyledTableCell>Action</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {displayedRecords.map((appointment) => (
+                      <StyledTableRow key={appointment.appointmentId}>
+                        <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
+                        <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
+                        <StyledTableCell>{appointment.patientName || "Unknown"}</StyledTableCell>
+                        <StyledTableCell>{appointment.dentistName || "Unknown"}</StyledTableCell>
+                        <StyledTableCell>
+                          <StatusBadge status={appointment.status} />
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          {statusFilter === 'pending' && (
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                              <Button 
+                                variant="contained"
+                                size="small"
+                                startIcon={<CheckIcon />}
+                                sx={{
+                                  backgroundColor: '#4caf50',
+                                  color: 'white',
+                                  minWidth: '100px',
+                                  '&:hover': {
+                                    backgroundColor: '#45a049'
+                                  }
+                                }}
+                                onClick={() => handleApproveAppointment(appointment.appointmentId)}
+                              >
+                                Approve
+                              </Button>
+                              <Button 
+                                variant="contained"
+                                size="small"
+                                startIcon={<CancelIcon />}
+                                sx={{
+                                  backgroundColor: '#f44336',
+                                  color: 'white',
+                                  minWidth: '90px',
+                                  '&:hover': {
+                                    backgroundColor: '#d32f2f'
+                                  }
+                                }}
+                                onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          )}
+                          {statusFilter === 'confirmed' && (
                             <Button 
                               variant="contained"
                               size="small"
-                              startIcon={<CheckIcon />}
+                              startIcon={<RateReviewIcon />}
                               sx={{
-                                backgroundColor: '#4caf50',
+                                backgroundColor: '#2196f3',
                                 color: 'white',
                                 minWidth: '100px',
                                 '&:hover': {
-                                  backgroundColor: '#45a049'
+                                  backgroundColor: '#1976d2'
                                 }
                               }}
-                              onClick={() => handleApproveAppointment(appointment.appointmentId)}
+                              onClick={() => handleReviewAppointment(appointment)}
                             >
-                              Approve
+                              Review
                             </Button>
+                          )}
+                          {statusFilter === 'cancelled' && (
                             <Button 
                               variant="contained"
                               size="small"
-                              startIcon={<CancelIcon />}
+                              startIcon={<DeleteIcon />}
                               sx={{
                                 backgroundColor: '#f44336',
                                 color: 'white',
@@ -340,168 +466,149 @@ function ManageAppointment() {
                                   backgroundColor: '#d32f2f'
                                 }
                               }}
-                              onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                              onClick={() => handleDeleteAppointment(appointment.appointmentId)}
                             >
-                              Cancel
+                              Delete
                             </Button>
-                          </div>
-                        )}
-                        {statusFilter === 'confirmed' && (
-                          <Button 
-                            variant="contained"
-                            size="small"
-                            startIcon={<RateReviewIcon />}
-                            sx={{
-                              backgroundColor: '#2196f3',
-                              color: 'white',
-                              minWidth: '100px',
-                              '&:hover': {
-                                backgroundColor: '#1976d2'
-                              }
-                            }}
-                            onClick={() => handleReviewAppointment(appointment)}
-                          >
-                            Review
-                          </Button>
-                        )}
-                        {statusFilter === 'cancelled' && (
-                          <Button 
-                            variant="contained"
-                            size="small"
-                            startIcon={<DeleteIcon />}
-                            sx={{
-                              backgroundColor: '#f44336',
-                              color: 'white',
-                              minWidth: '90px',
-                              '&:hover': {
-                                backgroundColor: '#d32f2f'
-                              }
-                            }}
-                            onClick={() => handleDeleteAppointment(appointment.appointmentId)}
-                          >
-                            Delete
-                          </Button>
-                        )}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={records.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPageOptions={[]}
-            />
-          </motion.div>
-        )}
-
-        {/* Modal animations */}
-        <AnimatePresence>
-          {openModal && (
-            <Modal open={openModal} onClose={() => setOpenModal(false)}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: -20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Box sx={modalStyle}>
-                  <div className="modal-header">
-                    <h2>Review Appointment</h2>
-                  </div>
-                  
-                  <div className="modal-body">
-                    <TextField
-                      select
-                      label="Diagnosis"
-                      fullWidth
-                      margin="normal"
-                      value={diagnosis}
-                      onChange={(e) => {
-                        setDiagnosis(e.target.value);
-                        setTreatment('');
-                      }}
-                      className="modal-text-field"
-                    >
-                      {Object.keys(diagnosisTreatmentMap).map((option, index) => (
-                        <MenuItem key={index} value={option}>{option}</MenuItem>
-                      ))}
-                    </TextField>
-
-                    <TextField
-                      select
-                      label="Treatment"
-                      fullWidth
-                      margin="normal"
-                      value={treatment}
-                      onChange={(e) => setTreatment(e.target.value)}
-                      disabled={!diagnosis}
-                      className="modal-text-field"
-                    >
-                      {diagnosis && diagnosisTreatmentMap[diagnosis]?.map((option, index) => (
-                        <MenuItem key={index} value={option}>{option}</MenuItem>
-                      ))}
-                    </TextField>
-
-                    <TextField
-                      label="Fine (₱)"
-                      type="number"
-                      fullWidth
-                      margin="normal"
-                      value={fineAmount}
-                      onChange={(e) => setFineAmount(e.target.value)}
-                      inputProps={{ min: 0 }}
-                      className="modal-text-field"
-                    />
-
-                    <TextField
-                      label="Remark"
-                      multiline
-                      rows={3}
-                      fullWidth
-                      margin="normal"
-                      value={remark}
-                      onChange={(e) => setRemark(e.target.value)}
-                      placeholder="Add any notes or summary here..."
-                      className="modal-text-field"
-                    />
-
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => setImageFiles(Array.from(e.target.files))}
-                      style={{ marginTop: '1rem' }}
-                    />
-                  </div>
-                  
-                  <div className="modal-footer">
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => setOpenModal(false)}
-                      className="modal-cancel-btn"
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      variant="contained" 
-                      color="primary" 
-                      onClick={handleSubmitRecord}
-                      className="modal-submit-btn"
-                    >
-                      Submit Record
-                    </Button>
-                  </div>
-                </Box>
-              </motion.div>
-            </Modal>
+                          )}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                component="div"
+                count={records.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPageOptions={[]}
+              />
+            </motion.div>
           )}
-        </AnimatePresence>
+        </motion.div>
       </motion.div>
+
+      {/* Modal animations - keep the existing code */}
+      <AnimatePresence>
+        {openModal && (
+          <Modal open={openModal} onClose={() => setOpenModal(false)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Box sx={modalStyle}>
+                <div className="modal-header">
+                  <h2>Review Appointment</h2>
+                </div>
+                
+                <div className="modal-body">
+                  <TextField
+                    select
+                    label="Diagnosis"
+                    fullWidth
+                    margin="normal"
+                    value={diagnosis}
+                    onChange={(e) => {
+                      setDiagnosis(e.target.value);
+                      setTreatment('');
+                    }}
+                    className="modal-text-field"
+                  >
+                    {Object.keys(diagnosisTreatmentMap).map((option, index) => (
+                      <MenuItem key={index} value={option}>{option}</MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    select
+                    label="Treatment"
+                    fullWidth
+                    margin="normal"
+                    value={treatment}
+                    onChange={(e) => setTreatment(e.target.value)}
+                    disabled={!diagnosis}
+                    className="modal-text-field"
+                  >
+                    {diagnosis && diagnosisTreatmentMap[diagnosis]?.map((option, index) => (
+                      <MenuItem key={index} value={option}>{option}</MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    label="Fine (₱)"
+                    type="number"
+                    fullWidth
+                    margin="normal"
+                    value={fineAmount}
+                    onChange={(e) => setFineAmount(e.target.value)}
+                    inputProps={{ min: 0 }}
+                    className="modal-text-field"
+                  />
+
+                  <TextField
+                    label="Remark"
+                    multiline
+                    rows={3}
+                    fullWidth
+                    margin="normal"
+                    value={remark}
+                    onChange={(e) => setRemark(e.target.value)}
+                    placeholder="Add any notes or summary here..."
+                    className="modal-text-field"
+                  />
+
+                  {/* Replace the basic file upload with this improved one */}
+                  <div className="file-upload-container">
+                    <label className="file-upload-button">
+                      <AttachFileIcon />
+                      Choose Files
+                      <input
+                        type="file"
+                        multiple
+                        onChange={(e) => setImageFiles(Array.from(e.target.files))}
+                        style={{ display: 'none' }}
+                        accept="image/*"
+                      />
+                    </label>
+                    {imageFiles.length > 0 && (
+                      <div className="file-list">
+                        {imageFiles.map((file, index) => (
+                          <div key={index} className="file-list-item">
+                            <InsertPhotoIcon fontSize="small" />
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="modal-footer">
+                  <Button 
+                    variant="outlined" 
+                    onClick={() => setOpenModal(false)}
+                    className="modal-cancel-btn"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={handleSubmitRecord}
+                    className="modal-submit-btn"
+                  >
+                    Submit Record
+                  </Button>
+                </div>
+              </Box>
+            </motion.div>
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

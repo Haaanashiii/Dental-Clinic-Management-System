@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ClientSidebar from "./ClientSidebar";
 import OrthoIn from "../../assets/OrthoisIn.png";
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -28,6 +30,13 @@ import Paper from '@mui/material/Paper';
 import axios from "axios";
 import dayjs from "dayjs";
 import "./UserDashboard.css";
+
+// Content animation variants
+const contentVariants = {
+  initial: { opacity: 0, x: 20, y: 10 },
+  animate: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: -20, y: 10 }
+};
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -216,35 +225,79 @@ function UserDashboard() {
   return (
     <div className="user-dashboard">
       <ClientSidebar />
-      <div className="dashboard-content">
-        <div className="dashboard-Funct">
-          <div className="Text">
-            <h1>Welcome to Molar Records!</h1>
-            <h2>Your dental visit history and treatment details are securely recorded here.</h2>
-            <h3>Easily track your past diagnoses, visits, and any pending fines.</h3>
-            <Divider sx={{ borderColor: '#1C444D', borderBottomWidth: 2, width: '100%' }} />
-            <div className="BtnAppointment">
-              <Button variant="contained" sx={{ backgroundColor: "#3AB286" }} onClick={handleOpen}>
+      <motion.div 
+        className="profile-container"
+        variants={contentVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        {/* Header Section with gradient background */}
+        <motion.div 
+          className="profile-header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <motion.h1 
+            className="profile-welcome"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            Welcome to Molar Records!
+          </motion.h1>
+          <motion.p 
+            className="profile-date"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            Your dental visit history and treatment details are securely recorded here
+          </motion.p>
+        </motion.div>
+
+        {/* Main Content Area */}
+        <motion.div 
+          className="dashboard-grid"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <motion.div 
+            className="appointments-section"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Box className="section-header">
+              <Typography variant="h5" component="h2" className="section-title">
+                Latest Patient Appointments
+              </Typography>
+              <Button 
+                variant="contained" 
+                onClick={handleOpen}
+                className="new-appointment-btn"
+              >
                 Make Appointment
               </Button>
-            </div>
-          </div>
-
-          <div className="Table">
-            <h2>Latest Patient Appointments</h2>
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            </Box>
+            
+            <Box className="filter-buttons">
               {['completed', 'confirmed', 'pending'].map((status) => (
                 <Button
                   key={status}
                   variant={statusFilter === status ? 'contained' : 'outlined'}
                   onClick={() => setStatusFilter(status)}
+                  className={statusFilter === status ? 'active-filter' : ''}
                 >
-                  <h3 style={{ margin: 0 }}>{status.charAt(0).toUpperCase() + status.slice(1)}</h3>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
                 </Button>
               ))}
-            </div>
-
-            <TableContainer component={Paper}>
+            </Box>
+            
+            <TableContainer component={Paper} className="dashboard-table-container">
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
@@ -262,10 +315,42 @@ function UserDashboard() {
                       <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
                       <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
                       <StyledTableCell>{appointment.dentistName || "Unknown"}</StyledTableCell>
-                      <StyledTableCell>{appointment.status}</StyledTableCell>
+                      <StyledTableCell>
+                        <Box sx={{
+                          display: 'inline-block',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 'medium',
+                          bgcolor: 
+                            appointment.status === 'completed' ? '#e8f5e8' : 
+                            appointment.status === 'confirmed' ? '#e3f2fd' : 
+                            '#fff3cd',
+                          color: 
+                            appointment.status === 'completed' ? '#2e7d32' : 
+                            appointment.status === 'confirmed' ? '#1976d2' : 
+                            '#856404',
+                          textTransform: 'capitalize'
+                        }}>
+                          {appointment.status}
+                        </Box>
+                      </StyledTableCell>
                       {statusFilter === 'pending' && (
                         <StyledTableCell>
-                          <Button onClick={() => handleCancelAppointment(appointment._id)} color="error">Cancel</Button>
+                          <Button 
+                            variant="outlined" 
+                            color="error" 
+                            size="small"
+                            onClick={() => handleCancelAppointment(appointment._id)}
+                            sx={{
+                              minWidth: '32px',
+                              height: '32px',
+                              borderRadius: 1
+                            }}
+                          >
+                            Cancel
+                          </Button>
                         </StyledTableCell>
                       )}
                       {statusFilter === 'completed' && (
@@ -273,10 +358,21 @@ function UserDashboard() {
                       )}
                     </StyledTableRow>
                   ))}
+                  {displayedRecords.length === 0 && (
+                    <TableRow>
+                      <TableCell 
+                        colSpan={statusFilter === 'pending' || statusFilter === 'completed' ? 5 : 4} 
+                        align="center"
+                        sx={{ py: 3 }}
+                      >
+                        No {statusFilter} appointments found
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
-
+            
             <TablePagination
               component="div"
               count={records.length}
@@ -285,68 +381,129 @@ function UserDashboard() {
               onPageChange={handleChangePage}
               rowsPerPageOptions={[]}
             />
-          </div>
-        </div>
-
-        <div className="DetailsandEtc">
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <img src={OrthoIn} alt="Dental" style={{ width: '300px', height: 'auto' }} />
-          </div>
-          <div className="AppointmentSection">
-            <h2>Appointment Dates</h2>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateCalendar
-                showDaysOutsideCurrentMonth
-                fixedWeekNumber={6}
-                renderDay={renderDay}
+          </motion.div>
+          
+          <motion.div 
+            className="calendar-section"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+          >
+            <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+              <Box sx={{ 
+                p: 2, 
+                background: 'linear-gradient(135deg, #1c444d 0%, #2d5a66 100%)', 
+                color: 'white',
+                borderRadius: '8px 8px 0 0'
+              }}>
+                <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
+                  Appointment Calendar
+                </Typography>
+              </Box>
+              
+              <Box className="calendar-container" sx={{ p: 2, background: '#fff' }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateCalendar
+                    showDaysOutsideCurrentMonth
+                    fixedWeekNumber={6}
+                    renderDay={renderDay}
+                    sx={{ 
+                      '& .MuiPickersDay-root.Mui-selected': {
+                        backgroundColor: '#1c444d',
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
+              </Box>
+            </Paper>
+            
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+              <img 
+                src={OrthoIn} 
+                alt="Dental" 
+                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }} 
               />
-            </LocalizationProvider>
-          </div>
-        </div>
-      </div>
+            </Box>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       {/* Modal */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Book an Appointment</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            select
-            label="Select Dentist"
-            value={selectedDentist}
-            onChange={(e) => setSelectedDentist(e.target.value)}
-            margin="dense"
+      <AnimatePresence>
+        {open && (
+          <Dialog 
+            open={open} 
+            onClose={handleClose}
+            PaperProps={{
+              component: motion.div,
+              initial: { opacity: 0, scale: 0.9, y: -20 },
+              animate: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.9, y: -20 },
+              transition: { duration: 0.3 }
+            }}
           >
-            {dentists.map((dentist) => (
-              <MenuItem key={dentist._id} value={dentist.dentistId}>
-                {dentist.name}
-              </MenuItem>
-            ))}
-          </TextField>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateCalendar
-              value={appointmentDate}
-              onChange={(newDate) => setAppointmentDate(newDate)}
-            />
-            <TimePicker
-              label="Appointment Time"
-              value={appointmentTime}
-              onChange={(newTime) => setAppointmentTime(newTime)}
-              sx={{ mt: 2, width: '100%' }}
-            />
-          </LocalizationProvider>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={handleSubmitAppointment}
-            variant="contained"
-            sx={{ backgroundColor: "#3AB286" }}
-          >
-            Submit
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogTitle sx={{ 
+              background: 'linear-gradient(135deg, #1c444d 0%, #2d5a66 100%)', 
+              color: '#ffffff',
+              fontWeight: 'bold'
+            }}>
+              Book an Appointment
+            </DialogTitle>
+            <DialogContent>
+              <TextField
+                fullWidth
+                select
+                label="Select Dentist"
+                value={selectedDentist}
+                onChange={(e) => setSelectedDentist(e.target.value)}
+                margin="dense"
+              >
+                {dentists.map((dentist) => (
+                  <MenuItem key={dentist._id} value={dentist.dentistId}>
+                    {dentist.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  value={appointmentDate}
+                  onChange={(newDate) => setAppointmentDate(newDate)}
+                  sx={{ 
+                    '& .MuiPickersDay-root.Mui-selected': {
+                      backgroundColor: '#1c444d',
+                    }
+                  }}
+                />
+                <TimePicker
+                  label="Appointment Time"
+                  value={appointmentTime}
+                  onChange={(newTime) => setAppointmentTime(newTime)}
+                  sx={{ mt: 2, width: '100%' }}
+                />
+              </LocalizationProvider>
+            </DialogContent>
+            <DialogActions sx={{ px: 3, py: 2 }}>
+              <Button 
+                onClick={handleClose}
+                variant="outlined"
+                sx={{ color: '#1c444d', borderColor: '#1c444d' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmitAppointment}
+                variant="contained"
+                sx={{ 
+                  bgcolor: '#1c444d',
+                  '&:hover': { bgcolor: '#153239' } 
+                }}
+              >
+                Book Appointment
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

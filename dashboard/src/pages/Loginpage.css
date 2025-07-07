@@ -12,75 +12,537 @@
 }
 
 .LoginMain .LoginContent {
-  width: 400px;
-  padding: 30px;
+  width: 900px;
+  display: flex;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   animation: fadeIn 0.6s ease-in-out;
   z-index: 1;
   position: relative;
+  overflow: hidden;
 }
 
-.LoginMain .LoginContent h2 {
-  margin-bottom: 20px;
-  color: #1c444d;
+/* Left panel - refined spacing and layout */
+.login-form-panel {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+/* Right panel - cleaner design */
+.welcome-panel {
+  width: 380px;
+  background: linear-gradient(135deg, #1c444d 0%, #16363f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Improved decorative elements */
+.welcome-panel::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  top: -250px;
+  right: -250px;
+}
+
+.welcome-panel::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  bottom: -200px;
+  left: -200px;
+}
+
+/* Improved welcome content */
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 30px;
+}
+
+.welcome-content h1 {
+  font-size: 32px;
   font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
 }
 
-.LoginMain .MuiTextField-root,
-.LoginMain .MuiFormControl-root {
-  margin-bottom: 15px;
+.welcome-content p {
+  font-size: 16px;
+  opacity: 0.9;
+  line-height: 1.7;
+  font-weight: 300;
+  letter-spacing: 0.2px;
 }
 
-.LoginMain .LoginContent a {
+/* Improved header styling */
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-logo {
+  width: 100px;
+  height: auto;
+  margin: 0 auto 20px;
   display: block;
-  margin-top: 8px;
-  font-size: 14px;
-  color: #1c444d;
-  text-decoration: none;
 }
 
-.LoginMain .LoginContent a:hover {
+.login-header h2 {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+  font-size: 28px;
+}
+
+.login-subtitle {
+  color: #666;
+  font-size: 15px;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+/* Better error message styling */
+.error-message {
+  background-color: rgba(244, 67, 54, 0.06);
+  border-left: 3px solid #f44336;
+  color: #f44336;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 25px;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* Improved form field spacing */
+.input-group {
+  margin-bottom: 25px;
+  text-align: left;
+  position: relative;
+}
+
+/* Enhanced form fields */
+.LoginMain .MuiOutlinedInput-root {
+  background-color: #fafafa;
+  border-radius: 10px;
+  height: 55px;
+  transition: all 0.2s ease-in-out;
+}
+
+.LoginMain .MuiOutlinedInput-root:hover {
+  background-color: #f5f5f5;
+}
+
+.LoginMain .MuiOutlinedInput-notchedOutline {
+  border-color: #e0e0e0;
+  border-width: 1px;
+}
+
+.LoginMain .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #1c444d;
+}
+
+.LoginMain .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #1c444d;
+  border-width: 2px;
+}
+
+/* Input icon styling */
+.input-icon {
+  color: #1c444d;
+  opacity: 0.8;
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+/* Remember me and forgot password improved layout */
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.remember-me {
+  font-size: 14px;
+  color: #555;
+}
+
+.forgot-link {
+  color: #1c444d;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #16363f;
   text-decoration: underline;
 }
 
-.LoginMain .MuiButton-root {
-  margin-top: 20px;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: bold;
+/* Enhanced button styling */
+.login-button {
+  width: 100%;
+  padding: 12px !important;
   background-color: #1c444d !important;
-  transition: background-color 0.3s ease;
-  color: white;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  text-transform: uppercase !important;
+  margin-top: 10px !important;
+  margin-bottom: 25px !important;
+  letter-spacing: 1.5px;
+  box-shadow: 0 6px 12px rgba(28, 68, 77, 0.2) !important;
+  transition: all 0.3s ease !important;
+  height: 50px;
 }
 
-.LoginMain .MuiButton-root:hover {
+.login-button:hover {
   background-color: #16363f !important;
+  box-shadow: 0 8px 15px rgba(28, 68, 77, 0.3) !important;
+  transform: translateY(-2px);
 }
 
-/* Parallax animation */
+/* Sign-up link area */
+.links-container {
+  margin-top: 10px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.signup-link {
+  color: #1c444d;
+  margin-left: 5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.signup-link:hover {
+  color: #16363f;
+  text-decoration: underline;
+}
+
+/* Improved dialog styling */
+.auth-dialog .MuiDialog-paper {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Dialog header styling */
+.dialog-header {
+  background-color: #1c444d !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  text-align: center;
+}
+
+.dialog-title {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+  color: white;
+  font-weight: 500;
+}
+
+/* Custom stepper design */
+.stepper-container {
+  padding-top: 15px;
+}
+
+.custom-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.step-item.active {
+  opacity: 1;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.step-item.active .step-number {
+  background-color: white;
+  color: #1c444d;
+}
+
+.step-label {
+  font-size: 12px;
+  color: white;
+  white-space: nowrap;
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin: 0 8px;
+  margin-bottom: 20px;
+}
+
+/* Dialog content styling */
+.dialog-content {
+  padding: 24px !important;
+  background: linear-gradient(to bottom, #f9fafb, #fff);
+}
+
+.dialog-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(28, 68, 77, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-circle svg {
+  font-size: 28px;
+  color: #1c444d;
+}
+
+.dialog-subtitle {
+  font-size: 15px;
+  color: #444;
+  margin: 0 0 24px 0;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* Improved input fields */
+.auth-dialog .MuiOutlinedInput-root {
+  background-color: #fafafa;
+  border-radius: 8px;
+  height: 54px;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-dialog .MuiInputLabel-root {
+  color: #555;
+}
+
+.auth-dialog .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #1c444d;
+}
+
+.auth-dialog .MuiInputLabel-root.Mui-focused {
+  color: #1c444d;
+}
+
+/* Error and timer messages */
+.dialog-error {
+  color: #f44336;
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  background-color: rgba(244, 67, 54, 0.06);
+  border-radius: 6px;
+  border-left: 3px solid #f44336;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-timer {
+  color: #1c444d;
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  background-color: rgba(28, 68, 77, 0.06);
+  border-radius: 6px;
+  border-left: 3px solid #1c444d;
+  display: flex;
+  align-items: center;
+}
+
+.timer-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Dialog actions area */
+.dialog-actions {
+  padding: 16px 24px 24px !important;
+  background-color: #fff;
+  border-top: 1px solid #f0f0f0;
+  justify-content: center !important;
+}
+
+/* Action buttons */
+.dialog-action {
+  background-color: #1c444d !important;
+  color: white !important;
+  padding: 8px 24px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 8px rgba(28, 68, 77, 0.2) !important;
+  transition: all 0.2s ease !important;
+  min-width: 120px !important;
+}
+
+.dialog-action:hover {
+  background-color: #16363f !important;
+  box-shadow: 0 6px 12px rgba(28, 68, 77, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.dialog-cancel {
+  color: #1c444d !important;
+  border: 1px solid rgba(28, 68, 77, 0.3) !important;
+  padding: 8px 24px !important;
+  border-radius: 8px !important;
+  margin-right: 10px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  min-width: 100px !important;
+}
+
+.dialog-cancel:hover {
+  background-color: rgba(28, 68, 77, 0.05) !important;
+}
+
+/* Password field error */
+.password-error {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 8px;
+  margin-left: 4px;
+  display: block;
+}
+
+/* Keep your existing animations */
 @keyframes moveBackground {
-  0% {
-    background-position: 0% 50%;
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Improved responsive layout */
+@media (max-width: 950px) {
+  .LoginMain .LoginContent {
+    width: 90%;
+    max-width: 700px;
   }
-  50% {
-    background-position: 100% 50%;
+  
+  .welcome-panel {
+    width: 350px;
   }
-  100% {
-    background-position: 0% 50%;
+  
+  .login-form-panel {
+    padding: 40px;
   }
 }
 
-/* Fade in content */
-@keyframes fadeIn {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
+@media (max-width: 850px) {
+  .LoginMain .LoginContent {
+    flex-direction: column;
+    max-width: 500px;
+    height: auto;
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+  
+  .welcome-panel {
+    width: 100%;
+    padding: 40px 30px;
+    order: -1;
+    min-height: 200px;
+  }
+  
+  .login-form-panel {
+    padding: 35px;
+  }
+  
+  .login-logo {
+    width: 80px;
+    margin-bottom: 15px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  .login-header {
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 500px) {
+  .LoginMain .LoginContent {
+    width: 95%;
+    border-radius: 12px;
+  }
+  
+  .login-form-panel,
+  .welcome-panel {
+    padding: 25px 20px;
+  }
+  
+  .welcome-panel {
+    min-height: 180px;
+  }
+  
+  .login-logo {
+    width: 70px;
+  }
+  
+  .welcome-content h1 {
+    font-size: 26px;
+    margin-bottom: 15px;
+  }
+  
+  .welcome-content p {
+    font-size: 15px;
   }
 }

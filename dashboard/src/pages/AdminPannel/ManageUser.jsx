@@ -98,117 +98,159 @@ export default function ManageUser() {
     <div className="ManageDentist-dashboard">
       <ClientSidebar />
       <motion.div 
-        className="ManageDentist-content"
+        className="profile-container" // Changed from ManageDentist-content
         variants={contentVariants}
         initial="initial"
         animate="animate"
         exit="exit"
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
+        {/* Header Section with gradient background */}
+        <motion.div 
+          className="profile-header"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Manage User Accounts
-        </motion.h1>
-        
-        <motion.div 
-          style={{ marginBottom: "40px" }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <Button
-            variant={roleFilter === "patient" ? "contained" : "outlined"}
-            onClick={() => setRoleFilter("patient")}
-            sx={{ mr: 1 }}
+          <motion.h1 
+            className="profile-welcome"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
           >
-            Show Patients
-          </Button>
-          <Button
-            variant={roleFilter === "staff" ? "contained" : "outlined"}
-            onClick={() => setRoleFilter("staff")}
-            sx={{ mr: 1 }}
+            Manage User Accounts
+          </motion.h1>
+          <motion.p 
+            className="profile-date"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
           >
-            Show Staff
-          </Button>
-          <Button
-            variant={roleFilter === "dentist" ? "contained" : "outlined"}
-            onClick={() => setRoleFilter("dentist")}
-          >
-            Show Dentists
-          </Button>
+            View and manage patient, staff, and dentist accounts
+          </motion.p>
         </motion.div>
-        
+
+        {/* Main Content Area */}
         <motion.div 
-          className="ManageDentist-table"
+          className="profile-content"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <TableContainer component={Paper}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Username</StyledTableCell>
-                  <StyledTableCell>Email</StyledTableCell>
-                  <StyledTableCell>Role</StyledTableCell>
-                  <StyledTableCell>Status</StyledTableCell>
-                  <StyledTableCell align="center">Actions</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                  <StyledTableRow key={user.userId}>
-                    <StyledTableCell>{user.username}</StyledTableCell>
-                    <StyledTableCell>{user.email}</StyledTableCell>
-                    <StyledTableCell>{user.role}</StyledTableCell>
-                    <StyledTableCell>{user.status}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      {user.status !== "Active" && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            style={{ marginBottom: "20px" }}
+          >
+            <Button
+              variant={roleFilter === "patient" ? "contained" : "outlined"}
+              onClick={() => setRoleFilter("patient")}
+              sx={{ mr: 1 }}
+            >
+              Show Patients
+            </Button>
+            <Button
+              variant={roleFilter === "staff" ? "contained" : "outlined"}
+              onClick={() => setRoleFilter("staff")}
+              sx={{ mr: 1 }}
+            >
+              Show Staff
+            </Button>
+            <Button
+              variant={roleFilter === "dentist" ? "contained" : "outlined"}
+              onClick={() => setRoleFilter("dentist")}
+            >
+              Show Dentists
+            </Button>
+          </motion.div>
+          
+          <motion.div 
+            className="ManageDentist-table"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <TableContainer component={Paper}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Username</StyledTableCell>
+                    <StyledTableCell>Email</StyledTableCell>
+                    <StyledTableCell>Role</StyledTableCell>
+                    <StyledTableCell>Status</StyledTableCell>
+                    <StyledTableCell align="center">Actions</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+                    <StyledTableRow key={user.userId}>
+                      <StyledTableCell>{user.username}</StyledTableCell>
+                      <StyledTableCell>{user.email}</StyledTableCell>
+                      <StyledTableCell>{user.role}</StyledTableCell>
+                      <StyledTableCell>
+                        <Box sx={{
+                          display: 'inline-block',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 'medium',
+                          bgcolor: user.status === 'Active' ? '#e8f5e8' : '#fff3cd',
+                          color: user.status === 'Active' ? '#2e7d32' : '#856404',
+                        }}>
+                          {user.status}
+                        </Box>
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {user.status !== "Active" && (
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="success"
+                            onClick={() => handleStatusChange(user.userId, "Active")}
+                            sx={{ mr: 1 }}
+                          >
+                            <ThumbUpIcon fontSize="small" />
+                          </Button>
+                        )}
+                        {user.status !== "Deactivated" && (
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="warning"
+                            onClick={() => handleStatusChange(user.userId, "Deactivated")}
+                            sx={{ mr: 1 }}
+                          >
+                            <BlockIcon fontSize="small" />
+                          </Button>
+                        )}
                         <Button
                           size="small"
-                          color="success"
-                          onClick={() => handleStatusChange(user.userId, "Active")}
-                          sx={{ mr: 1 }}
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDeleteUser(user.userId)}
                         >
-                          <ThumbUpIcon fontSize="small" />
+                          <DeleteIcon fontSize="small" />
                         </Button>
-                      )}
-                      {user.status !== "Deactivated" && (
-                        <Button
-                          size="small"
-                          color="warning"
-                          onClick={() => handleStatusChange(user.userId, "Deactivated")}
-                          sx={{ mr: 1 }}
-                        >
-                          <BlockIcon fontSize="small" />
-                        </Button>
-                      )}
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeleteUser(user.userId)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            component="div"
-            count={filteredUsers.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[]}
-          />
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              component="div"
+              count={filteredUsers.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[]}
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
+      
       <ToastContainer
         position="top-right"
         autoClose={3000}

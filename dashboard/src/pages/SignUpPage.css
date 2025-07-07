@@ -1,0 +1,34 @@
+/* Import the base styling from LoginPage.css */
+@import url('./LoginPage.css');
+
+/* Additional styling specific to the signup page */
+.input-group {
+  margin-bottom: 18px; /* Slightly less margin to accommodate more fields */
+}
+
+.LoginMain .LoginContent .login-form-panel {
+  padding: 40px 50px; /* Adjust padding for signup form */
+}
+
+.LoginMain .MuiOutlinedInput-root {
+  height: 52px; /* Slightly smaller fields to fit more content */
+}
+
+.login-header h2 {
+  margin-bottom: 8px;
+}
+
+.login-header {
+  margin-bottom: 30px; /* Reduce header margin to fit more content */
+}
+
+/* Responsive adjustments */
+@media (max-width: 850px) {
+  .LoginMain .LoginContent .login-form-panel {
+    padding: 30px;
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+  }
+}

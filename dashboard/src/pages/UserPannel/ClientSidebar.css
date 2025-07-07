@@ -85,28 +85,56 @@
 /* Logout button container */
 .logout-button-container {
   padding: 16px;
-  margin-bottom: 48px; /* Space for the collapse trigger */
+  margin-bottom: 16px;
 }
 
-.logout-button {
+/* When collapsed, adjust logout button container padding and center items */
+.ClientSidebar.ant-layout-sider-collapsed .logout-button-container {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Make logout and collapse buttons look like menu items */
+.logout-button,
+.collapse-button {
   width: 100%;
-  text-align: left;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
   color: #fff !important;
   background-color: transparent !important;
   border: none !important;
-  padding: 8px 16px;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 14px;
+  transition: all 0.3s;
 }
 
-.logout-button:hover {
-  background-color:  #8d021f!important;
-  color: #ffffff;
+/* Hover effects - same as menu items */
+.logout-button:hover,
+.collapse-button:hover {
+  background-color: #ffffff !important;
+  color: #1C444D !important;
   font-weight: bold;
 }
 
-/* Style for the ant layout sider trigger button */
+/* When collapsed, center the buttons like menu icons */
+.ClientSidebar.ant-layout-sider-collapsed .logout-button,
+.ClientSidebar.ant-layout-sider-collapsed .collapse-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  justify-content: center;
+  margin: 0;
+}
+
+/* Remove default trigger button styling */
 .ClientSidebar .ant-layout-sider-trigger {
-  background-color: #16363f;
-  color: #ffffff;
+  display: none !important;
 }
 
 /* User info container */
@@ -116,10 +144,54 @@
   margin-bottom: 12px;
   padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* When collapsed, make it circular and smaller */
+.ClientSidebar.ant-layout-sider-collapsed .user-info-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 8px;
+  margin: 0 auto 12px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-info {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* When collapsed, center the avatar */
+.ClientSidebar.ant-layout-sider-collapsed .user-info {
+  justify-content: center;
+  gap: 0;
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-avatar svg {
+  font-size: 24px !important;
+  color: #1C444D;
+}
+
+/* When collapsed, make icon slightly smaller */
+.ClientSidebar.ant-layout-sider-collapsed .user-avatar svg {
+  font-size: 20px !important;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0; /* Allows text to truncate if needed */
 }
 
 .username {
@@ -127,16 +199,16 @@
   color: #1C444D;
   font-size: 14px;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-role {
   color: #666;
   font-size: 12px;
   text-transform: capitalize;
-}
-
-/* Adjust logout button container spacing */
-.logout-button-container {
-  padding: 16px;
-  margin-bottom: 48px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

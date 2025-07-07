@@ -155,77 +155,162 @@ export default function ManageDentist() {
     <div className="ManageDentist-dashboard">
       <ClientSidebar />
       <motion.div 
-        className="ManageDentist-content"
+        className="profile-container" // Changed from ManageDentist-content
         variants={contentVariants}
         initial="initial"
         animate="animate"
         exit="exit"
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
+        {/* Header Section with gradient background */}
+        <motion.div 
+          className="profile-header"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Manage Dentist Users
-        </motion.h1>
-        
-        <motion.div 
-          className="BTNADD"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <Button variant="contained" onClick={() => handleOpenModal()} sx={{ mb: 2 }}>
-            Add Dentist
-          </Button>
+          <motion.h1 
+            className="profile-welcome"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            Manage Dentists
+          </motion.h1>
+          <motion.p 
+            className="profile-date"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            Create, edit and manage dentist accounts and specializations
+          </motion.p>
         </motion.div>
-        
+
+        {/* Main Content Area */}
         <motion.div 
-          className="ManageDentist-table"
+          className="profile-content"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          sx={{ display: 'flex', flexDirection: 'column', height: '100%' }} // Added height
         >
-          <TableContainer component={Paper}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Username</StyledTableCell>
-                  <StyledTableCell>Email</StyledTableCell>
-                  <StyledTableCell>Specialization</StyledTableCell>
-                  <StyledTableCell>Role</StyledTableCell>
-                  <StyledTableCell align="center">Actions</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                  <StyledTableRow key={user.userId}>
-                    <StyledTableCell>{user.username}</StyledTableCell>
-                    <StyledTableCell>{user.email}</StyledTableCell>
-                    <StyledTableCell>{user.specialization}</StyledTableCell>
-                    <StyledTableCell>{user.role}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      <EditIcon sx={{ cursor: "pointer" }} onClick={() => handleOpenModal(user)} />
-                      <DeleteIcon sx={{ cursor: "pointer", ml: 1 }} onClick={() => handleDeleteUser(user.userId)} />
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            component="div"
-            count={users.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[]}
-          />
+          <motion.div 
+            className="BTNADD"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginBottom: '20px',
+              marginTop: '0px'
+            }}
+          >
+            <Button 
+              variant="contained" 
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenModal()} 
+              sx={{ 
+                bgcolor: '#1c444d',
+                '&:hover': {
+                  bgcolor: '#153239'
+                },
+                textTransform: 'uppercase',
+                fontSize: '0.8rem',
+                fontWeight: 500,
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                py: 0.8
+              }}
+            >
+              Add Dentist
+            </Button>
+          </motion.div>
+          
+          <motion.div 
+            className="ManageDentist-table"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+          >
+            <TableContainer 
+              component={Paper}
+              sx={{ 
+                height: 'calc(100vh - 350px)', // Fixed height based on viewport
+                maxHeight: '600px', // Maximum height
+                display: 'flex',
+                flexDirection: 'column',
+                mb: 1
+              }}
+            >
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Username</StyledTableCell>
+                    <StyledTableCell>Email</StyledTableCell>
+                    <StyledTableCell>Specialization</StyledTableCell>
+                    <StyledTableCell>Role</StyledTableCell>
+                    <StyledTableCell align="center">Actions</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+                    <StyledTableRow key={user.userId}>
+                      <StyledTableCell>{user.username}</StyledTableCell>
+                      <StyledTableCell>{user.email}</StyledTableCell>
+                      <StyledTableCell>{user.specialization}</StyledTableCell>
+                      <StyledTableCell>{user.role}</StyledTableCell>
+                      <StyledTableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => handleOpenModal(user)}
+                            sx={{
+                              minWidth: '32px',
+                              height: '32px',
+                              p: 0.5,
+                              borderRadius: 1
+                            }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="error"
+                            onClick={() => handleDeleteUser(user.userId)}
+                            sx={{
+                              minWidth: '32px',
+                              height: '32px',
+                              p: 0.5,
+                              borderRadius: 1
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </Button>
+                        </Box>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              component="div"
+              count={users.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[]}
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
 
-      {/* Modal animations */}
+      {/* Modal animations - Keep existing code */}
       <AnimatePresence>
         {openModal && (
           <Modal open={openModal} onClose={handleCloseModal}>

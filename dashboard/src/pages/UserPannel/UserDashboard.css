@@ -1,69 +1,168 @@
-.user-dashboard{
+.user-dashboard {
   display: flex;
   flex-direction: row;
-    width: 100%;
-    height: 100vh;
-    justify-content: space-between;
-  
-    overflow: hidden; 
-}
-.Text{
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 10px;
-  justify-content: space-between;
-}
-.dashboard-content{
-  margin-top: -30px;
-
-    display: flex;
-    flex-direction: row;
-    gap: 100px;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-}
-.dashboard-Funct{
-    width: 110vh;
-    padding: 20px;
-    top: 0;
-}
-.DetailsandEtc {
-  position: sticky;
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  gap: 30px;
-  max-height: 100vh;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
 }
-.AppointmentSection{
+
+/* Profile container styles */
+.profile-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 10px;
+  width: 100%;
+  overflow-y: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
 }
-.CalendarMain{
-    border: 2px solid #1C444D;
-    padding: 10px;
+
+.profile-header {
+  background: linear-gradient(135deg, #1c444d 0%, #2d5a66 100%);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  position: relative;
 }
-.BtnAppointment{
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+}
+
+.profile-welcome {
+  color: white;
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.profile-date {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Dashboard grid layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* Appointments section */
+.appointments-section {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8f4f8;
+}
+
+/* Calendar section */
+.calendar-section {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 20px;
 }
-.calendar-wrapper {
-    border: 1px;
-    width: 500px;
-    height: 350px; 
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-weight: 600 !important;
+  color: #1c444d !important;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  text-transform: capitalize;
+}
+
+.filter-buttons .active-filter {
+  background-color: #1c444d;
+  color: white;
+}
+
+.new-appointment-btn {
+  background-color: #1c444d !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.new-appointment-btn:hover {
+  background-color: #153239 !important;
+}
+
+.dashboard-table-container {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 350px;
+  max-height: calc(100vh - 350px);
+}
+
+/* Calendar styling */
+.calendar-container {
+  min-height: 350px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
-  .Img img {
+  
+  .calendar-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .calendar-section > div {
+    flex: 1;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
+  }
+  
+  .profile-header, 
+  .appointments-section {
+    padding: 20px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .filter-buttons {
     width: 100%;
-    height: auto;
-    display: block; 
-    
+    justify-content: space-between;
   }
-  .table {
-   top: -50px;
+  
+  .calendar-section {
+    flex-direction: column;
   }
+}

@@ -7,7 +7,10 @@ import {
   FileTextOutlined,
   LogoutOutlined,
   TeamOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import logo from '../../assets/logo-white.png';
 import './ClientSidebar.css';
 
@@ -141,6 +144,7 @@ function ClientDashboard() {
         onCollapse={setCollapsed}
         className="ClientSidebar"
         width={200}
+        trigger={null} // This removes the default trigger that causes delay
       >
         <div className="logo-container">
           <img
@@ -181,8 +185,15 @@ function ClientDashboard() {
             {/* User Info Section */}
             <div className="user-info-container">
               <div className="user-info">
-                <div className="username">{currentUser.username}</div>
-                <div className="user-role">{currentUser.role}</div>
+                <div className="user-avatar">
+                  <AccountCircleIcon />
+                </div>
+                {!collapsed && (
+                  <div className="user-details">
+                    <div className="username">{currentUser.username}</div>
+                    <div className="user-role">{currentUser.role}</div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -193,6 +204,16 @@ function ClientDashboard() {
               className="logout-button"
             >
               {!collapsed && "Logout"}
+            </Button>
+
+            {/* Custom Collapse Button - This eliminates the delay */}
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              className="collapse-button"
+            >
+              {!collapsed}
             </Button>
           </div>
         </div>

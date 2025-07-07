@@ -41,25 +41,165 @@ exports.createAppointment = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'alipintester1245@gmail.com',
-        pass: 'knrq hevi pszd hofd',
+        user: 'molarrecord0@gmail.com',
+        pass: 'sgzg nnup buqa onqt',
       },
     });
 
-    const mailOptions = {
-      from: 'alipintester1245@gmail.com',
-      to: 'alipintester1245@gmail.com',
-      subject: 'New Appointment Created',
-      text: `A new appointment has been created.\n\nPatient:
-       ${patientName}\nDentist: ${dentistName}\nDate & Time: ${readableDateTime}\nStatus: ${status}`,
-    };
+    // HTML email template for new appointment
+    const htmlTemplate = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Appointment Created</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333333;
+          margin: 0;
+          padding: 0;
+          background-color: #f9f9f9;
+        }
+        .wrapper {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .card {
+          background-color: #ffffff;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+          background-color: #1c444d;
+          padding: 30px 0;
+          text-align: center;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          color: white;
+          letter-spacing: 1px;
+        }
+        .content {
+          padding: 40px 30px;
+          text-align: center;
+        }
+        .title {
+          font-size: 26px;
+          margin-bottom: 10px;
+          color: #1c444d;
+          font-weight: 600;
+        }
+        .subtitle {
+          font-size: 16px;
+          margin-bottom: 30px;
+          color: #666666;
+        }
+        .info-box {
+          background-color: #f0f7f8;
+          border: 2px solid #e0eef0;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 25px 0;
+          text-align: left;
+        }
+        .info-item {
+          margin-bottom: 12px;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #1c444d;
+        }
+        .info-value {
+          color: #333;
+        }
+        .message {
+          font-size: 16px;
+          color: #1c444d;
+          margin-top: 20px;
+        }
+        .note {
+          font-size: 14px;
+          color: #777777;
+          margin-top: 30px;
+          font-style: italic;
+        }
+        .footer {
+          background-color: #f5f5f5;
+          padding: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #999999;
+        }
+        .divider {
+          height: 1px;
+          background-color: #eeeeee;
+          margin: 30px 0;
+        }
+        .highlight {
+          color: #1c444d;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="card">
+          <div class="header">
+            <div class="logo">MolarRecord Dental Clinic</div>
+          </div>
+          <div class="content">
+            <h1 class="title">New Appointment Created</h1>
+            <p class="subtitle">A new appointment has been scheduled in the system</p>
+            
+            <div class="info-box">
+              <div class="info-item">
+                <span class="info-label">Patient:</span> 
+                <span class="info-value">${patientName}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Dentist:</span> 
+                <span class="info-value">${dentistName}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Date & Time:</span> 
+                <span class="info-value">${readableDateTime}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Status:</span> 
+                <span class="info-value highlight">${status}</span>
+              </div>
+            </div>
+            
+            <p class="message">Please check the appointment details in the system.</p>
+            
+            <div class="divider"></div>
+            
+            <p class="note">
+              This is a system notification for the dental clinic staff.
+            </p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} MolarRecord Dental Clinic | All rights reserved</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending notification email:', error);
-      } else {
-        console.log('Notification email sent:', info.response);
-      }
+    await transporter.sendMail({
+      from: '"Molar Record Dental Clinic" <molarrecord0@gmail.com>',
+      to: 'molarrecord0@gmail.com',
+      subject: 'New Appointment Created - MolarRecord Dental Clinic',
+      text: `A new appointment has been created.\n\nPatient: ${patientName}\nDentist: ${dentistName}\nDate & Time: ${readableDateTime}\nStatus: ${status}`,
+      html: htmlTemplate
     });
 
     res.status(201).json(newAppointment);
@@ -238,16 +378,158 @@ exports.confirmAppointment = async (req, res) => {
         timeZone: "Asia/Singapore"
       });
     } catch (e) { /* fallback to raw */ }
+    
+    // HTML email template
+    const htmlTemplate = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Appointment Confirmed</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333333;
+          margin: 0;
+          padding: 0;
+          background-color: #f9f9f9;
+        }
+        .wrapper {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .card {
+          background-color: #ffffff;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+          background-color: #1c444d;
+          padding: 30px 0;
+          text-align: center;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          color: white;
+          letter-spacing: 1px;
+        }
+        .content {
+          padding: 40px 30px;
+          text-align: center;
+        }
+        .title {
+          font-size: 26px;
+          margin-bottom: 10px;
+          color: #1c444d;
+          font-weight: 600;
+        }
+        .subtitle {
+          font-size: 16px;
+          margin-bottom: 30px;
+          color: #666666;
+        }
+        .info-box {
+          background-color: #f0f7f8;
+          border: 2px solid #e0eef0;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 25px 0;
+          text-align: left;
+        }
+        .info-item {
+          margin-bottom: 12px;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #1c444d;
+        }
+        .info-value {
+          color: #333;
+        }
+        .message {
+          font-size: 16px;
+          color: #1c444d;
+          margin-top: 20px;
+        }
+        .note {
+          font-size: 14px;
+          color: #777777;
+          margin-top: 30px;
+          font-style: italic;
+        }
+        .footer {
+          background-color: #f5f5f5;
+          padding: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #999999;
+        }
+        .divider {
+          height: 1px;
+          background-color: #eeeeee;
+          margin: 30px 0;
+        }
+        .highlight {
+          color: #1c444d;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="card">
+          <div class="header">
+            <div class="logo">Molar Record Dental Clinic</div>
+          </div>
+          <div class="content">
+            <h1 class="title">Appointment Confirmed</h1>
+            <p class="subtitle">Your dental appointment has been confirmed!</p>
+            
+            <div class="info-box">
+              <div class="info-item">
+                <span class="info-label">Patient:</span> 
+                <span class="info-value">${patient.name || 'Patient'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Date & Time:</span> 
+                <span class="info-value">${formattedDateTime}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Status:</span> 
+                <span class="info-value highlight">Confirmed</span>
+              </div>
+            </div>
+            
+            <p class="message">Please arrive 10 minutes before your scheduled appointment time.</p>
+            
+            <div class="divider"></div>
+            
+            <p class="note">
+              If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance.
+            </p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} MolarRecord Dental Clinic | All rights reserved</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
 
-    const mailOptions = {
-      from: 'molarrecord0@gmail.com', // your Gmail address
+    await transporter.sendMail({
+      from: '"Molar Record Dental Clinic" <molarrecord0@gmail.com>',
       to: user.email,
-      subject: 'Appointment Confirmed',
-      text: `Dear ${patient.name || 'Patient'},\n\nYour appointment has been confirmed for ${formattedDateTime}.\n\nThank you!`,
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
+      subject: 'Dental Appointment Confirmed - Molar Record Dental Clinic',
+      text: `Dear ${patient.name || 'Patient'},\n\nYour appointment has been confirmed for ${formattedDateTime}.\n\nPlease arrive 10 minutes before your scheduled appointment time.\n\nIf you need to reschedule or cancel, please contact us at least 24 hours in advance.\n\nThank you for choosing Molar Record Dental Clinic.`,
+      html: htmlTemplate
+    });
 
     res.status(200).json(updatedAppointment);
   } catch (err) {
@@ -284,23 +566,212 @@ exports.getAllAppointmentsByStatusAndDentistId = async (req, res) => {
 };
 
 exports.markAppointmentCompleted = async (req, res) => {
-const { appointmentId } = req.params;
-const { remark } = req.body;
+  const { appointmentId } = req.params;
+  const { remark } = req.body;
 
-try {
-  const updatedAppointment = await Appointments.findOneAndUpdate(
-    { appointmentId },
-    { status: 'completed', remarks: remark || '' },
-    { new: true }
-  );
+  try {
+    const updatedAppointment = await Appointments.findOneAndUpdate(
+      { appointmentId },
+      { status: 'completed', remarks: remark || '' },
+      { new: true }
+    );
 
-  if (!updatedAppointment) {
-    return res.status(404).json({ message: 'Appointment not found' });
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Get patient information for email
+    const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
+    if (!patient) {
+      console.log('Patient not found for email notification');
+    } else {
+      const user = await User.findOne({ userId: patient.userId });
+      
+      if (user && user.email) {
+        // Format date and time
+        let formattedDateTime = updatedAppointment.appointmentDate;
+        try {
+          const dateObj = new Date(updatedAppointment.appointmentDate);
+          if (updatedAppointment.appointmentTime) {
+            const [hours, minutes] = updatedAppointment.appointmentTime.split(':');
+            dateObj.setHours(Number(hours), Number(minutes));
+          }
+          formattedDateTime = dateObj.toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Singapore'
+          });
+        } catch (e) { /* fallback to raw date */ }
+
+        // HTML email template
+        const htmlTemplate = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Appointment Completed</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              line-height: 1.6;
+              color: #333333;
+              margin: 0;
+              padding: 0;
+              background-color: #f9f9f9;
+            }
+            .wrapper {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .card {
+              background-color: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            }
+            .header {
+              background-color: #1c444d;
+              padding: 30px 0;
+              text-align: center;
+            }
+            .logo {
+              font-size: 24px;
+              font-weight: bold;
+              color: white;
+              letter-spacing: 1px;
+            }
+            .content {
+              padding: 40px 30px;
+              text-align: center;
+            }
+            .title {
+              font-size: 26px;
+              margin-bottom: 10px;
+              color: #1c444d;
+              font-weight: 600;
+            }
+            .subtitle {
+              font-size: 16px;
+              margin-bottom: 30px;
+              color: #666666;
+            }
+            .info-box {
+              background-color: #f0f7f8;
+              border: 2px solid #e0eef0;
+              border-radius: 8px;
+              padding: 20px;
+              margin: 25px 0;
+              text-align: left;
+            }
+            .info-item {
+              margin-bottom: 12px;
+            }
+            .info-label {
+              font-weight: bold;
+              color: #1c444d;
+            }
+            .info-value {
+              color: #333;
+            }
+            .message {
+              font-size: 16px;
+              color: #1c444d;
+              margin-top: 20px;
+            }
+            .note {
+              font-size: 14px;
+              color: #777777;
+              margin-top: 30px;
+              font-style: italic;
+            }
+            .footer {
+              background-color: #f5f5f5;
+              padding: 20px;
+              text-align: center;
+              font-size: 12px;
+              color: #999999;
+            }
+            .divider {
+              height: 1px;
+              background-color: #eeeeee;
+              margin: 30px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="wrapper">
+            <div class="card">
+              <div class="header">
+                <div class="logo">Molar Record Dental Clinic</div>
+              </div>
+              <div class="content">
+                <h1 class="title">Appointment Completed</h1>
+                <p class="subtitle">Thank you for visiting our dental clinic!</p>
+                
+                <div class="info-box">
+                  <div class="info-item">
+                    <span class="info-label">Patient:</span> 
+                    <span class="info-value">${patient.name || 'Patient'}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Date & Time:</span> 
+                    <span class="info-value">${formattedDateTime}</span>
+                  </div>
+                  ${remark ? `
+                  <div class="info-item">
+                    <span class="info-label">Remarks:</span> 
+                    <span class="info-value">${remark}</span>
+                  </div>` : ''}
+                </div>
+                
+                <p class="message">We hope you had a pleasant experience with our services.</p>
+                
+                <div class="divider"></div>
+                
+                <p class="note">
+                  If you have any questions about your dental care or need to schedule a follow-up,
+                  please don't hesitate to contact us.
+                </p>
+              </div>
+              <div class="footer">
+                <p>© ${new Date().getFullYear()} Molar Record Dental Clinic | All rights reserved</p>
+                <p>This is an automated message. Please do not reply to this email.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+        `;
+
+        // Send email notification
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'molarrecord0@gmail.com',
+            pass: 'sgzg nnup buqa onqt',   
+          },
+        });
+
+        await transporter.sendMail({
+          from: '"Molar Record Dental Clinic" <molarrecord0@gmail.com>',
+          to: user.email,
+          subject: 'Dental Appointment Completed - Molar Record Dental Clinic',
+          text: `Dear ${patient.name || 'Patient'},\n\nYour dental appointment on ${formattedDateTime} has been completed.\n\n${remark ? `Remarks: ${remark}\n\n` : ''}Thank you for visiting Molar Record Dental Clinic.`,
+          html: htmlTemplate
+        });
+      }
+    }
+
+    res.status(200).json({ message: 'Appointment marked as completed', appointment: updatedAppointment });
+  } catch (err) {
+    console.error('Error updating appointment:', err);
+    res.status(500).json({ message: 'Failed to mark appointment as completed', error: err.message });
   }
-
-  res.status(200).json({ message: 'Appointment marked as completed', appointment: updatedAppointment });
-} catch (err) {
-  console.error('Error updating appointment:', err);
-  res.status(500).json({ message: 'Failed to mark appointment as completed', error: err.message });
-}
 };

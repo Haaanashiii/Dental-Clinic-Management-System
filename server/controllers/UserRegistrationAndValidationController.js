@@ -241,12 +241,141 @@ exports.changeStatusUser = async (req, res) => {
           pass: 'sgzg nnup buqa onqt',   
         },
       });
+      
+      // HTML email template
+      const htmlTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Account Status Update</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+          }
+          .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+          }
+          .header {
+            background-color: #1c444d;
+            padding: 30px 0;
+            text-align: center;
+          }
+          .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+          }
+          .content {
+            padding: 40px 30px;
+            text-align: center;
+          }
+          .title {
+            font-size: 26px;
+            margin-bottom: 10px;
+            color: #1c444d;
+            font-weight: 600;
+          }
+          .subtitle {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #666666;
+          }
+          .status-box {
+            background-color: #f0f7f8;
+            border: 2px solid #e0eef0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+          }
+          .status {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1c444d;
+          }
+          .message {
+            margin-top: 25px;
+            font-size: 16px;
+            color: #555555;
+          }
+          .contact {
+            font-size: 14px;
+            color: #777777;
+            margin-top: 30px;
+          }
+          .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+          }
+          .divider {
+            height: 1px;
+            background-color: #eeeeee;
+            margin: 30px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="card">
+            <div class="header">
+              <div class="logo">MolarRecord Dental Clinic</div>
+            </div>
+            <div class="content">
+              <h1 class="title">Account Status Update</h1>
+              <p class="subtitle">Hello ${user.name || user.username},</p>
+              
+              <div class="status-box">
+                <div class="status">${status.toUpperCase()}</div>
+              </div>
+              
+              <p class="message">
+                Your account status has been updated to <strong>${status}</strong>.
+                ${status === 'Active' ? 'You can now log in to your account and use our services.' : ''}
+              </p>
+              
+              <div class="divider"></div>
+              
+              <p class="contact">
+                If you have any questions, please contact us at:<br>
+                +63 977 641 4655 / +63 921 355 3335
+              </p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} MolarRecord Dental Clinic | All rights reserved</p>
+              <p>This is an automated message. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+      `;
+      
       const mailOptions = {
-        from: 'molarrecord0@gmail.com',
+        from: '"MolarRecord Dental Clinic" <molarrecord0@gmail.com>',
         to: user.email,
-        subject: 'Account Status Update',
+        subject: 'Account Status Update - MolarRecord Dental Clinic',
         text: `Hello ${user.username || ''},\n\nYour account status has been changed to: ${status.toUpperCase()}.\n\nIf you have questions, please contact +63 977 641 4655/+63 921 355 3335.`,
+        html: htmlTemplate
       };
+      
       try {
         await transporter.sendMail(mailOptions);
       } catch (mailErr) {

@@ -1,126 +1,223 @@
-.ManageDentist-dashboard{
+.ManageDentist-dashboard {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100vh;
-  justify-content: space-between;
-  overflow: hidden; 
+  overflow: hidden;
 }
-.ManageDentist-content{
+
+.ManageDentist-content {
   display: flex;
   flex-direction: column;
+  padding: 30px;
+  overflow: auto;
   width: 100%;
-  height: 100%;
-  padding: 10px;
 }
+
 .ManageDentist-table {
-    position: relative;
-    max-height: 100%; 
-    width: 166vh;         
-    margin: auto;   
-    margin-top: -25px; 
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .MuiTableContainer-root {
-    width: 100%; 
-    
+  flex: 1;
+  overflow-y: auto;
 }
 
-/* Table Header */
-.ManageDentist-table .MuiTableHead-root {
-    background-color: #000;  
-    
+.MuiTableHead-root {
+  background-color: #1c444d;
 }
 
-.ManageDentist-table .MuiTableCell-head {
-    background-color: #1c444d;
-    color: #fff;
-    text-align: center;
-    font-weight: bold;
+.MuiTableCell-head {
+  background-color: #1c444d !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  text-align: center;
 }
 
 /* Table Cells */
 .ManageDentist-table .MuiTableCell-body {
-    font-size: 14px;
-    padding: 12px 24px;      
-    text-align: center;
+  font-size: 14px;
+  padding: 12px 24px;
+  text-align: center;
 }
 
 /* Table Rows */    
 .ManageDentist-table .MuiTableRow-root {
-    height: 60px;           
+  height: 60px;
 }
 
 .ManageDentist-table .MuiTableRow-root:nth-child(odd) {
-    background-color: #f3f3f3; 
+  background-color: #f3f3f3;
 }
 
 /* Modal Styling */
 .professional-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 450px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    padding: 0;
-    overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 0;
+  overflow: hidden;
 }
 
 .modal-header {
-    background-color: #1c444d;
-    color: white;
-    padding: 20px 24px;
-    margin: 0;
-    border-bottom: 1px solid #e0e0e0;
+  background-color: #1c444d;
+  color: white;
+  padding: 20px 24px;
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-header h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .modal-body {
-    padding: 24px;
+  padding: 24px;
 }
 
 .modal-footer {
-    padding: 16px 24px;
-    background-color: #fafafa;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .modal-cancel-btn {
-    min-width: 100px;
-    text-transform: none;
-    border-color: #ccc;
-    color: #666;
+  min-width: 100px;
+  text-transform: none;
+  border-color: #ccc;
+  color: #666;
 }
 
 .modal-submit-btn {
-    min-width: 120px;
-    background-color: #1c444d;
-    text-transform: none;
+  min-width: 120px;
+  background-color: #1c444d;
+  text-transform: none;
 }
 
 .modal-submit-btn:hover {
-    background-color: #2d5a66;
+  background-color: #2d5a66;
 }
 
 .modal-text-field {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
+/* Profile container styles */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #1c444d 0%, #2d5a66 100%);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+}
+
+.profile-welcome {
+  color: white;
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.profile-date {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 180px); /* Adjust based on header height and padding */
+  min-height: 500px;
+  overflow: hidden;
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8f4f8;
+  box-sizing: border-box;
+}
+
+/* Fix BTNADD position */
 .BTNADD {
-    margin-top: -50px;
-    display: flex;
-    justify-content: flex-end; 
-    margin-bottom: 16px;
-    left: 825px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Custom button colors */
+.MuiButton-contained {
+  background-color: #1c444d !important;
+  color: white !important;
+  box-shadow: none;
+}
+
+.MuiButton-outlined {
+  color: #1c444d !important;
+  border-color: #1c444d !important;
+  background-color: white !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: #f0f4f5 !important;
+  border-color: #1c444d !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
+  }
+  
+  .profile-header, 
+  .profile-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .profile-container {
+    padding: 15px;
+  }
+  
+  .profile-header, 
+  .profile-content {
+    padding: 15px;
+  }
 }
