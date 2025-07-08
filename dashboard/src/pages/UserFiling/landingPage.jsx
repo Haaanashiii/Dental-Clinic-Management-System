@@ -228,17 +228,7 @@ function LandingPage() {
               </IconButton>
               <Button
                 onClick={() => {
-                  const token = sessionStorage.getItem('authToken');
-                  const role = sessionStorage.getItem('role');
-                  if (token && role) {
-                    if (role === 'patient') {
-                      navigate('/', { replace: true });
-                    } else {
-                      navigate('/ManageAppointment', { replace: true });
-                    }
-                  } else {
-                    navigate('/login', { replace: true });
-                  }
+                  navigate('/login', { replace: true });
                 }}
                 className="mint-navbar-btn"
                 sx={{
