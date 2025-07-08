@@ -38,7 +38,9 @@ function ClientDashboard() {
     if (path.includes('ManageAppointment')) return '6';
     if (path.includes('ManageRecord')) return '7';
     if (path.includes('UserRecords')) return '8';
-    if (path.includes('OtherPlatform')) return '9';
+    if (path.includes('AdminDashboard')) return '1';
+    if (path.includes('ViewAudit')) return '9';
+    if (path.includes('OtherPlatform')) return '10';
 
     return '';
   };
@@ -58,15 +60,16 @@ function ClientDashboard() {
   const getCurrentUser = () => {
     // Debug: Check what's in sessionStorage
     console.log('SessionStorage contents:', {
+      name: sessionStorage.getItem('name'),
       username: sessionStorage.getItem('username'),
       role: sessionStorage.getItem('role'),
       allKeys: Object.keys(sessionStorage),
       allItems: { ...sessionStorage }
     });
 
-    const username = sessionStorage.getItem('username') || 'User';
+    const name = sessionStorage.getItem('name') || sessionStorage.getItem('username') || 'User';
     const role = sessionStorage.getItem('role') || 'Unknown';
-    return { username, role };
+    return { name, role };
   };
 
   const currentUser = getCurrentUser();
@@ -76,8 +79,14 @@ function ClientDashboard() {
       key: '1',
       icon: <HomeOutlined />,
       label: 'Home',
-      onClick: () => navigate('/'),
-      hidden: role !== 'patient',
+      onClick: () => {
+        if (role === 'patient') {
+          navigate('/');
+        } else {
+          navigate('/AdminDashboard');
+        }
+      },
+      hidden: false,
     },
     {
       key: '2',
@@ -127,8 +136,22 @@ function ClientDashboard() {
       onClick: () => navigate('/UserRecords'),
       hidden: role !== 'patient',
     },
-    {
+     {
+      key: '8',
+      icon: <FileTextOutlined />,
+      label: 'User Records',
+      onClick: () => navigate('/UserRecords'),
+      hidden: role !== 'patient',
+    },
+     {
       key: '9',
+      icon: <TeamOutlined />, // Changed icon to TeamOutlined for Audit logs
+      label: 'Audit Logs', // Changed label to Audit Logs
+      onClick: () => navigate('/ViewAudit'),
+      hidden: role !== 'staff' && role !== 'dentist',
+    },
+    {
+      key: '10',
       icon: <FileTextOutlined />,
       label: 'Other Platforms',
       onClick: () => navigate('/OtherPlatform'),
@@ -146,7 +169,7 @@ function ClientDashboard() {
         width={200}
         trigger={null} // This removes the default trigger that causes delay
       >
-        <div className="logo-container">
+        <div className="logo-container" onClick={() => navigate('/LandingPage')} style={{ cursor: 'pointer' }}>
           <img
             src={logo}
             alt="Dental Clinic Logo"
@@ -190,7 +213,7 @@ function ClientDashboard() {
                 </div>
                 {!collapsed && (
                   <div className="user-details">
-                    <div className="username">{currentUser.username}</div>
+                    <div className="username">{currentUser.name}</div>
                     <div className="user-role">{currentUser.role}</div>
                   </div>
                 )}

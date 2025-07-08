@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import {
   Button,
   TextField,
@@ -113,7 +113,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
   // Check if new password is same as old password
   React.useEffect(() => {
     if (forgotStep === 2 && forgotNewPassword && forgotEmail) {
-      axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/check-password`, {
+      api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/check-password`, {
         email: forgotEmail,
         password: forgotNewPassword,
       })
@@ -128,7 +128,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     const { emailOrUsername, password } = userForm;
     const isEmail = emailOrUsername.includes("@");
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
         {
           email: isEmail ? emailOrUsername.toLowerCase().trim() : "",
@@ -147,7 +147,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
           setOtpDialogOpen(true);
           // Send OTP to user (only if email is present)
           if (email) {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email });
+            await api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email });
           } else {
             setError("OTP can only be sent to a valid email address. Please use your email to log in.");
             setOtpDialogOpen(false);
@@ -168,7 +168,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
         if (role === "patient") {
           try {
             const token = sessionStorage.getItem("authToken");
-            const profileRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
+            const profileRes = await api.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             if (profileRes.data && profileRes.data.userId) {
@@ -202,7 +202,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
         setOtpLoading(false);
         return;
       }
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
+      await api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
         email: pendingLogin.email,
         otp: otpValue,
         checkOnly: true, // Only verify OTP, do not reset password
@@ -225,7 +225,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
       if (role === "patient") {
         try {
           const token = sessionStorage.getItem("authToken");
-          const profileRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
+          const profileRes = await api.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (profileRes.data && profileRes.data.userId) {
@@ -269,7 +269,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
       // Step 1: Send OTP
       setForgotLoading(true);
       try {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email: forgotEmail });
+        await api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/request-otp`, { email: forgotEmail });
         setForgotStep(1);
         setForgotOtpTimer(300); // 5 min
       } catch (err) {
@@ -285,7 +285,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
       // Step 2: Verify OTP
       setForgotLoading(true);
       try {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
+        await api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
           email: forgotEmail,
           otp: forgotOtp,
           checkOnly: true, // Only check OTP, don't reset password yet
@@ -304,7 +304,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
       }
       setForgotLoading(true);
       try {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
+        await api.post(`${import.meta.env.VITE_API_BASE_URL}/otp/verify-otp`, {
           email: forgotEmail,
           otp: forgotOtp,
           newPassword: forgotNewPassword,

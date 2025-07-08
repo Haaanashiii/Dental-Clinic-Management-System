@@ -6,7 +6,7 @@ import {
   TableHead, TablePagination, TableRow
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import axios from "axios";
+import api from '../../api';
 import DeleteIcon from "@mui/icons-material/Delete";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import BlockIcon from "@mui/icons-material/Block";
@@ -56,7 +56,7 @@ export default function ManageUser() {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user`);
+      const { data } = await api.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user`);
       setUsers(data);
     } catch (error) {
       console.error("ERROR fetching users:", error);
@@ -66,7 +66,7 @@ export default function ManageUser() {
 
   const handleStatusChange = async (userId, status) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/status/${userId}`, { status });
+      await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/status/${userId}`, { status });
       fetchUsers();
       toast.success(`User status changed to ${status} successfully!`);
     } catch (error) {
@@ -78,7 +78,7 @@ export default function ManageUser() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
+      await api.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
       fetchUsers();
       toast.success("User deleted successfully!");
     } catch (error) {

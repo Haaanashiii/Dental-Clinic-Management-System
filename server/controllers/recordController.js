@@ -1,4 +1,9 @@
 const Records = require('../models/records.models');
+const axios = require('axios');
+const { LOCAL_IP } = require('../config/localIP');
+const { SERVER_PORT } = require('../index');
+const Audit = require('../models/audit.models'); // Add Audit model for direct logging
+const { writeAuditLog } = require('../utils/auditLogHelper');
 
 
 exports.createRecord = async (req, res) => {
@@ -11,7 +16,7 @@ exports.createRecord = async (req, res) => {
       treatment,
       images,
       visitDate,
-      fine // ← ADD THIS
+      fine
     } = req.body;
 
     // Validate base64 images
@@ -42,61 +47,27 @@ exports.createRecord = async (req, res) => {
 
     await newRecord.save();
 
+    let patientName = patientId;
+    let dentistName = dentistId;
     try {
-      const Patient = require('../models/patient.models');
-      const User = require('../models/user.models');
-      const Dentist = require('../models/dentist.models');
-      const nodemailer = require('nodemailer');
-
       const patient = await Patient.findOne({ patientId });
-      const patientName = patient?.name || 'Patient';
-      const userId = patient?.userId;
-
-      let userEmail = '';
-      if (userId) {
-        const user = await User.findOne({ userId });
-        userEmail = user?.email || '';
-      }
-
-      let dentistName = dentistId;
-      if (dentistId) {
-        const dentist = await Dentist.findOne({ dentistId });
-        if (dentist && dentist.name) dentistName = dentist.name;
-      }
-
-      if (userEmail) {
-        let formattedVisitDate = visitDate;
-        try {
-          const dateObj = new Date(visitDate);
-          formattedVisitDate = dateObj.toLocaleString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Singapore'
-          });
-        } catch (e) { /* fallback to raw */ }
-
-        
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: 'molarrecord0@gmail.com',
-            pass: 'sgzg nnup buqa onqt',   
-          },
-        });
-
-        // Email content
-        const mailOptions = {
-          from: 'molarrecord0@gmail.com',
-          to: userEmail,
-          subject: 'Dental Visit Record & Fine Details',
-          text: `Dear ${patientName},\n\nYour dental visit record has been created.\n\nDentist: ${dentistName}\nVisit Date: ${formattedVisitDate}\nDiagnosis: ${diagnosis || 'N/A'}\nTreatment: ${treatment || 'N/A'}\nFine: $${fine || 0} (${fine > 0 ? 'Unpaid' : 'Paid'})\n\nThank you for visiting!`,
-        };
-
-        await transporter.sendMail(mailOptions);
-      }
-    } catch (emailErr) {
-      console.error('Error sending record email:', emailErr);
+      if (patient && patient.name) patientName = patient.name;
+      const dentist = await Dentist.findOne({ dentistId });
+      if (dentist && dentist.name) dentistName = dentist.name;
+    } catch (e) { /* fallback to IDs */ }
+    const dateStr = new Date(visitDate).toLocaleDateString();
+    // Audit log for record creation
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'Record Created',
+        targetType: 'record',
+        targetId: newRecord._id,
+        targetName: `${patientName} with ${dentistName}`,
+        after: newRecord,
+        extra: `${req.user.name} (${req.user.role}) created a record for patient ${patientName} with dentist ${dentistName} on ${dateStr}`
+      });
     }
-
     res.status(201).json({ message: 'Record created successfully', record: newRecord });
   } catch (err) {
     console.error("Error creating record:", err);
@@ -130,15 +101,46 @@ exports.getFilteredRecords = async (req, res) => {
 exports.markAsPaid = async (req, res) => {
   const { recordId } = req.params;
   try {
+    // Get the user from the JWT token (for auditing)
+    const user = req.user;
+    const beforeRecord = await Records.findById(recordId);
     const updated = await Records.findByIdAndUpdate(
       recordId,
       { fineStatus: 'paid' },
       { new: true }
     );
     if (!updated) return res.status(404).json({ message: 'Record not found' });
+    // Fetch patient and dentist names for audit log
+    let patientName = updated.patientId;
+    let dentistName = updated.dentistId;
+    try {
+      const Patient = require('../models/patient.models');
+      const Dentist = require('../models/dentist.models');
+      const patient = await Patient.findOne({ patientId: updated.patientId });
+      if (patient && patient.name) patientName = patient.name;
+      const dentist = await Dentist.findOne({ dentistId: updated.dentistId });
+      if (dentist && dentist.name) dentistName = dentist.name;
+    } catch (e) { /* fallback to IDs */ }
+    // Audit log for marking record as paid
+    try {
+      if (user) {
+        await writeAuditLog({
+          req,
+          action: 'Record Marked as Paid',
+          targetType: 'record',
+          targetId: updated._id,
+          targetName: `${patientName} with ${dentistName}`,
+          before: { fineStatus: beforeRecord ? beforeRecord.fineStatus : 'unpaid' },
+          after: { fineStatus: 'paid' },
+          extra: `${user.name} (${user.role}) marked record as paid.`
+        });
+      }
+    } catch (auditErr) {
+      console.error('Audit log error (mark as paid):', auditErr);
+    }
     res.status(200).json({ message: 'Record marked as paid', record: updated });
   } catch (err) {
-    console.error("Error updating fineStatus:", err);
+    console.error('Error updating fineStatus:', err);
     res.status(500).json({ message: 'Error updating fine status' });
   }
 };

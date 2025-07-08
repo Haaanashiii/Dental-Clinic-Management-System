@@ -1,6 +1,7 @@
 // controllers/StaffController.js
 const Staff = require('../models/staff.models');
 const fs = require('fs');
+const { writeAuditLog } = require('../utils/auditLogHelper');
 
 
 // Get Staff profile by userId
@@ -132,6 +133,18 @@ exports.editProfile = async (req, res) => {
       contactNumber: updatedProfile.contactNumber,
       profileImage: base64Image ? `data:image/png;base64,${base64Image}` : null,
     });
+    // Audit log for staff profile update
+    try {
+      await writeAuditLog({
+        req,
+        action: 'Profile Update',
+        targetType: 'profile',
+        targetId: updatedProfile.userId,
+        targetName: updatedProfile.name,
+        after: updatedProfile,
+        extra: 'Staff updated their profile information.'
+      });
+    } catch (e) { console.error('Audit log error:', e.message); }
   } catch (err) {
     console.error("Error updating profile:", err);
     res.status(500).json({ message: "Error updating profile", error: err.message });

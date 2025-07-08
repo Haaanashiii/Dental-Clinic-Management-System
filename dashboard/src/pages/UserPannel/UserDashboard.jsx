@@ -27,7 +27,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
-import axios from "axios";
+import api from '../../api';
 import dayjs from "dayjs";
 import "./UserDashboard.css";
 
@@ -88,7 +88,7 @@ function UserDashboard() {
   useEffect(() => {
     const fetchPatientProfile = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`);
+        const res = await api.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`);
         if (res.data.patientId) {
           setPatientId(res.data.patientId);
         } else {
@@ -101,7 +101,7 @@ function UserDashboard() {
 
     const fetchDentists = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile`);
+        const res = await api.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile`);
         setDentists(res.data);
       } catch (err) {
         console.error("Error fetching dentists:", err);
@@ -114,9 +114,9 @@ function UserDashboard() {
 
   const fetchAppointments = async (status) => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/patient/${patientId}`);
+      const res = await api.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/patient/${patientId}`);
       const appointmentsWithDentists = await Promise.all(res.data.map(async (appointment) => {
-        const dentistRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile/dentist/${appointment.dentistId}`);
+        const dentistRes = await api.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile/dentist/${appointment.dentistId}`);
         const dentistName = dentistRes.data.name;
         return { ...appointment, dentistName };
       }));
@@ -199,7 +199,7 @@ function UserDashboard() {
         appointmentTime: appointmentTime.format("HH:mm"),
         status: "pending",
       };
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointment/create`, payload);
+      await api.post(`${import.meta.env.VITE_API_BASE_URL}/appointment/create`, payload);
       alert("Appointment created successfully!");
       handleClose();
       fetchAppointments('pending');
@@ -211,7 +211,7 @@ function UserDashboard() {
 
   const handleCancelAppointment = async (appointmentId) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/cancel/${appointmentId}`);
+      await api.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/cancel/${appointmentId}`);
       alert("Appointment cancelled successfully!");
       fetchAppointments(statusFilter);
     } catch (err) {
@@ -311,7 +311,7 @@ function UserDashboard() {
                 </TableHead>
                 <TableBody>
                   {displayedRecords.map((appointment) => (
-                    <StyledTableRow key={appointment._id}>
+                    <StyledTableRow key={appointment.appointmentId || appointment._id}>
                       <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
                       <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
                       <StyledTableCell>{appointment.dentistName || "Unknown"}</StyledTableCell>
@@ -342,7 +342,7 @@ function UserDashboard() {
                             variant="outlined" 
                             color="error" 
                             size="small"
-                            onClick={() => handleCancelAppointment(appointment._id)}
+                            onClick={() => handleCancelAppointment(appointment.appointmentId)}
                             sx={{
                               minWidth: '32px',
                               height: '32px',

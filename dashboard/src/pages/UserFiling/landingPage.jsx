@@ -82,6 +82,24 @@ const dentalServices = [
 
 function LandingPage() {
   const navigate = useNavigate();
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const role = sessionStorage.getItem('role');
+    const currentPath = window.location.pathname;
+    if (currentPath === '/LandingPage') return; // Don't redirect if already on LandingPage
+    if (token && role) {
+      if (role === 'patient') {
+        navigate('/', { replace: true });
+      } else if (role === 'dentist' || role === 'staff') {
+        navigate('/ManageAppointment', { replace: true });
+      }
+    } else {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
+
+
   const refs = {
     home: useRef(null),
     about: useRef(null),
@@ -210,7 +228,9 @@ function LandingPage() {
                 {mode === 'dark' ? <Brightness7Icon sx={{ color: '#fff' }} /> : <Brightness4Icon sx={{ color: '#fff' }} />}
               </IconButton>
               <Button
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  navigate('/login', { replace: true });
+                }}
                 className="mint-navbar-btn"
                 sx={{
                   bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
@@ -239,6 +259,19 @@ function LandingPage() {
               </Button>
               <IconButton
                 className="mint-navbar-btn"
+                onClick={() => {
+                  const token = sessionStorage.getItem('authToken');
+                  const role = sessionStorage.getItem('role');
+                  if (token && role) {
+                    if (role === 'patient') {
+                      navigate('/', { replace: true });
+                    } else {
+                      navigate('/ManageAppointment', { replace: true });
+                    }
+                  } else {
+                    navigate('/login', { replace: true });
+                  }
+                }}
                 sx={{
                   bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
                   color: '#1eb2a6',
@@ -535,7 +568,7 @@ function LandingPage() {
 
 
         {/* Services Section Separator (Oval) - now in whitespace between sections */}
-        {/* This is the oval separator between About and Services sections. It visually separates the two sections. */}
+        {/* This is the oval separator between About and Services sections. It visually separates the two sections */}
         <Box sx={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: { xs: -4, md: -6 }, mb: { xs: 3, md: 4 }, zIndex: 3, position: 'relative', background: 'transparent' }}>
           <Box
             sx={{

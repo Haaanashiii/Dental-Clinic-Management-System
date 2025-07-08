@@ -1,0 +1,201 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+.admin-dashboard-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+  padding: 30px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+.admin-dashboard-Body{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+  padding: 50px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+.admin-dashboard-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  background: none;
+}
+.admin-dashboard-boxes {
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 32px;
+}
+
+.admin-dashboard-box {
+  background: #1C444D;
+  color: #fff;
+  border-radius: 12px;
+  padding: 24px 32px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.admin-dashboard-card {
+  background: #fff !important;
+  color: #1C444D !important;
+  min-width: 0;
+  flex: 1 1 0;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 16px rgba(28,68,77,0.10) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 36px 40px 30px 40px;
+  border: 1.5px solid #e6e6e6;
+  transition: box-shadow 0.2s, border 0.2s;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+.admin-dashboard-card:hover {
+  box-shadow: 0 6px 32px rgba(28,68,77,0.18) !important;
+  border: 1.5px solid #1C444D;
+}
+
+.admin-dashboard-box-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.admin-dashboard-card-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #1C444D;
+  text-align: left;
+  letter-spacing: 0.01em;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-box-value {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.admin-dashboard-card-value {
+  font-size: 2.7rem;
+  font-weight: 900;
+  color: #111;
+  text-align: left;
+  margin-bottom: 10px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-card-sub {
+  font-size: 1.04rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-card-paid {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1dbf73 !important;
+  text-align: left;
+  display: inline-block;
+  margin-right: 16px;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-card-unpaid {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #e74c3c !important;
+  text-align: left;
+  display: inline-block;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-card-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #e6faf1;
+  color: #1dbf73;
+  font-size: 1.01rem;
+  font-weight: 700;
+  border-radius: 16px;
+  padding: 2px 14px;
+  margin-left: 12px;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.admin-dashboard-card-badge.down {
+  background: #fdeaea;
+  color: #e74c3c;
+}
+
+.admin-dashboard-body-cards {
+  display: flex;
+  width: 100%;
+  gap: 32px;
+  margin-top: 0;
+}
+
+.admin-dashboard-card.pending-users {
+  flex: 2 1 0;
+  min-width: 400px;
+  max-width: 700px;
+  height: 100%;
+}
+
+.admin-dashboard-card.audit-preview {
+  flex: 1 1 0;
+  min-width: 250px;
+  max-width: 400px;
+  height: 100%;
+}
+
+.admin-dashboard-card,
+.admin-dashboard-card-content {
+  min-height: 180px !important;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+  .admin-dashboard-boxes {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .admin-dashboard-card {
+    width: 100%;
+    min-width: 0;
+    align-items: stretch;
+  }
+  .admin-dashboard-body-cards {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .admin-dashboard-card.pending-users,
+  .admin-dashboard-card.audit-preview {
+    max-width: 100%;
+    min-width: 0;
+  }
+}

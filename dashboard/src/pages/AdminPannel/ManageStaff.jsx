@@ -17,7 +17,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import SearchIcon from "@mui/icons-material/Search";
-import axios from "axios";
+import api from '../../api';
 import "./ManageDentist.css";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -69,7 +69,7 @@ export default function ManageStaff() {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user?role=staff`);
+      const { data } = await api.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user?role=staff`);
       setUsers(data);
       console.log("Fetched users:", data);
     } catch (error) {
@@ -123,10 +123,10 @@ export default function ManageStaff() {
 
     if (isEditing) {
       // Send PUT request to update user profile
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
+      await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
     } else {
       // Send POST request to create new user
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
+      await api.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
     }
 
     // Reload users list and close modal
@@ -141,8 +141,8 @@ export default function ManageStaff() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/staff/delete/${userId}`);
+      await api.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
+      await api.delete(`${import.meta.env.VITE_API_BASE_URL}/staff/delete/${userId}`);
       fetchUsers();
     } catch (error) {
       console.error("ERROR deleting user:", error);

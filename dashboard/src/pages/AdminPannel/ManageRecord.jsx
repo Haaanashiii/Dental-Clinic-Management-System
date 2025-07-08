@@ -8,7 +8,7 @@ import {
   TableHead, TableRow, Paper, Grid, Modal, Box, TablePagination
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import axios from "axios";
+import api from '../../api';
 import './ManageRecord.css';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -48,7 +48,7 @@ function ManageRecord() {
         ? `${import.meta.env.VITE_API_BASE_URL}/record/list?status=${filterStatus}`
         : `${import.meta.env.VITE_API_BASE_URL}/record/list`;
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
       const data = response.data.data || [];
 
       const enriched = await Promise.all(
@@ -57,14 +57,14 @@ function ManageRecord() {
           let dentistName = "Unknown";
 
           try {
-            const resPatient = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/name/${record.patientId}`);
+            const resPatient = await api.get(`${import.meta.env.VITE_API_BASE_URL}/patient/name/${record.patientId}`);
             patientName = resPatient.data?.name ?? "Unknown";
           } catch (e) {
             console.warn("❗ Could not fetch patient", e);
           }
 
           try {
-            const resDentist = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${record.dentistId}`);
+            const resDentist = await api.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${record.dentistId}`);
             dentistName = resDentist.data?.name ?? "Unknown";
           } catch (e) {
             console.warn("❗ Could not fetch dentist", e);
@@ -96,7 +96,7 @@ function ManageRecord() {
 
   const markAsPaid = async (recordId) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/record/pay/${recordId}`);
+      await api.put(`${import.meta.env.VITE_API_BASE_URL}/record/pay/${recordId}`);
       alert("Marked as paid");
       fetchRecords();
     } catch {
