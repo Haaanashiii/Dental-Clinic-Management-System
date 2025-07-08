@@ -15,6 +15,8 @@ const UserRegistrationAndValidation = require("./routes/UserRegistrationAndValid
 const patientRoute = require("./routes/patientRoute.js");
 const otpRoute = require("./routes/otpRoute.js");
 
+const auditRoute = require("./routes/auditRoute.js");
+
 const connectDB = require("./config/connection.js");
 
 const app = express();
@@ -35,6 +37,7 @@ app.use("/appointment", appointmentRoute);
 app.use("/record", recordRoute);
 app.use("/auth", UserRegistrationAndValidation);
 app.use("/otp", otpRoute);
+app.use("/audit", auditRoute);
 
 // Error handler
 app.use(errorHandler);
@@ -53,8 +56,12 @@ function getLocalIP() {
 }
 
 // Start server
-const PORT = process.env.PORT || 1337;
+const PORT = process.env.PORT || 5137;
 const IP = getLocalIP();
+
+// Export for use in controllers
+module.exports.SERVER_PORT = PORT;
+module.exports.SERVER_IP = IP;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(` Server running at:`);

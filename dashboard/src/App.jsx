@@ -15,6 +15,7 @@ import ManageStaff from "./pages/AdminPannel/ManageStaff";
 import ManageRecord from "./pages/AdminPannel/ManageRecord";
 import ManageAppointment from "./pages/AdminPannel/ManageAppointment";
 import ManageUser from "./pages/AdminPannel/ManageUser";
+import ViewAudit from "./pages/AdminPannel/ViewAudit";
 //Main imports
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -160,10 +161,21 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             </AnimatedContent>
           ) : <Navigate to="/login" />
         } />
-        
+         <Route path="/AdminDashboard" element={
+          isAuthenticated && (userRole === "staff" || userRole === "dentist") ? (
+            <AnimatedContent hasSidebar={true}>
+              <AdminDashboard />
+            </AnimatedContent>
+          ) : <Navigate to="/login" />
+        } />
         <Route path="/LandingPage" element={
             <AnimatedContent hasSidebar={true}>
               <LandingPage />
+            </AnimatedContent>
+        } />
+          <Route path="/ViewAudit" element={
+            <AnimatedContent hasSidebar={true}>
+              <ViewAudit />
             </AnimatedContent>
         } />
         {/* Redirect to landing if not found */}
@@ -218,6 +230,7 @@ function App() {
         <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
         <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
         <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
+        <Route path="/ViewAudit" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ViewAudit onLogout={() => handleLogout(setIsAuthenticated, setUserRole)} /> : <Navigate to="/LandingPage" />} />
         <Route path="*" element={<Navigate to="/LandingPage" />} />
       </Routes>
     </BrowserRouter>

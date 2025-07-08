@@ -2,10 +2,26 @@ const Appointments = require('../models/appointment.models');
 const nodemailer = require('nodemailer');
 const User = require('../models/user.models');
 const Patient = require('../models/patient.models');
+const Audit = require('../models/audit.models'); // Add Audit model for direct logging
+const axios = require('axios');
+const { LOCAL_IP } = require('../config/localIP');
+const { SERVER_PORT } = require('../index');
+const { writeAuditLog } = require('../utils/auditLogHelper');
 
 exports.createAppointment = async (req, res) => {
   try {
     const { patientId, dentistId, appointmentDate, appointmentTime, status, remarks } = req.body;
+
+    // Prevent duplicate appointment for same patient, dentist, date, and time
+    const existing = await Appointments.findOne({
+      patientId,
+      dentistId,
+      appointmentDate: new Date(appointmentDate),
+      appointmentTime
+    });
+    if (existing) {
+      return res.status(409).json({ message: 'An appointment already exists for this patient, dentist, date, and time.' });
+    }
 
     const newAppointment = new Appointments({
       patientId,
@@ -203,6 +219,18 @@ exports.createAppointment = async (req, res) => {
     });
 
     res.status(201).json(newAppointment);
+    // Audit log for appointment creation
+    try {
+      await writeAuditLog({
+        req,
+        action: 'Appointment Created',
+        targetType: 'appointment',
+        targetId: newAppointment.appointmentId || newAppointment._id,
+        targetName: `${patientName} with ${dentistName}`,
+        after: newAppointment,
+        extra: `Appointment created for patient ${patientName} with dentist ${dentistName} on ${readableDateTime}`
+      });
+    } catch (e) { console.error('Audit log error:', e.message); }
   } catch (err) {
     console.error("Error creating appointment:", err);
     res.status(500).json({ message: "Error creating appointment", error: err.message });
@@ -272,6 +300,19 @@ exports.deleteAppointment = async (req, res) => {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
+    // Audit log for appointment deletion
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'Appointment Deleted',
+        targetType: 'appointment',
+        targetId: appointmentId,
+        targetName: deleted.patientId + ' with ' + deleted.dentistId,
+        before: deleted,
+        extra: `Appointment ${appointmentId} deleted by ${req.user.name}`
+      });
+    }
+
     res.status(200).json({ success: true, message: "Appointment deleted successfully" });
   } catch (err) {
     console.error("Error deleting appointment:", err);
@@ -319,6 +360,42 @@ exports.cancelAppointment = async (req, res) => {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
+    // Fetch patient and dentist names for audit log
+    let patientName = updatedAppointment.patientId;
+    let dentistName = updatedAppointment.dentistId;
+    try {
+      const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
+      if (patient && patient.name) patientName = patient.name;
+      const dentist = await require('../models/dentist.models').findOne({ dentistId: updatedAppointment.dentistId });
+      if (dentist && dentist.name) dentistName = dentist.name;
+    } catch (e) { /* fallback to IDs */ }
+    const dateStr = new Date(updatedAppointment.appointmentDate).toLocaleDateString();
+    const timeStr = updatedAppointment.appointmentTime;
+
+    // Audit log for appointment cancellation
+    if (req.user) {
+      let details = '';
+      if (req.user.role === 'patient' && req.user.name === patientName) {
+        details = `Patient ${patientName} cancelled their own appointment with dentist ${dentistName} on ${dateStr} at ${timeStr}`;
+      } else if (req.user.role === 'dentist' && req.user.name === dentistName) {
+        details = `Dentist ${dentistName} cancelled appointment for patient ${patientName} on ${dateStr} at ${timeStr}`;
+      } else if (req.user.role === 'staff') {
+        details = `Staff ${req.user.name} cancelled appointment for patient ${patientName} with dentist ${dentistName} on ${dateStr} at ${timeStr}`;
+      } else {
+        details = `${req.user.name} (${req.user.role}) cancelled appointment for patient ${patientName} with dentist ${dentistName} on ${dateStr} at ${timeStr}`;
+      }
+      await writeAuditLog({
+        req,
+        action: 'Appointment Cancelled',
+        targetType: 'appointment',
+        targetId: appointmentId,
+        targetName: `${patientName} with ${dentistName}`,
+        before: { status: 'confirmed' },
+        after: { status: 'cancelled' },
+        extra: details
+      });
+    }
+
     res.status(200).json(updatedAppointment);
   } catch (err) {
     console.error("Error cancelling appointment:", err);
@@ -339,6 +416,31 @@ exports.confirmAppointment = async (req, res) => {
 
     if (!updatedAppointment) {
       return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Fetch patient and dentist names for audit log
+    let patientName = updatedAppointment.patientId;
+    let dentistName = updatedAppointment.dentistId;
+    try {
+      const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
+      if (patient && patient.name) patientName = patient.name;
+      const dentist = await require('../models/dentist.models').findOne({ dentistId: updatedAppointment.dentistId });
+      if (dentist && dentist.name) dentistName = dentist.name;
+    } catch (e) { /* fallback to IDs */ }
+    const dateStr = new Date(updatedAppointment.appointmentDate).toLocaleDateString();
+    const timeStr = updatedAppointment.appointmentTime;
+
+    // Audit log for appointment confirmation
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'Appointment Confirmed',
+        targetType: 'appointment',
+        targetId: appointmentId,
+        targetName: `${patientName} with ${dentistName}`,
+        after: { status: 'confirmed' },
+        extra: `${req.user.name} (${req.user.role}) confirmed appointment for patient ${patientName} with dentist ${dentistName} on ${dateStr} at ${timeStr}`
+      });
     }
 
     const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
@@ -578,6 +680,31 @@ exports.markAppointmentCompleted = async (req, res) => {
 
     if (!updatedAppointment) {
       return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Fetch patient and dentist names for audit log
+    let patientName = updatedAppointment.patientId;
+    let dentistName = updatedAppointment.dentistId;
+    try {
+      const patient = await Patient.findOne({ patientId: updatedAppointment.patientId });
+      if (patient && patient.name) patientName = patient.name;
+      const dentist = await require('../models/dentist.models').findOne({ dentistId: updatedAppointment.dentistId });
+      if (dentist && dentist.name) dentistName = dentist.name;
+    } catch (e) { /* fallback to IDs */ }
+    const dateStr = new Date(updatedAppointment.appointmentDate).toLocaleDateString();
+    const timeStr = updatedAppointment.appointmentTime;
+
+    // Audit log for appointment completion
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'Appointment Completed',
+        targetType: 'appointment',
+        targetId: updatedAppointment.appointmentId,
+        targetName: `${patientName} with ${dentistName}`,
+        after: { status: 'completed' },
+        extra: `${req.user.name} (${req.user.role}) reviewed appointment and created a record for patient ${patientName} with dentist ${dentistName} on ${dateStr} at ${timeStr}`
+      });
     }
 
     // Get patient information for email

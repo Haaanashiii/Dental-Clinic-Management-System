@@ -157,7 +157,17 @@ function LandingPage() {
               </Button>
             ))}
             <Button
-              onClick={() => navigate('/login')}
+              onClick={() => {
+                // Check for local authentication
+                const role = sessionStorage.getItem('role');
+                if (role === 'patient') {
+                  navigate('/');
+                } else if (role === 'dentist' || role === 'staff') {
+                  navigate('/AdminDashboard');
+                } else {
+                  navigate('/login');
+                }
+              }}
               className="mint-navbar-btn"
               sx={{
                 bgcolor: '#fff',
@@ -231,7 +241,17 @@ function LandingPage() {
           <Button
             variant="contained"
             sx={{ bgcolor: '#1eb2a6', color: '#fff', fontWeight: 'bold', px: 3, borderRadius: 2, boxShadow: 1, '&:hover': { bgcolor: '#159a8a' } }}
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              // Check for local authentication
+              const role = sessionStorage.getItem('role');
+              if (role === 'patient') {
+                navigate('/');
+              } else if (role === 'dentist' || role === 'staff') {
+                navigate('/AdminDashboard');
+              } else {
+                navigate('/login');
+              }
+            }}
           >
             Book an Appointment
           </Button>

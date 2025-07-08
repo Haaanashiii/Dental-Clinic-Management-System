@@ -5,7 +5,7 @@ import {
   TableHead, TableRow, Paper, Modal, Box, Button, TextField, Alert, Snackbar,
   Stack
 } from "@mui/material";
-import axios from "axios";
+import api from '../../api';
 import Sidebar from "../UserPannel/ClientSidebar";
 import "./UserRecords.css";
 
@@ -39,7 +39,7 @@ function UserRecords() {
   useEffect(() => {
     const fetchPatientInfo = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/profile/user/${userId}`);
+        const res = await api.get(`/patient/profile/user/${userId}`);
         setPatientId(res.data.patientId);
         setPatientName(res.data?.name || res.data?.fullName || res.data?.full_name || "");
       } catch (err) {
@@ -54,9 +54,9 @@ function UserRecords() {
   const fetchRecords = async () => {
     if (!patientId) return;
     try {
-      let url = `${import.meta.env.VITE_API_BASE_URL}/record/list`;
+      let url = `/record/list`;
       if (statusFilter) url += `?status=${statusFilter}`;
-      const res = await axios.get(url);
+      const res = await api.get(url);
       const filtered = (res.data.data || []).filter(
         r => r.patientId === patientId && (r.fineStatus === "paid" || r.fineStatus === "unpaid")
       );
@@ -66,7 +66,7 @@ function UserRecords() {
       const dentistNameMap = {};
       await Promise.all(dentistIds.map(async (id) => {
         try {
-          const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${id}`);
+          const res = await api.get(`/dentist/name/${id}`);
           dentistNameMap[id] = res.data?.name || "-";
         } catch {
           dentistNameMap[id] = "-";
@@ -91,7 +91,7 @@ function UserRecords() {
     setModalDentistName("");
     if (record.dentistId) {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${record.dentistId}`);
+        const res = await api.get(`/dentist/name/${record.dentistId}`);
         setModalDentistName(res.data?.name || "-");
       } catch {
         setModalDentistName("-");
@@ -118,7 +118,7 @@ function UserRecords() {
     setPayError("");
     setPaySuccess("");
     try {
-      const response = await axios.post(
+      const response = await api.post(
         'http://192.168.9.23:4000/api/Philippine-National-Bank/business-integration/customer/pay-business',
         {
           fromAccountNumber: payForm.fromAccountNumber,
@@ -132,6 +132,16 @@ function UserRecords() {
       setPayingRecord(null);
       setPayForm({ fromAccountNumber: "", details: "" });
       fetchRecords(); // Refresh records
+      // Audit log for successful payment
+      try {
+        await api.post(`/audit`, {
+          userId: userId,
+          userName: patientName,
+          role: 'patient',
+          action: 'Payment Transfer',
+          details: `Transferred ₱${parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2)} for record ${payingRecord._id} from account ${payForm.fromAccountNumber}`
+        });
+      } catch (e) { console.error('Audit log error:', e.message); }
     } catch (err) {
       setPayError(err.response?.data?.message || "Payment failed. Please try again.");
     } finally {

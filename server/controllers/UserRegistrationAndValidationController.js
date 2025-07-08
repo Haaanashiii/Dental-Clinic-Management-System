@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const nodemailer = require('nodemailer');
+const { writeAuditLog } = require('../utils/auditLogHelper');
 const User = require("../models/user.models.js");
 
 // Register a new user
@@ -114,6 +115,9 @@ exports.editUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Save previous state for audit
+    const before = { name: user.name, username: user.username, role: user.role };
+
     // Update user fields if provided
     if (name && name !== user.name) {
       user.name = name;
@@ -130,6 +134,20 @@ exports.editUser = async (req, res) => {
 
     // Save updated user to database
     await user.save();
+
+    // Audit log for user edit
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'User Edited',
+        targetType: 'user',
+        targetId: userId,
+        targetName: user.name,
+        before,
+        after: { name: user.name, username: user.username, role: user.role },
+        extra: `User ${userId} edited by ${req.user.name}`
+      });
+    }
 
     const { password: _, ...userWithoutPassword } = user.toObject(); // Remove password from response
 
@@ -181,6 +199,18 @@ exports.deleteUser = async (req, res) => {
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+    // Audit log for user deletion
+    if (req.user) {
+      await writeAuditLog({
+        req,
+        action: 'User Deleted',
+        targetType: 'user',
+        targetId: userId,
+        targetName: deletedUser.name,
+        before: deletedUser,
+        extra: `User ${userId} deleted by ${req.user.name}`
+      });
+    }
     res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
     console.error("Delete user error:", err);
@@ -206,8 +236,29 @@ exports.changeStatusUser = async (req, res) => {
     if (user.status === status) {
       return res.status(400).json({ message: `User account is already ${status}` });
     }
+    const before = { status: user.status };
     user.status = status;
     await user.save();
+
+    // Audit log for user status change
+    try {
+      if (req.user) {
+        await writeAuditLog({
+          req,
+          action: 'User Status Changed',
+          targetType: 'user',
+          targetId: userId,
+          targetName: user.name,
+          before,
+          after: { status },
+          extra: `${req.user.name} (${req.user.role}) changed status of user ${user.name} (${user.role}) to ${status}`
+        });
+      } else {
+        console.warn('Audit log skipped: req.user missing on status change for user', userId);
+      }
+    } catch (auditErr) {
+      console.error('Audit log error (status change):', auditErr);
+    }
 
     // Auto-create profile on approval
     if (status === "Active") {

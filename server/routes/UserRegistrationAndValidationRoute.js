@@ -20,8 +20,8 @@ router.post("/signup", registerUser);
 // User routes
 router.get("/user", getAllUsersByRole); // ?role=staff
 router.get("/user/:userId", authenticateUser, getUserById);
-router.put("/user/edit", editUser);
-router.delete("/delete/:userId", deleteUser); 
-router.put("/status/:userId", changeStatusUser); 
+router.put("/user/edit", authenticateUser, editUser);
+router.delete("/delete/:userId", authenticateUser, deleteUser); 
+router.put("/status/:userId", authenticateUser, changeStatusUser); 
 
 module.exports = router;

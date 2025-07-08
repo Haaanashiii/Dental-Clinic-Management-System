@@ -1,5 +1,6 @@
 const Dentist = require('../models/dentist.models');
 const fs = require('fs');
+const { writeAuditLog } = require('../utils/auditLogHelper');
 
 // Get Dentist profile by userId
 exports.getProfile = async (req, res) => {
@@ -134,6 +135,18 @@ exports.editProfile = async (req, res) => {
       contactNumber: updatedProfile.contactNumber,
       profileImage: base64Image ? `data:image/png;base64,${base64Image}` : null,
     });
+    // Audit log for dentist profile update
+    try {
+      await writeAuditLog({
+        req,
+        action: 'Profile Update',
+        targetType: 'profile',
+        targetId: updatedProfile.userId,
+        targetName: updatedProfile.name,
+        after: updatedProfile,
+        extra: 'Dentist updated their profile information.'
+      });
+    } catch (e) { console.error('Audit log error:', e.message); }
   } catch (err) {
     console.error("Error updating profile:", err);
     res.status(500).json({ message: "Error updating profile", error: err.message });

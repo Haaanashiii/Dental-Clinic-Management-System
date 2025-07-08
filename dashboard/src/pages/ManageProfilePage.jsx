@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from '../api';
 import { Box, Typography, TextField, Button, Avatar, Modal, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ClientSidebar from "./UserPannel/ClientSidebar";
 import "./ManageProfilePage.css";
@@ -35,14 +35,14 @@ const ManageProfilePage = () => {
 
       try {
         // Get user info
-        const userRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/${userId}`, {
+        const userRes = await api.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserDetails(userRes.data);
 
         // Get profile based on role
         const profileUrl = `${import.meta.env.VITE_API_BASE_URL}/${role}/profile/user/${userId}`;
-        const profileRes = await axios.get(profileUrl, {
+        const profileRes = await api.get(profileUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(profileRes.data);
@@ -464,7 +464,7 @@ const EditProfileForm = ({ profile, setProfile, userId, role, onClose, getImageS
     try {
       let exists = false;
       try {
-        await axios.get(endpointCheck, {
+        await api.get(endpointCheck, {
           headers: { Authorization: `Bearer ${token}` },
         });
         exists = true;
@@ -502,7 +502,7 @@ const EditProfileForm = ({ profile, setProfile, userId, role, onClose, getImageS
             profileImage: base64Data ? `data:image/png;base64,${base64Data}` : "",
           };
 
-      const res = await axios({
+      const res = await api({
         method,
         url,
         data: payload,
@@ -639,7 +639,7 @@ const EditUserForm = ({ userDetails, setUserDetails, userId, onClose }) => {
     if (!formData.password) delete payload.password;
 
     try {
-      const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, payload, {
+      const res = await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

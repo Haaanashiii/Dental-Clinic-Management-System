@@ -13,7 +13,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-import axios from 'axios';
+import api from '../../api';
 import dayjs from 'dayjs';
 import imageCompression from 'browser-image-compression';
 import './ManageAppointment.css';
@@ -170,10 +170,10 @@ function ManageAppointment() {
       let res;
       if (role === 'staff') {
         res = status === 'all'
-          ? await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/getall`)
-          : await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}`);
+          ? await api.get(`/appointment/getall`)
+          : await api.get(`/appointment/status/${status}`);
       } else if (role === 'dentist' && loadedDentistId) {
-        res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/dentist/${loadedDentistId}`);
+        res = await api.get(`/appointment/status/${status}/dentist/${loadedDentistId}`);
       }
 
       const appointmentsWithProfiles = await Promise.all(res.data.map(async (appointment) => {
@@ -181,14 +181,14 @@ function ManageAppointment() {
         let patientName = "Unknown";
 
         try {
-          const resPatient = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/patient/name/${appointment.patientId}`);
+          const resPatient = await api.get(`/patient/name/${appointment.patientId}`);
           patientName = resPatient.data?.name ?? "Unknown";
         } catch (e) {
           console.warn("❗ Could not fetch patient", e);
         }
 
         try {
-          const resDentist = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/name/${appointment.dentistId}`);
+          const resDentist = await api.get(`/dentist/name/${appointment.dentistId}`);
           dentistName = resDentist.data?.name ?? "Unknown";
         } catch (e) {
           console.warn("❗ Could not fetch dentist", e);
@@ -209,7 +209,7 @@ function ManageAppointment() {
       setLoading(true);
       if (role === 'dentist') {
         try {
-          const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/dentist/profile/user/${userId}`);
+          const res = await api.get(`/dentist/profile/user/${userId}`);
           if (res.data.dentistId) {
             setDentistId(res.data.dentistId);
             await fetchAppointments(statusFilter, res.data.dentistId);
@@ -227,7 +227,7 @@ function ManageAppointment() {
 
   const handleCancelAppointment = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/cancel/${id}`);
+      await api.put(`/appointment/cancel/${id}`);
       alert("Appointment cancelled.");
       fetchAppointments(statusFilter);
     } catch {
@@ -237,7 +237,7 @@ function ManageAppointment() {
 
   const handleApproveAppointment = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/confirm/${id}`, { status: 'confirmed' });
+      await api.put(`/appointment/confirm/${id}`, { status: 'confirmed' });
       alert("Appointment approved.");
       fetchAppointments(statusFilter);
     } catch {
@@ -247,7 +247,7 @@ function ManageAppointment() {
 
   const handleDeleteAppointment = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/appointment/delete/${id}`);
+      await api.delete(`/appointment/delete/${id}`);
       alert("Appointment deleted.");
       fetchAppointments(statusFilter);
     } catch {
@@ -288,8 +288,8 @@ function ManageAppointment() {
         visitDate: selectedAppointment.appointmentDate,
       };
 
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/record/create`, recordData);
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/appointment/complete/${selectedAppointment.appointmentId}`, {
+      await api.post(`/record/create`, recordData);
+      await api.put(`/appointment/complete/${selectedAppointment.appointmentId}`, {
         remark,
       });
       alert('Record created and appointment marked as completed.');
