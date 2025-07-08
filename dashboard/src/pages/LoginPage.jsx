@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -24,6 +24,54 @@ import {
 import { Visibility, VisibilityOff, EmailOutlined, LockOutlined, KeyOutlined, VpnKeyOutlined } from "@mui/icons-material";
 import "./LoginPage.css";
 import LogoColored from "../assets/LOGO-COLORED.png";
+import DentalLogo from "../assets/DentalLogo.png";
+
+// AnimatedTagline animates each letter smoothly and centers the text
+function AnimatedTagline() {
+  const text = "Your smile, Our Passion!";
+  const [visibleCount, setVisibleCount] = useState(0);
+  useEffect(() => {
+    if (visibleCount < text.length) {
+      const timer = setTimeout(() => setVisibleCount(visibleCount + 1), 55);
+      return () => clearTimeout(timer);
+    }
+  }, [visibleCount, text.length]);
+  return (
+    <div
+      className="animated-tagline"
+      style={{
+        minHeight: 36,
+        marginBottom: 4,
+        marginTop: -4,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
+      {text.split("").map((char, idx) => (
+        <span
+          key={idx}
+          style={{
+            opacity: idx < visibleCount ? 1 : 0,
+            transform: idx < visibleCount ? 'translateY(0)' : 'translateY(10px)',
+            transition: 'opacity 0.25s cubic-bezier(.4,2,.6,1), transform 0.25s cubic-bezier(.4,2,.6,1)',
+            fontWeight: 700,
+            fontSize: 19,
+            color: 'var(--primary-color, #1eb2a6)',
+            letterSpacing: 0.5,
+            display: 'inline-block',
+            marginRight: char === ' ' ? 4 : 0,
+            whiteSpace: 'pre',
+            textShadow: '0 1px 6px rgba(30,178,166,0.10), 0 1px 2px rgba(0,0,0,0.08)',
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function LoginPage({ setIsAuthenticated, setUserRole }) {
   const navigate = useNavigate();
@@ -277,11 +325,17 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
         {/* Left Panel - Form */}
         <div className="login-form-panel">
           <div className="login-header">
-            <img src={LogoColored} alt="Dental Logo" className="login-logo" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 8 }}>
+              <img src={LogoColored} alt="Dental Logo Colored" className="login-logo" style={{ height: 56, width: 'auto' }} />
+              {/* <img src={DentalLogo} alt="Dental Logo" className="login-logo" style={{ height: 48, width: 'auto' }} /> */}
+            </div>
             <h2>Hello!</h2>
             <p className="login-subtitle">Sign in to your account</p>
           </div>
-          
+
+          {/* Animated tagline below header */}
+          <AnimatedTagline />
+
           {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">

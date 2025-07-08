@@ -27,6 +27,7 @@ import './mint-navbar.css';
 
 import DentalLogo from '../../assets/DentalLogo.png';
 import Logo2 from '../../assets/Logo (2).png';
+import ToothPng from '../../assets/Tooth.png';
 
 
 const sections = [
@@ -272,8 +273,8 @@ function LandingPage() {
           id="home"
           sx={{
             background: mode === 'light'
-              ? 'radial-gradient(circle at 60% 40%, #e0f7fa 60%, #fff 100%)'
-              : 'radial-gradient(circle at 60% 40%, #23272b 60%, #181c1f 100%)',
+              ? 'linear-gradient(120deg, #e0f7fa 55%, #b2ebe7 80%, #b2ebe7 100%)'
+              : 'linear-gradient(120deg, #23272b 55%, #159a8a 80%, #159a8a 100%)',
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             alignItems: 'center',
@@ -295,19 +296,16 @@ function LandingPage() {
             <Typography variant="h2" sx={{ fontWeight: 'bold', color: 'text.primary', mb: 2, lineHeight: 1.1, textAlign: 'center', fontSize: { xs: 34, md: 52 }, letterSpacing: 1 }}>
               <span style={{
                 color: theme.palette.primary.main,
-                background: mode === 'light'
-                  ? 'rgba(178,235,231,0.45)'
-                  : 'rgba(30,178,166,0.18)',
-                borderRadius: '8px',
-                padding: '0 10px',
-                boxShadow: mode === 'light'
-                  ? '0 0 6px #b2ebe7'
-                  : '0 0 8px #1eb2a6',
-                transition: 'background 0.3s',
-                display: 'inline-block',
+                textShadow: mode === 'light'
+                  ? '0 2px 12px #b2ebe7, 0 1px 0 #fff'
+                  : '0 2px 12px #159a8a, 0 1px 0 #23272b',
+                fontWeight: 800,
+                paddingBottom: 2,
+                transition: 'color 0.3s',
+                display: 'inline',
               }}>
-                Seeing the dentist just
-              </span> got cooler
+                YOUR SMILE,
+              </span> Our Passion!
             </Typography>
             <Typography sx={{ color: 'text.secondary', fontSize: 20, mb: 5, maxWidth: 560, mx: 'auto', textAlign: 'center', fontWeight: 500, letterSpacing: 0.5, textShadow: '0 1px 6px #fff' }}>
               Welcome to our clinic, where your comfort and confidence come first. We make dental visits easy, modern, and even enjoyable—so you can smile brighter every day.
@@ -355,24 +353,85 @@ function LandingPage() {
             </Box>
           </Box>
           <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', mt: { xs: 6, md: 0 } }}>
+            {/* Decorative blurred blob background for depth */}
+            <Box
+              sx={{
+                position: 'absolute',
+                width: { xs: 260, md: 360 },
+                height: { xs: 260, md: 360 },
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 0,
+                borderRadius: '50%',
+                background: mode === 'light'
+                  ? 'radial-gradient(circle at 60% 40%, #b2ebe7 0%, #e0f7fa 60%, #fff 100%)'
+                  : 'radial-gradient(circle at 60% 40%, #159a8a 0%, #23272b 60%, #181c1f 100%)',
+                filter: 'blur(32px)',
+                opacity: 0.65,
+                pointerEvents: 'none',
+                boxShadow: mode === 'light'
+                  ? '0 4px 32px 0 #b2ebe7, 0 2px 12px 0 #e0f7fa'
+                  : '0 4px 32px 0 #159a8a, 0 2px 12px 0 #23272b',
+              }}
+            />
+
+
+            {/* Main image: Tooth.png with outline and always visible in light mode */}
             <Box sx={{
               width: { xs: 260, md: 360 },
               height: { xs: 260, md: 360 },
-              borderTopLeftRadius: '60% 70%',
-              borderTopRightRadius: '40% 60%',
-              borderBottomLeftRadius: '60% 40%',
-              borderBottomRightRadius: '40% 60%',
-              overflow: 'hidden',
-              background: 'linear-gradient(135deg, #fff 60%, #e0f7fa 100%)',
               position: 'relative',
-              boxShadow: '0 8px 32px 0 rgba(30,178,166,0.13)',
+              zIndex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '4px solid #b2ebe7',
+              animation: 'floatY 3.5s ease-in-out infinite',
+              '::before': {
+                content: '""',
+                position: 'absolute',
+                inset: -10,
+                borderRadius: 'inherit',
+                zIndex: 0,
+                background: mode === 'light'
+                  ? 'linear-gradient(120deg, #b2ebe7 0%, #1eb2a6 100%)'
+                  : 'linear-gradient(120deg, #159a8a 0%, #23272b 100%)',
+                filter: 'blur(16px)',
+                opacity: 0.55,
+                pointerEvents: 'none',
+              },
             }}>
-              <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=facearea&w=600&q=80" alt="Dental clinic" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img
+                src={ToothPng}
+                alt="Tooth"
+                style={{
+                  width: '90%',
+                  height: '90%',
+                  objectFit: 'contain',
+                  zIndex: 2,
+                  filter: mode === 'light'
+                    ? 'drop-shadow(0 1px 6px #b2ebe7)'
+                    : 'drop-shadow(0 1px 6px #159a8a)',
+                  transition: 'filter 0.3s',
+                  background: 'transparent',
+                  borderRadius: 0,
+                  boxSizing: 'border-box',
+                  boxShadow: mode === 'light'
+                    ? '0 2px 8px 0 #b2ebe7'
+                    : '0 2px 8px 0 #159a8a',
+                }}
+              />
             </Box>
+
+            
+            {/* Floating animation keyframes */}
+            <style>{`
+              @keyframes floatY {
+                0% { transform: translateY(0); }
+                50% { transform: translateY(-18px); }
+                100% { transform: translateY(0); }
+              }
+            `}</style>
           </Box>
         </Box>
 
