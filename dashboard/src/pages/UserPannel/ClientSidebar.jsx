@@ -16,7 +16,7 @@ import './ClientSidebar.css';
 
 const { Sider } = Layout;
 
-function ClientDashboard() {
+function ClientDashboard({ setIsAuthenticated }) {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebarCollapsed');
     return stored ? stored === 'true' : false;
@@ -53,6 +53,7 @@ function ClientDashboard() {
 
   const handleLogout = () => {
     sessionStorage.clear();
+    if (setIsAuthenticated) setIsAuthenticated(false);
     navigate('/LandingPage');
   };
 
