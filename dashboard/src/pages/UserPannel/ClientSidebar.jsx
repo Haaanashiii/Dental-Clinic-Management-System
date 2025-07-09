@@ -137,13 +137,6 @@ function ClientDashboard() {
       hidden: role !== 'patient',
     },
      {
-      key: '8',
-      icon: <FileTextOutlined />,
-      label: 'User Records',
-      onClick: () => navigate('/UserRecords'),
-      hidden: role !== 'patient',
-    },
-     {
       key: '9',
       icon: <TeamOutlined />, // Changed icon to TeamOutlined for Audit logs
       label: 'Audit Logs', // Changed label to Audit Logs

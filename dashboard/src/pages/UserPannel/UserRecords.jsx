@@ -121,25 +121,34 @@ function UserRecords() {
       const response = await api.post(
         'http://192.168.9.23:4000/api/Philippine-National-Bank/business-integration/customer/pay-business',
         {
-          fromAccountNumber: payForm.fromAccountNumber,
-          toBusinessAccount: "<BUSINESS_ACCOUNT_NUMBER>", // TODO: Replace with your business account number
+          customerAccountNumber: payForm.fromAccountNumber,
+          toBusinessAccount: "842-6772-365-4863",
           amount: parseFloat(payingRecord.fine?.$numberDecimal || 0),
           details: payForm.details || `Payment for record ${payingRecord._id}`,
         }
       );
+      // Mark record as paid using backend endpoint
+      try {
+        const payRes = await api.put(`/record/pay/${payingRecord._id}`);
+        if (payRes.status === 200) {
+          fetchRecords(); // Refresh table after update
+        } else {
+          console.error('Unexpected PUT response:', payRes);
+        }
+      } catch (e) {
+        console.error('Failed to mark record as paid:', e.response?.data || e.message);
+      }
       setPaySuccess("Payment successful!");
       setPayModalOpen(false);
       setPayingRecord(null);
       setPayForm({ fromAccountNumber: "", details: "" });
-      fetchRecords(); // Refresh records
-      // Audit log for successful payment
       try {
         await api.post(`/audit`, {
           userId: userId,
           userName: patientName,
           role: 'patient',
           action: 'Payment Transfer',
-          details: `Transferred ₱${parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2)} for record ${payingRecord._id} from account ${payForm.fromAccountNumber}`
+          details: `Transferred ₱${parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2)} for record #${payingRecord._id} from account ${payForm.fromAccountNumber}. Payment was successful.`
         });
       } catch (e) { console.error('Audit log error:', e.message); }
     } catch (err) {
