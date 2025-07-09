@@ -14,6 +14,12 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import IconButton from '@mui/material/IconButton';
 import api from '../../api';
 import "./ViewAudit.css";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -51,6 +57,8 @@ export default function ViewAudit() {
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' for recent first, 'asc' for oldest first
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedAudit, setSelectedAudit] = useState(null);
 
   useEffect(() => { fetchAudits(); }, []);
 
@@ -182,24 +190,23 @@ export default function ViewAudit() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredAudits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((audit, idx) => {
-                    let shortDetails = audit.details || "-";
-                    if (shortDetails !== "-") {
-                      const words = shortDetails.split(/\s+/);
-                      if (words.length > 8) {
-                        shortDetails = words.slice(0, 8).join(' ') + '...';
-                      }
-                    }
-                    return (
-                      <StyledTableRow key={audit._id || idx}>
-                        <StyledTableCell>{audit.timestamp ? new Date(audit.timestamp).toLocaleString() : "-"}</StyledTableCell>
-                        <StyledTableCell>{audit.userName || "-"}</StyledTableCell>
-                        <StyledTableCell>{audit.role || "-"}</StyledTableCell>
-                        <StyledTableCell>{audit.action || "-"}</StyledTableCell>
-                        <StyledTableCell sx={{ maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shortDetails}</StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  })}
+                  {filteredAudits.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((audit, idx) => (
+                    <StyledTableRow key={audit._id || idx}>
+                      <StyledTableCell>{audit.timestamp ? new Date(audit.timestamp).toLocaleString() : "-"}</StyledTableCell>
+                      <StyledTableCell>{audit.userName || "-"}</StyledTableCell>
+                      <StyledTableCell>{audit.role || "-"}</StyledTableCell>
+                      <StyledTableCell>{audit.action || "-"}</StyledTableCell>
+                      <StyledTableCell sx={{ maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <Button
+                          variant="text"
+                          sx={{ color: '#1eb2a6', fontWeight: 600, textTransform: 'none', fontSize: 15, letterSpacing: 0.5 }}
+                          onClick={() => { setSelectedAudit(audit); setModalOpen(true); }}
+                        >
+                          View Audit
+                        </Button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -211,6 +218,54 @@ export default function ViewAudit() {
               page={page}
               onPageChange={handleChangePage}
             />
+            {/* Audit Details Modal */}
+            <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="sm" fullWidth>
+              <DialogTitle sx={{ background: 'linear-gradient(90deg, #1eb2a6 0%, #1c444d 100%)', color: '#fff', fontWeight: 700, letterSpacing: 1, fontSize: 22, textAlign: 'center', pb: 2 }}>
+                Audit Details
+              </DialogTitle>
+              <DialogContent sx={{ background: '#f8fafd', p: 4 }}>
+                {selectedAudit && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+                    <Box sx={{
+                      background: 'linear-gradient(135deg, #1eb2a6 30%, #1c444d 100%)',
+                      borderRadius: 3,
+                      p: 2,
+                      minWidth: 320,
+                      boxShadow: 3,
+                      color: '#fff',
+                      mb: 2,
+                      textAlign: 'center',
+                    }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, letterSpacing: 1 }}>{selectedAudit.userName || '-'}</Typography>
+                      <Typography variant="subtitle2" sx={{ fontStyle: 'italic', opacity: 0.85 }}>{selectedAudit.role || '-'}</Typography>
+                    </Box>
+                    <Box sx={{ width: '100%', background: '#fff', borderRadius: 2, p: 3, boxShadow: 1 }}>
+                      <Typography variant="body1" sx={{ mb: 1 }}><b>Date:</b> {selectedAudit.timestamp ? new Date(selectedAudit.timestamp).toLocaleString() : '-'}</Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}><b>Action:</b> {selectedAudit.action || '-'}</Typography>
+                      <Typography variant="body1" sx={{ mb: 1 }}><b>Details:</b></Typography>
+                      <Box sx={{
+                        background: '#f3f3f3',
+                        borderRadius: 2,
+                        p: 2,
+                        fontFamily: 'monospace',
+                        fontSize: 15,
+                        color: '#1c444d',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        boxShadow: 0,
+                      }}>
+                        {selectedAudit.details || '-'}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+              </DialogContent>
+              <DialogActions sx={{ background: '#f8fafd', justifyContent: 'center', pb: 2 }}>
+                <Button onClick={() => setModalOpen(false)} variant="contained" sx={{ background: '#1eb2a6', color: '#fff', fontWeight: 600, borderRadius: 2, px: 4, boxShadow: 2, '&:hover': { background: '#1c444d' } }}>
+                  Close
+                </Button>
+              </DialogActions>
+            </Dialog>
           </motion.div>
         </motion.div>
       </motion.div>

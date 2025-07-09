@@ -148,7 +148,9 @@ function UserRecords() {
           userName: patientName,
           role: 'patient',
           action: 'Payment Transfer',
-          details: `Transferred ₱${parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2)} for record #${payingRecord._id} from account ${payForm.fromAccountNumber}. Payment was successful.`
+          details:
+            `Transferred ₱${parseFloat(payingRecord.fine?.$numberDecimal || 0).toFixed(2)} for record #${payingRecord._id} from account ${payForm.fromAccountNumber}. Payment was successful.\n` +
+            `Clinical Assessment:\nDiagnosis: ${payingRecord.diagnosis || '-'}\nTreatment: ${payingRecord.treatment || '-'}`
         });
       } catch (e) { console.error('Audit log error:', e.message); }
     } catch (err) {
