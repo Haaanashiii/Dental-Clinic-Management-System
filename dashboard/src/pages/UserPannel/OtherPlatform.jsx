@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
 import jollibeeImg from "../../assets/Jollibee.png";
@@ -9,7 +9,9 @@ import TaraLabaImg from "../../assets/taraLaba.png";
 import PNBImg from "../../assets/PNB.png";
 
 // MUI imports
-import { Box, Card, CardContent, Typography, Grid, Button, Container, Avatar, Paper } from "@mui/material";
+import { Box, Card, CardContent, Typography, Grid, Button, Container, Avatar, Paper, Chip, Switch, FormControlLabel, Badge } from "@mui/material";
+import WifiIcon from '@mui/icons-material/Wifi';
+import WifiOffIcon from '@mui/icons-material/WifiOff';
 
 // Import motion components from framer-motion
 import { motion } from "framer-motion";
@@ -21,53 +23,74 @@ const contentVariants = {
   exit: { opacity: 0, x: -20, y: 10 }
 };
 
+// Updated cardData with online status
 const cardData = [
   {
     title: "Jollibee",
     image: jollibeeImg,
     url: "http://192.168.9.37:5173/",
     gradient: "linear-gradient(135deg, #FF8C00, #FF0000)",
-    description: "Food ordering platform"
+    description: "Food ordering platform",
+    isOnline: true
   },
   {
     title: "Blended",
     image: BlendedImg,
     url: "http://192.168.9.7:5173/",
     gradient: "linear-gradient(135deg, #36D1DC, #5B86E5)",
-    description: "Beverage ordering system"
+    description: "Beverage ordering system",
+    isOnline: false
   },
   {
     title: "NBS",
     image: NationalBImg,
     url: "http://192.168.9.16:5173/",
     gradient: "linear-gradient(135deg, #AA4465, #861657)",
-    description: "Book purchasing platform"
+    description: "Book purchasing platform",
+    isOnline: true
   },
   {
     title: "TaraLaba",
     image: TaraLabaImg,
     url: "http://192.168.9.27:5173/",
     gradient: "linear-gradient(135deg, #00B4DB, #0083B0)",
-    description: "Laundry service booking"
+    description: "Laundry service booking",
+    isOnline: true
   },
   {
     title: "IT Bytes",
     image: ITbytesImg,
     url: "http://192.168.9.4:5173/",
     gradient: "linear-gradient(135deg, #1D976C, #93F9B9)",
-    description: "Tech product marketplace"
+    description: "Tech product marketplace",
+    isOnline: false
   },
   {
     title: "PNB",
     image: PNBImg,
     url: "http://192.168.9.23:5173/",
     gradient: "linear-gradient(135deg, #F2994A, #F2C94C)",
-    description: "Banking services platform"
+    description: "Banking services platform",
+    isOnline: true
   },
 ];
 
 function OtherPlatform() {
   const navigate = useNavigate();
+  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+  const [platformsData, setPlatformsData] = useState(cardData);
+  
+  // Count online platforms
+  const onlineCount = cardData.filter(card => card.isOnline).length;
+
+  // Filter platforms based on online status
+  useEffect(() => {
+    if (showOnlineOnly) {
+      setPlatformsData(cardData.filter(card => card.isOnline));
+    } else {
+      setPlatformsData(cardData);
+    }
+  }, [showOnlineOnly]);
 
   const handleCardClick = (url) => {
     if (/^https?:\/\//.test(url)) {
@@ -135,6 +158,32 @@ function OtherPlatform() {
             </motion.div>
           </Box>
 
+          {/* Filter switch - new section added here */}
+          <Box sx={{ 
+            mb: 4, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between",
+            flexDirection: { xs: "column", sm: "row" }
+          }}>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 0 } }}>
+              {showOnlineOnly ? "Showing online platforms only" : `Showing all platforms (${onlineCount} online)`}
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showOnlineOnly}
+                  onChange={(e) => setShowOnlineOnly(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label={showOnlineOnly ? "Show All" : "Show Online Only"}
+              labelPlacement="start"
+              sx={{ m: 0 }}
+            />
+          </Box>
+
           {/* Main content card */}
           <Paper
             elevation={0}
@@ -156,7 +205,7 @@ function OtherPlatform() {
               justifyContent={{ xs: "center", md: "flex-start" }}
               sx={{ mt: 0 }}
             >
-              {cardData.map((card, idx) => (
+              {platformsData.map((card, idx) => (
                 <Grid item key={idx} xs={12} sm={6} md={4} lg={4} xl={2}>
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -179,7 +228,7 @@ function OtherPlatform() {
                       <Card
                         sx={{
                           width: { xs: "100%", sm: 200 }, 
-                          height: 350,
+                          height: 370,
                           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
                           transition: "all 0.3s ease",
                           borderRadius: 4,
@@ -272,6 +321,52 @@ function OtherPlatform() {
                           
                           <Box sx={{ flexGrow: 1 }} />
                           
+                          {/* Online status indicator above the Visit button */}
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 + idx * 0.1 }}
+                          >
+                            <Box 
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mb: 2
+                              }}
+                            >
+                              {card.isOnline ? (
+                                <Chip
+                                  icon={<WifiIcon fontSize="small" />}
+                                  label="Online"
+                                  size="small"
+                                  sx={{
+                                    bgcolor: 'rgba(76, 175, 80, 0.1)',
+                                    color: '#388e3c',
+                                    fontWeight: 500,
+                                    '& .MuiChip-icon': {
+                                      color: '#388e3c'
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <Chip
+                                  icon={<WifiOffIcon fontSize="small" />}
+                                  label="Offline"
+                                  size="small"
+                                  sx={{
+                                    bgcolor: 'rgba(244, 67, 54, 0.1)',
+                                    color: '#d32f2f',
+                                    fontWeight: 500,
+                                    '& .MuiChip-icon': {
+                                      color: '#d32f2f'
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </motion.div>
+                          
                           <motion.div
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -297,6 +392,8 @@ function OtherPlatform() {
                             </Button>
                           </motion.div>
                         </CardContent>
+
+           
                       </Card>
                     </motion.div>
                   </motion.div>
