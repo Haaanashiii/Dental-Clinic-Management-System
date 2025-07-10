@@ -12,6 +12,10 @@ import PNBImg from "../../assets/PNB.png";
 import { Box, Card, CardContent, Typography, Grid, Button, Container, Avatar, Paper, Chip, Switch, FormControlLabel, Badge } from "@mui/material";
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
 // Import motion components from framer-motion
 import { motion } from "framer-motion";
@@ -23,74 +27,126 @@ const contentVariants = {
   exit: { opacity: 0, x: -20, y: 10 }
 };
 
-// Updated cardData with online status
+// Updated cardData without static online status
 const cardData = [
   {
     title: "Jollibee",
     image: jollibeeImg,
     url: "http://192.168.9.37:5173/",
     gradient: "linear-gradient(135deg, #FF8C00, #FF0000)",
-    description: "Food ordering platform",
-    isOnline: true
+    description: "Food ordering platform"
   },
   {
     title: "Blended",
     image: BlendedImg,
     url: "http://192.168.9.7:5173/",
     gradient: "linear-gradient(135deg, #36D1DC, #5B86E5)",
-    description: "Beverage ordering system",
-    isOnline: false
+    description: "Beverage ordering system"
   },
   {
     title: "NBS",
     image: NationalBImg,
     url: "http://192.168.9.16:5173/",
     gradient: "linear-gradient(135deg, #AA4465, #861657)",
-    description: "Book purchasing platform",
-    isOnline: true
+    description: "Book purchasing platform"
   },
   {
     title: "TaraLaba",
     image: TaraLabaImg,
     url: "http://192.168.9.27:5173/",
     gradient: "linear-gradient(135deg, #00B4DB, #0083B0)",
-    description: "Laundry service booking",
-    isOnline: true
+    description: "Laundry service booking"
   },
   {
     title: "IT Bytes",
     image: ITbytesImg,
     url: "http://192.168.9.4:5173/",
     gradient: "linear-gradient(135deg, #1D976C, #93F9B9)",
-    description: "Tech product marketplace",
-    isOnline: false
+    description: "Tech product marketplace"
   },
   {
     title: "PNB",
     image: PNBImg,
     url: "http://192.168.9.23:5173/",
     gradient: "linear-gradient(135deg, #F2994A, #F2C94C)",
-    description: "Banking services platform",
-    isOnline: true
+    description: "Banking services platform"
   },
 ];
 
 function OtherPlatform() {
   const navigate = useNavigate();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-  const [platformsData, setPlatformsData] = useState(cardData);
+  const [platformsData, setPlatformsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   
-  // Count online platforms
-  const onlineCount = cardData.filter(card => card.isOnline).length;
-
-  // Filter platforms based on online status
+  // Check if a platform is online
+  const checkPlatformStatus = async (url) => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(url, { 
+        method: 'HEAD',
+        mode: 'no-cors',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return true; // If no error, consider it online
+    } catch (error) {
+      console.log(`Error checking ${url}:`, error.message);
+      return false; // If error/timeout, consider it offline
+    }
+  };
+  
+  // Check all platforms
+  const checkAllPlatforms = async () => {
+    setRefreshing(true);
+    
+    const updatedPlatforms = await Promise.all(
+      cardData.map(async (platform) => {
+        const isOnline = await checkPlatformStatus(platform.url);
+        return { ...platform, isOnline };
+      })
+    );
+    
+    setPlatformsData(updatedPlatforms);
+    setIsLoading(false);
+    setRefreshing(false);
+  };
+  
+  // Initial check and setup periodic checks
   useEffect(() => {
-    if (showOnlineOnly) {
-      setPlatformsData(cardData.filter(card => card.isOnline));
-    } else {
-      setPlatformsData(cardData);
+    checkAllPlatforms();
+    
+    const intervalId = setInterval(() => {
+      checkAllPlatforms();
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Filter platforms based on showOnlineOnly state
+  useEffect(() => {
+    if (showOnlineOnly && platformsData.length > 0) {
+      setPlatformsData(prev => 
+        cardData.filter(card => 
+          prev.find(p => p.title === card.title)?.isOnline
+        )
+      );
+    } else if (platformsData.length > 0) {
+      setPlatformsData(prev => 
+        cardData.map(card => ({
+          ...card, 
+          isOnline: prev.find(p => p.title === card.title)?.isOnline || false
+        }))
+      );
     }
   }, [showOnlineOnly]);
+  
+  // Count online platforms
+  const onlineCount = platformsData.filter(platform => platform.isOnline).length;
 
   const handleCardClick = (url) => {
     if (/^https?:\/\//.test(url)) {
@@ -158,7 +214,7 @@ function OtherPlatform() {
             </motion.div>
           </Box>
 
-          {/* Filter switch - new section added here */}
+          {/* Filter switch section */}
           <Box sx={{ 
             mb: 4, 
             display: "flex", 
@@ -167,21 +223,36 @@ function OtherPlatform() {
             flexDirection: { xs: "column", sm: "row" }
           }}>
             <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 0 } }}>
-              {showOnlineOnly ? "Showing online platforms only" : `Showing all platforms (${onlineCount} online)`}
+              {isLoading ? "Checking platform status..." : 
+               (showOnlineOnly ? "Showing online platforms only" : 
+                `Showing all platforms (${onlineCount} online)`)}
             </Typography>
 
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showOnlineOnly}
-                  onChange={(e) => setShowOnlineOnly(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={showOnlineOnly ? "Show All" : "Show Online Only"}
-              labelPlacement="start"
-              sx={{ m: 0 }}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title="Refresh status">
+                <IconButton 
+                  onClick={checkAllPlatforms} 
+                  disabled={refreshing || isLoading}
+                  sx={{ mr: 2 }}
+                >
+                  {refreshing ? <CircularProgress size={20} /> : <RefreshIcon />}
+                </IconButton>
+              </Tooltip>
+              
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showOnlineOnly}
+                    onChange={(e) => setShowOnlineOnly(e.target.checked)}
+                    color="primary"
+                    disabled={isLoading}
+                  />
+                }
+                label={showOnlineOnly ? "Show All" : "Show Online Only"}
+                labelPlacement="start"
+                sx={{ m: 0 }}
+              />
+            </Box>
           </Box>
 
           {/* Main content card */}
@@ -321,7 +392,7 @@ function OtherPlatform() {
                           
                           <Box sx={{ flexGrow: 1 }} />
                           
-                          {/* Online status indicator above the Visit button */}
+                          {/* Online status indicator */}
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -335,7 +406,9 @@ function OtherPlatform() {
                                 mb: 2
                               }}
                             >
-                              {card.isOnline ? (
+                              {isLoading ? (
+                                <CircularProgress size={16} sx={{ mr: 1 }} />
+                              ) : card.isOnline ? (
                                 <Chip
                                   icon={<WifiIcon fontSize="small" />}
                                   label="Online"
