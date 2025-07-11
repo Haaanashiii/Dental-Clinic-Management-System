@@ -75,7 +75,6 @@ const cardData = [
 
 function OtherPlatform() {
   const navigate = useNavigate();
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [platformsData, setPlatformsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -126,24 +125,6 @@ function OtherPlatform() {
     
     return () => clearInterval(intervalId);
   }, []);
-  
-  // Filter platforms based on showOnlineOnly state
-  useEffect(() => {
-    if (showOnlineOnly && platformsData.length > 0) {
-      setPlatformsData(prev => 
-        cardData.filter(card => 
-          prev.find(p => p.title === card.title)?.isOnline
-        )
-      );
-    } else if (platformsData.length > 0) {
-      setPlatformsData(prev => 
-        cardData.map(card => ({
-          ...card, 
-          isOnline: prev.find(p => p.title === card.title)?.isOnline || false
-        }))
-      );
-    }
-  }, [showOnlineOnly]);
   
   // Count online platforms
   const onlineCount = platformsData.filter(platform => platform.isOnline).length;
@@ -223,9 +204,7 @@ function OtherPlatform() {
             flexDirection: { xs: "column", sm: "row" }
           }}>
             <Typography variant="body1" color="text.secondary" sx={{ mb: { xs: 2, sm: 0 } }}>
-              {isLoading ? "Checking platform status..." : 
-               (showOnlineOnly ? "Showing online platforms only" : 
-                `Showing all platforms (${onlineCount} online)`)}
+              {isLoading ? "Checking platform status..." : `Showing all platforms (${onlineCount} online)`}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -238,20 +217,6 @@ function OtherPlatform() {
                   {refreshing ? <CircularProgress size={20} /> : <RefreshIcon />}
                 </IconButton>
               </Tooltip>
-              
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showOnlineOnly}
-                    onChange={(e) => setShowOnlineOnly(e.target.checked)}
-                    color="primary"
-                    disabled={isLoading}
-                  />
-                }
-                label={showOnlineOnly ? "Show All" : "Show Online Only"}
-                labelPlacement="start"
-                sx={{ m: 0 }}
-              />
             </Box>
           </Box>
 

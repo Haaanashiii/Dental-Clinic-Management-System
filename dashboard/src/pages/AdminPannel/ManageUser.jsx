@@ -171,82 +171,84 @@ export default function ManageUser() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <TableContainer component={Paper}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Username</StyledTableCell>
-                    <StyledTableCell>Email</StyledTableCell>
-                    <StyledTableCell>Role</StyledTableCell>
-                    <StyledTableCell>Status</StyledTableCell>
-                    <StyledTableCell align="center">Actions</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                    <StyledTableRow key={user.userId}>
-                      <StyledTableCell>{user.username}</StyledTableCell>
-                      <StyledTableCell>{user.email}</StyledTableCell>
-                      <StyledTableCell>{user.role}</StyledTableCell>
-                      <StyledTableCell>
-                        <Box sx={{
-                          display: 'inline-block',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: '12px',
-                          fontSize: '0.75rem',
-                          fontWeight: 'medium',
-                          bgcolor: user.status === 'Active' ? '#e8f5e8' : '#fff3cd',
-                          color: user.status === 'Active' ? '#2e7d32' : '#856404',
-                        }}>
-                          {user.status}
-                        </Box>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {user.status !== "Active" && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <TableContainer component={Paper} sx={{ flex: 1, maxHeight: '100%' }}>
+                <Table stickyHeader aria-label="users table">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell>Username</StyledTableCell>
+                      <StyledTableCell>Email</StyledTableCell>
+                      <StyledTableCell>Role</StyledTableCell>
+                      <StyledTableCell>Status</StyledTableCell>
+                      <StyledTableCell align="center">Actions</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+                      <StyledTableRow key={user.userId}>
+                        <StyledTableCell>{user.username}</StyledTableCell>
+                        <StyledTableCell>{user.email}</StyledTableCell>
+                        <StyledTableCell>{user.role}</StyledTableCell>
+                        <StyledTableCell>
+                          <Box sx={{
+                            display: 'inline-block',
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: '12px',
+                            fontSize: '0.75rem',
+                            fontWeight: 'medium',
+                            bgcolor: user.status === 'Active' ? '#e8f5e8' : '#fff3cd',
+                            color: user.status === 'Active' ? '#2e7d32' : '#856404',
+                          }}>
+                            {user.status}
+                          </Box>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {user.status !== "Active" && (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="success"
+                              onClick={() => handleStatusChange(user.userId, "Active")}
+                              sx={{ mr: 1 }}
+                            >
+                              <ThumbUpIcon fontSize="small" />
+                            </Button>
+                          )}
+                          {user.status !== "Deactivated" && (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="warning"
+                              onClick={() => handleStatusChange(user.userId, "Deactivated")}
+                              sx={{ mr: 1 }}
+                            >
+                              <BlockIcon fontSize="small" />
+                            </Button>
+                          )}
                           <Button
                             size="small"
                             variant="outlined"
-                            color="success"
-                            onClick={() => handleStatusChange(user.userId, "Active")}
-                            sx={{ mr: 1 }}
+                            color="error"
+                            onClick={() => handleDeleteUser(user.userId)}
                           >
-                            <ThumbUpIcon fontSize="small" />
+                            <DeleteIcon fontSize="small" />
                           </Button>
-                        )}
-                        {user.status !== "Deactivated" && (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color="warning"
-                            onClick={() => handleStatusChange(user.userId, "Deactivated")}
-                            sx={{ mr: 1 }}
-                          >
-                            <BlockIcon fontSize="small" />
-                          </Button>
-                        )}
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color="error"
-                          onClick={() => handleDeleteUser(user.userId)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </Button>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={filteredUsers.length}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[]}
-            />
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                component="div"
+                count={filteredUsers.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[]}
+              />
+            </Box>
           </motion.div>
         </motion.div>
       </motion.div>

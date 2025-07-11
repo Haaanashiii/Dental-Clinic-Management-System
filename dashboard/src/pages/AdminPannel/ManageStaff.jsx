@@ -218,47 +218,49 @@ export default function ManageStaff() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <TableContainer component={Paper}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Username</StyledTableCell>
-                    <StyledTableCell>Email</StyledTableCell>
-                    <StyledTableCell>Role</StyledTableCell>
-                    <StyledTableCell align="center">Actions</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
-                    <StyledTableRow key={user.userId}>
-                      <StyledTableCell>{user.username}</StyledTableCell>
-                      <StyledTableCell>{user.email}</StyledTableCell>
-                      <StyledTableCell>{user.role}</StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Tooltip title="Edit">
-                          <IconButton onClick={() => handleOpenModal(user)} size="small">
-                            <EditIcon color="primary" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <IconButton onClick={() => handleDeleteUser(user.userId)} size="small">
-                            <DeleteIcon color="error" />
-                          </IconButton>
-                        </Tooltip>
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={users.length}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[]}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <TableContainer component={Paper} sx={{ flex: 1, maxHeight: '100%' }}>
+                <Table stickyHeader aria-label="staff table">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell>Username</StyledTableCell>
+                      <StyledTableCell>Email</StyledTableCell>
+                      <StyledTableCell>Role</StyledTableCell>
+                      <StyledTableCell align="center">Actions</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+                      <StyledTableRow key={user.userId}>
+                        <StyledTableCell>{user.username}</StyledTableCell>
+                        <StyledTableCell>{user.email}</StyledTableCell>
+                        <StyledTableCell>{user.role}</StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Tooltip title="Edit">
+                            <IconButton onClick={() => handleOpenModal(user)} size="small">
+                              <EditIcon color="primary" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <IconButton onClick={() => handleDeleteUser(user.userId)} size="small">
+                              <DeleteIcon color="error" />
+                            </IconButton>
+                          </Tooltip>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                component="div"
+                count={users.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[]}
+              />
+            </Box>
           </motion.div>
         </motion.div>
       </motion.div>
