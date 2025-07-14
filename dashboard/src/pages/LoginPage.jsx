@@ -319,6 +319,19 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
     }
   };
 
+  // Password validation for forgot password reset
+  const passwordRequirements = {
+    minLength: 8,
+    hasUppercase: /[A-Z]/,
+    hasNumber: /[0-9]/,
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/
+  };
+  const isPasswordValid =
+    forgotNewPassword.length >= passwordRequirements.minLength &&
+    passwordRequirements.hasUppercase.test(forgotNewPassword) &&
+    passwordRequirements.hasNumber.test(forgotNewPassword) &&
+    passwordRequirements.hasSpecial.test(forgotNewPassword);
+
   return (
     <div className="LoginMain">
       <div className="LoginContent">
@@ -573,7 +586,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
                   value={forgotNewPassword}
                   onChange={e => setForgotNewPassword(e.target.value)}
                   disabled={forgotLoading}
-                  error={isSamePassword}
+                  error={isSamePassword || (forgotNewPassword && !isPasswordValid)}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
@@ -588,6 +601,11 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
                   label="New Password"
                 />
                 {isSamePassword && <span className="password-error">New password must be different from the old password.</span>}
+                {forgotNewPassword && !isPasswordValid && (
+                  <span className="password-error">
+                    Password must be at least 8 characters, include a capital letter, a number, and a special character.
+                  </span>
+                )}
               </FormControl>
               <FormControl fullWidth margin="dense" variant="outlined" sx={{ mt: 2 }}>
                 <InputLabel htmlFor="forgot-confirm-password">Confirm Password</InputLabel>
@@ -641,7 +659,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
           {forgotStep === 2 && (
             <Button 
               onClick={handleForgotNext} 
-              disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword || isSamePassword} 
+              disabled={forgotLoading || !forgotNewPassword || !forgotConfirmPassword || isSamePassword || !isPasswordValid} 
               className="dialog-action"
             >
               {forgotLoading ? <CircularProgress size={20} /> : "Reset Password"}

@@ -148,7 +148,7 @@ const StatusBadge = ({ status }) => {
 function ManageAppointment() {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(8);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [dentistId, setDentistId] = useState('');
   const [loading, setLoading] = useState(true);

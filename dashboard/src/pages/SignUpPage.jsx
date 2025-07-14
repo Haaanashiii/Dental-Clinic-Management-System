@@ -25,6 +25,19 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Password validation for sign up
+  const passwordRequirements = {
+    minLength: 8,
+    hasUppercase: /[A-Z]/,
+    hasNumber: /[0-9]/,
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/
+  };
+  const isPasswordValid =
+    userForm.password.length >= passwordRequirements.minLength &&
+    passwordRequirements.hasUppercase.test(userForm.password) &&
+    passwordRequirements.hasNumber.test(userForm.password) &&
+    passwordRequirements.hasSpecial.test(userForm.password);
+
   const handleSignUp = async () => {
     try {
       const userFormWithRole = { ...userForm, role: "patient" };
@@ -125,11 +138,17 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
                     </IconButton>
                   </InputAdornment>
                 }
+                error={userForm.password && !isPasswordValid}
               />
+              {userForm.password && !isPasswordValid && (
+                <span className="password-error">
+                  Password must be at least 8 characters, include a capital letter, a number, and a special character.
+                </span>
+              )}
             </FormControl>
           </div>
           
-          <Button variant="contained" className="login-button" onClick={handleSignUp}>
+          <Button variant="contained" className="login-button" onClick={handleSignUp} disabled={!isPasswordValid}>
             SIGN UP
           </Button>
           

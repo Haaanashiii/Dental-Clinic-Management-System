@@ -73,6 +73,7 @@ function UserDashboard() {
   const [appointmentTime, setAppointmentTime] = useState(null);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [confirmedDates, setConfirmedDates] = useState([]);
+  const [warning, setWarning] = useState("");
 
   const userId = sessionStorage.getItem("userId");
   const role = sessionStorage.getItem("role");
@@ -170,13 +171,14 @@ function UserDashboard() {
   };
 
   const handleSubmitAppointment = async () => {
+    setWarning("");
     if (!selectedDentist) {
-      alert("Please select a dentist.");
+      setWarning("Please select a dentist.");
       return;
     }
 
     if (!appointmentDate || !appointmentTime) {
-      alert("Please select both a date and time.");
+      setWarning("Please select both a date and time.");
       return;
     }
 
@@ -187,7 +189,7 @@ function UserDashboard() {
     const now = dayjs();
 
     if (selectedDateTime.isBefore(now)) {
-      alert("You cannot set an appointment in the past. Please choose a future date and time.");
+      setWarning("You cannot set an appointment in the past. Please choose a future date and time.");
       return;
     }
 
@@ -217,6 +219,18 @@ function UserDashboard() {
     } catch (err) {
       console.error("Failed to cancel appointment:", err);
       alert("Error cancelling appointment.");
+    }
+  };
+
+  // Handle time change and show alert if out of business hours
+  const handleTimeChange = (newTime) => {
+    setAppointmentTime(newTime);
+    if (newTime) {
+      const hour = newTime.hour();
+      if (hour < 10 || hour >= 17) {
+        alert("Invalid time: Business hours are only 10:00 AM to 5:00 PM.");
+        setAppointmentTime(null);
+      }
     }
   };
 
@@ -450,6 +464,13 @@ function UserDashboard() {
               Book an Appointment
             </DialogTitle>
             <DialogContent>
+              {warning && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography color="error" sx={{ fontWeight: 'bold' }}>
+                    {warning}
+                  </Typography>
+                </Box>
+              )}
               <TextField
                 fullWidth
                 select
@@ -477,7 +498,9 @@ function UserDashboard() {
                 <TimePicker
                   label="Appointment Time"
                   value={appointmentTime}
-                  onChange={(newTime) => setAppointmentTime(newTime)}
+                  onChange={handleTimeChange}
+                  minTime={dayjs().hour(10).minute(0)}
+                  maxTime={dayjs().hour(17).minute(0)}
                   sx={{ mt: 2, width: '100%' }}
                 />
               </LocalizationProvider>
