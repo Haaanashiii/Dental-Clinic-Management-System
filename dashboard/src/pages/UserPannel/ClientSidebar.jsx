@@ -59,14 +59,6 @@ function ClientDashboard({ setIsAuthenticated }) {
 
   // Get current user info
   const getCurrentUser = () => {
-    // Debug: Check what's in sessionStorage
-    console.log('SessionStorage contents:', {
-      name: sessionStorage.getItem('name'),
-      username: sessionStorage.getItem('username'),
-      role: sessionStorage.getItem('role'),
-      allKeys: Object.keys(sessionStorage),
-      allItems: { ...sessionStorage }
-    });
 
     const name = sessionStorage.getItem('name') || sessionStorage.getItem('username') || 'User';
     const role = sessionStorage.getItem('role') || 'Unknown';
