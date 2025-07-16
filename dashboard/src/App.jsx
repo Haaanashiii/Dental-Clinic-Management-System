@@ -1,4 +1,6 @@
-import React, { useEffect, useState, Suspense, lazy, useCallback, memo } from "react";
+import React, { useEffect, useState, Suspense, lazy, useCallback, memo, createContext } from "react";
+// Global loading context
+export const LoadingContext = createContext({ setLoading: () => {}, loading: false });
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -197,6 +199,7 @@ function handleLogout(setIsAuthenticated, setUserRole) {
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!sessionStorage.getItem("authToken"));
   const [userRole, setUserRole] = useState(() => sessionStorage.getItem("role") || "");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("authToken");
@@ -213,30 +216,71 @@ function App() {
   // Memoized logout handler
   const memoizedLogout = useCallback(() => handleLogout(setIsAuthenticated, setUserRole), [setIsAuthenticated, setUserRole]);
 
-  // Pass handleLogout to sidebar pages as needed
+  // Global loading overlay
+  const LoadingOverlay = () => (
+    loading ? (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(255,255,255,0.6)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'all',
+        transition: 'opacity 0.2s',
+      }}>
+        <div style={{
+          background: '#fff',
+          padding: 32,
+          borderRadius: 16,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginBottom: 12}}>
+            <circle cx="24" cy="24" r="20" stroke="#1c444d" strokeWidth="4" opacity="0.2" />
+            <path d="M44 24c0-11.046-8.954-20-20-20" stroke="#1c444d" strokeWidth="4" strokeLinecap="round">
+              <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="1s" repeatCount="indefinite" />
+            </path>
+          </svg>
+          <span style={{color:'#1c444d',fontWeight:'bold',fontSize:18}}>Loading...</span>
+        </div>
+      </div>
+    ) : null
+  );
+
+  // Pass handleLogout and loading context to sidebar pages as needed
   return (
-    <BrowserRouter>
-      <Suspense fallback={<div style={{textAlign:'center',marginTop:40}}>Loading...</div>}>
-        <Routes>
-          <Route path="/" element={isAuthenticated ? <UserDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/LandingPage" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
-          <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
-          <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage onLogout={memoizedLogout} /> ) : ( <Navigate to="/LandingPage" />)}/>
-          <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/OtherPlatform" element={isAuthenticated ? <OtherPlatform onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/AdminDashboard" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <AdminDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ManageDentist" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageDentist onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ManageStaff" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageStaff onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="/ViewAudit" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ViewAudit onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-          <Route path="*" element={<Navigate to="/LandingPage" />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <LoadingContext.Provider value={{ setLoading, loading }}>
+      <BrowserRouter>
+        <Suspense fallback={<div style={{textAlign:'center',marginTop:40}}>Loading...</div>}>
+          <LoadingOverlay />
+          <Routes>
+            <Route path="/" element={isAuthenticated ? <UserDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/LandingPage" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+            <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+            <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage onLogout={memoizedLogout} /> ) : ( <Navigate to="/LandingPage" />)}/>
+            <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/OtherPlatform" element={isAuthenticated ? <OtherPlatform onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/AdminDashboard" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <AdminDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ManageDentist" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageDentist onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ManageStaff" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageStaff onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="/ViewAudit" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ViewAudit onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
+            <Route path="*" element={<Navigate to="/LandingPage" />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </LoadingContext.Provider>
   );
 }
 

@@ -59,6 +59,7 @@ export default function ManageStaff() {
   const rowsPerPage = 10;
 
   const [userForm, setUserForm] = useState({
+    name: "",
     username: "",
     email: "",
     role: "staff",
@@ -82,13 +83,14 @@ export default function ManageStaff() {
     setSelectedUser(user);
     if (user) {
       setUserForm({
+        name: user.name || "",
         username: user.username,
         email: user.email,
         role: "staff",
-        password: "", 
+        password: "",
       });
     } else {
-      setUserForm({ username: "", email: "", role: "staff", password: "" });
+      setUserForm({ name: "", username: "", email: "", role: "staff", password: "" });
     }
     setOpenModal(true);
   };
@@ -99,53 +101,58 @@ export default function ManageStaff() {
   };
 
   const handleSubmit = async () => {
-  const { username, email, password } = userForm;
-  
-  // Ensure username, email are provided and password is required only when creating a user
-  if (!username || !email || (!isEditing && !password)) {
-    alert("All fields (except password when editing) are required.");
-    return;
-  }
-
-  try {
-    // Prepare data to send
-    const updateData = {
-      userId: selectedUser?.userId, // Only use selectedUser if editing
-      username: userForm.username,
-      email: userForm.email,
-      role: "staff",
-    };
-
-    // Only add password if editing and password field is not empty
-    if (password) {
-      updateData.password = password;
+    const { name, username, email, password } = userForm;
+    // Validate required fields
+    if (!name || !username || !email || (!isEditing && !password)) {
+      alert("All fields are required. Password is required for new staff.");
+      return;
     }
-
-    if (isEditing) {
-      // Send PUT request to update user profile
-      await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
-    } else {
-      // Send POST request to create new user
-      await api.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
+    try {
+      if (isEditing) {
+        // Editing existing user
+        const updateData = {
+          userId: selectedUser?.userId,
+          name,
+          username,
+          email,
+          role: "staff",
+        };
+        if (password) {
+          updateData.password = password;
+        }
+        await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
+      } else {
+        // Creating new user: do NOT send userId, always send password
+        const createData = {
+          name,
+          username,
+          email,
+          role: "staff",
+          password,
+        };
+        await api.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, createData);
+      }
+      fetchUsers();
+      handleCloseModal();
+    } catch (error) {
+      console.error("ERROR submitting user:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        alert("Failed to save user: " + error.response.data.message);
+      } else {
+        alert("Failed to save user. See console for details.");
+      }
     }
-
-    // Reload users list and close modal
-    fetchUsers();
-    handleCloseModal();
-  } catch (error) {
-    console.error("ERROR submitting user:", error);
-    alert("Failed to save user. See console for details.");
-  }
-};
+  };
 
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       await api.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
-      await api.delete(`${import.meta.env.VITE_API_BASE_URL}/staff/delete/${userId}`);
+      await api.delete(`${import.meta.env.VITE_API_BASE_URL}/staff/profile/${userId}`);
       fetchUsers();
     } catch (error) {
       console.error("ERROR deleting user:", error);
+      alert("Failed to delete user. See console for details.");
     }
   };
 
@@ -282,6 +289,16 @@ export default function ManageStaff() {
                 
                 <div className="modal-body">
                   <TextField
+                    label="Full Name"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.name}
+                    onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                    className="modal-text-field"
+                    required
+                  />
+                  <TextField
                     label="Username"
                     fullWidth
                     margin="normal"
@@ -289,6 +306,7 @@ export default function ManageStaff() {
                     value={userForm.username}
                     onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
                     className="modal-text-field"
+                    required
                   />
                   <TextField
                     label="Email Address"
@@ -299,6 +317,7 @@ export default function ManageStaff() {
                     value={userForm.email}
                     onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                     className="modal-text-field"
+                    required
                   />
                   <TextField
                     label={isEditing ? "New Password (leave blank to keep current)" : "Password"}
@@ -309,6 +328,7 @@ export default function ManageStaff() {
                     value={userForm.password}
                     onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                     helperText={isEditing ? "Only fill this if you want to change the password" : ""}
+                    required={!isEditing}
                   />
                 </div>
                 

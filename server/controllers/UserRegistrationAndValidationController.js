@@ -8,7 +8,7 @@ const User = require("../models/user.models.js");
 // Register a new user
 exports.registerUser = async (req, res) => {
   try {
-    const { email,name, username, password, role } = req.body;
+    const { email, name, username, password, role } = req.body;
 
     if (!email || !name || !username || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
@@ -39,8 +39,23 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
 
+    // Auto-create dentist or staff profile immediately if role is dentist or staff
+    if (role.trim() === "dentist") {
+      const Dentist = require("../models/dentist.models.js");
+      const existing = await Dentist.findOne({ userId: newUser.userId });
+      if (!existing) {
+        await Dentist.create({ userId: newUser.userId, name: newUser.name });
+      }
+    } else if (role.trim() === "staff") {
+      const Staff = require("../models/staff.models.js");
+      const existing = await Staff.findOne({ userId: newUser.userId });
+      if (!existing) {
+        await Staff.create({ userId: newUser.userId, name: newUser.name });
+      }
+    }
+
     // Return success message
-    res.status(201).json({ success: true, message: "User registered successfully" });
+    res.status(201).json({ success: true, message: "User registered successfully", userId: newUser.userId });
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ message: "Server error", error: err.message });

@@ -61,6 +61,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// List of common holidays (MM-DD format for annual holidays, YYYY-MM-DD for fixed-date holidays)
+const HOLIDAYS = [
+  { date: '01-01', name: "New Year's Day" },
+  { date: '12-25', name: "Christmas Day" },
+  { date: '07-04', name: "Independence Day" },
+  { date: '11-01', name: "All Saints' Day" },
+  { date: '12-31', name: "New Year's Eve" },
+  // Add more as needed
+];
+
+// Helper to check if a date is a holiday and get its name
+function getHoliday(date) {
+  // date: dayjs object
+  const mmdd = date.format('MM-DD');
+  const yyyymmdd = date.format('YYYY-MM-DD');
+  const found = HOLIDAYS.find(h => h.date === mmdd || h.date === yyyymmdd);
+  return found ? found.name : null;
+}
+
 function UserDashboard() {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(0);
@@ -73,6 +92,7 @@ function UserDashboard() {
   const [appointmentTime, setAppointmentTime] = useState(null);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [confirmedDates, setConfirmedDates] = useState([]);
+  const [confirmedAppointments, setConfirmedAppointments] = useState([]);
   const [warning, setWarning] = useState("");
 
   const userId = sessionStorage.getItem("userId");
@@ -113,6 +133,7 @@ function UserDashboard() {
     fetchDentists();
   }, [userId, role]);
 
+  // Update fetchAppointments to also store confirmed appointments for the calendar
   const fetchAppointments = async (status) => {
     try {
       const res = await api.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/${status}/patient/${patientId}`);
@@ -124,6 +145,7 @@ function UserDashboard() {
       setRecords(appointmentsWithDentists);
 
       if (status === 'confirmed') {
+        setConfirmedAppointments(appointmentsWithDentists);
         const dates = appointmentsWithDentists.map(app =>
           dayjs(app.appointmentDate).startOf('day').format('YYYY-MM-DD')
         );
@@ -144,22 +166,43 @@ function UserDashboard() {
     return confirmedDates.includes(date.format('YYYY-MM-DD'));
   };
 
+  // Helper to check if a date is a confirmed appointment for the user
+  const isUserConfirmedDate = (date) => {
+    return confirmedAppointments.some(app => dayjs(app.appointmentDate).isSame(date, 'day'));
+  };
+
   const renderDay = (date, selectedDates, pickersDayProps) => {
     const isConfirmed = isConfirmedDate(date);
+    const isUserConfirmed = isUserConfirmedDate(date);
+    const holidayName = getHoliday(date);
+    let bgColor = undefined;
+    let color = undefined;
+    if (holidayName) {
+      bgColor = '#e57373'; // red for holiday
+      color = 'white';
+    } else if (isUserConfirmed) {
+      color = '#2e7d32'; // green text for user's confirmed
+      bgColor = undefined;
+    } else if (isConfirmed) {
+      bgColor = '#3AB286';
+      color = 'white';
+    }
     return (
       <div
         {...pickersDayProps}
         style={{
           borderRadius: '50%',
-          backgroundColor: isConfirmed ? '#3AB286' : undefined,
-          color: isConfirmed ? 'white' : undefined,
+          backgroundColor: bgColor,
+          color: color,
           width: 36,
           height: 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: 'auto'
+          margin: 'auto',
+          border: holidayName ? '2px solid #b71c1c' : undefined,
         }}
+        title={holidayName || undefined}
       >
         {date.date()}
       </div>
@@ -170,29 +213,59 @@ function UserDashboard() {
     setPage(newPage);
   };
 
+  // Prevent double-booking: check if dentist has an appointment at the selected time (±1hr window)
+  const isSlotAvailable = async (dentistId, date, time) => {
+    try {
+      const res = await api.get(`${import.meta.env.VITE_API_BASE_URL}/appointment/status/confirmed`);
+      const appointments = res.data.filter(app => app.dentistId === dentistId);
+      const selectedDateTime = dayjs(date).hour(time.hour()).minute(time.minute()).second(0);
+      for (const app of appointments) {
+        const appDateTime = dayjs(app.appointmentDate);
+        if (appDateTime.isSame(selectedDateTime, 'day')) {
+          const appTime = dayjs(app.appointmentTime, 'HH:mm');
+          const appStart = appDateTime.hour(appTime.hour()).minute(appTime.minute());
+          const appEnd = appStart.add(1, 'hour');
+          // If selected time is within the 1hr window of any confirmed appointment
+          if (
+            (selectedDateTime.isSame(appStart) ||
+             (selectedDateTime.isAfter(appStart) && selectedDateTime.isBefore(appEnd)) ||
+             (selectedDateTime.add(1, 'hour').isAfter(appStart) && selectedDateTime.add(1, 'hour').isBefore(appEnd)))
+          ) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('Error checking slot availability:', err);
+      return false;
+    }
+  };
+
   const handleSubmitAppointment = async () => {
     setWarning("");
     if (!selectedDentist) {
       setWarning("Please select a dentist.");
       return;
     }
-
     if (!appointmentDate || !appointmentTime) {
       setWarning("Please select both a date and time.");
       return;
     }
-
     const selectedDateTime = appointmentDate
       .hour(appointmentTime.hour())
       .minute(appointmentTime.minute());
-
     const now = dayjs();
-
     if (selectedDateTime.isBefore(now)) {
       setWarning("You cannot set an appointment in the past. Please choose a future date and time.");
       return;
     }
-
+    // Check for double-booking (1hr slot)
+    const slotAvailable = await isSlotAvailable(selectedDentist, appointmentDate, appointmentTime);
+    if (!slotAvailable) {
+      alert("This time slot is already taken for this dentist. Please choose another time (1 hour per session).");
+      return;
+    }
     try {
       const payload = {
         patientId,
@@ -488,7 +561,16 @@ function UserDashboard() {
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateCalendar
                   value={appointmentDate}
-                  onChange={(newDate) => setAppointmentDate(newDate)}
+                  onChange={(newDate) => {
+                    const holiday = newDate ? getHoliday(newDate) : null;
+                    if (holiday) {
+                      alert(`It's a holiday on this day. The dentist is not in for "${holiday}".`);
+                      setAppointmentDate(null);
+                    } else {
+                      setAppointmentDate(newDate);
+                    }
+                  }}
+                  renderDay={renderDay}
                   sx={{ 
                     '& .MuiPickersDay-root.Mui-selected': {
                       backgroundColor: '#1c444d',

@@ -51,12 +51,12 @@ export default function ManageUser() {
   const [roleFilter, setRoleFilter] = useState("patient");
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsersByRole(roleFilter);
+  }, [roleFilter]);
 
-  const fetchUsers = async () => {
+  const fetchUsersByRole = async (role) => {
     try {
-      const { data } = await api.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user`);
+      const { data } = await api.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user?role=${role}`);
       setUsers(data);
     } catch (error) {
       console.error("ERROR fetching users:", error);
@@ -67,7 +67,7 @@ export default function ManageUser() {
   const handleStatusChange = async (userId, status) => {
     try {
       await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/status/${userId}`, { status });
-      fetchUsers();
+      fetchUsersByRole(roleFilter);
       toast.success(`User status changed to ${status} successfully!`);
     } catch (error) {
       console.error("ERROR changing status:", error);
@@ -79,7 +79,7 @@ export default function ManageUser() {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       await api.delete(`${import.meta.env.VITE_API_BASE_URL}/auth/delete/${userId}`);
-      fetchUsers();
+      fetchUsersByRole(roleFilter);
       toast.success("User deleted successfully!");
     } catch (error) {
       console.error("ERROR deleting user:", error);
@@ -91,8 +91,8 @@ export default function ManageUser() {
     setPage(newPage);
   };
 
-  // Filter users by selected role
-  const filteredUsers = users.filter(user => user.role === roleFilter);
+  // No need to filter on frontend, backend already returns correct role
+  const filteredUsers = users;
 
   return (
     <div className="ManageDentist-dashboard">

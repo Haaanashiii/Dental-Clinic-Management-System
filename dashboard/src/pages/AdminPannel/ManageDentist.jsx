@@ -59,9 +59,10 @@ export default function ManageDentist() {
   const rowsPerPage = 10;
 
   const [userForm, setUserForm] = useState({
+    name: "",
     username: "",
     email: "",
-    role: "staff",
+    role: "dentist",
     password: "",
   });
 
@@ -82,13 +83,14 @@ export default function ManageDentist() {
     setSelectedUser(user);
     if (user) {
       setUserForm({
+        name: user.name || "",
         username: user.username,
         email: user.email,
         role: "dentist",
-        password: "", // Don't pre-fill the password in case of edit
+        password: "",
       });
     } else {
-      setUserForm({ username: "", email: "", role: "dentist", password: "" });
+      setUserForm({ name: "", username: "", email: "", role: "dentist", password: "" });
     }
     setOpenModal(true);
   };
@@ -99,42 +101,42 @@ export default function ManageDentist() {
   };
 
   const handleSubmit = async () => {
-  const { username, email, password } = userForm;
-  
-  // Ensure username, email are provided and password is required only when creating a user
-  if (!username || !email || (!isEditing && !password)) {
-    alert("All fields (except password when editing) are required.");
-    return;
-  }
-
-  try {
-    // Prepare data to send
-    const updateData = {
-      userId: selectedUser?.userId, // Only use selectedUser if editing
-      username: userForm.username,
-      email: userForm.email,
-      role: "dentist",
-    };
-
-    // Only add password if editing and password field is not empty
-    if (password) {
-      updateData.password = password;
+    const { name, username, email, password } = userForm;
+    // Ensure all fields are provided and password is required only when creating a user
+    if (!name || !username || !email || (!isEditing && !password)) {
+      alert("All fields (except password when editing) are required.");
+      return;
     }
 
-    if (isEditing) {
-      await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
-    } else {
-      await api.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
+    try {
+      // Prepare data to send
+      const updateData = {
+        userId: selectedUser?.userId, // Only use selectedUser if editing
+        name: userForm.name,
+        username: userForm.username,
+        email: userForm.email,
+        role: "dentist",
+      };
+
+      // Only add password if editing and password field is not empty
+      if (password) {
+        updateData.password = password;
+      }
+
+      if (isEditing) {
+        await api.put(`${import.meta.env.VITE_API_BASE_URL}/auth/user/edit`, updateData);
+      } else {
+        await api.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, updateData);
+      }
+
+
+      fetchUsers();
+      handleCloseModal();
+    } catch (error) {
+      console.error("ERROR submitting user:", error);
+      alert("Failed to save user. See console for details.");
     }
-
-
-    fetchUsers();
-    handleCloseModal();
-  } catch (error) {
-    console.error("ERROR submitting user:", error);
-    alert("Failed to save user. See console for details.");
-  }
-};
+  };
 
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -249,7 +251,6 @@ export default function ManageDentist() {
                   <TableRow>
                     <StyledTableCell>Username</StyledTableCell>
                     <StyledTableCell>Email</StyledTableCell>
-                    <StyledTableCell>Specialization</StyledTableCell>
                     <StyledTableCell>Role</StyledTableCell>
                     <StyledTableCell align="center">Actions</StyledTableCell>
                   </TableRow>
@@ -259,7 +260,6 @@ export default function ManageDentist() {
                     <StyledTableRow key={user.userId}>
                       <StyledTableCell>{user.username}</StyledTableCell>
                       <StyledTableCell>{user.email}</StyledTableCell>
-                      <StyledTableCell>{user.specialization}</StyledTableCell>
                       <StyledTableCell>{user.role}</StyledTableCell>
                       <StyledTableCell align="center">
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
@@ -327,6 +327,16 @@ export default function ManageDentist() {
                 
                 <div className="modal-body">
                   <TextField
+                    label="Full Name"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    value={userForm.name}
+                    onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                    className="modal-text-field"
+                    required
+                  />
+                  <TextField
                     label="Username"
                     fullWidth
                     margin="normal"
@@ -334,6 +344,7 @@ export default function ManageDentist() {
                     value={userForm.username}
                     onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
                     className="modal-text-field"
+                    required
                   />
                   <TextField
                     label="Email Address"
@@ -344,15 +355,7 @@ export default function ManageDentist() {
                     value={userForm.email}
                     onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                     className="modal-text-field"
-                  />
-                  <TextField
-                    label="Specialization"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    value={userForm.specialization}
-                    onChange={(e) => setUserForm({ ...userForm, specialization: e.target.value })}
-                    className="modal-text-field"
+                    required
                   />
                   <TextField
                     label={isEditing ? "New Password (leave blank to keep current)" : "Password"}
@@ -363,6 +366,7 @@ export default function ManageDentist() {
                     value={userForm.password}
                     onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                     helperText={isEditing ? "Only fill this if you want to change the password" : ""}
+                    required={!isEditing}
                   />
                 </div>
                 

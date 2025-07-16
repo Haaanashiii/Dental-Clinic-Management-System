@@ -175,29 +175,8 @@ function ManageAppointment() {
       } else if (role === 'dentist' && loadedDentistId) {
         res = await api.get(`/appointment/status/${status}/dentist/${loadedDentistId}`);
       }
-
-      const appointmentsWithProfiles = await Promise.all(res.data.map(async (appointment) => {
-        let dentistName = "Unknown";
-        let patientName = "Unknown";
-
-        try {
-          const resPatient = await api.get(`/patient/name/${appointment.patientId}`);
-          patientName = resPatient.data?.name ?? "Unknown";
-        } catch (e) {
-          console.warn("❗ Could not fetch patient", e);
-        }
-
-        try {
-          const resDentist = await api.get(`/dentist/name/${appointment.dentistId}`);
-          dentistName = resDentist.data?.name ?? "Unknown";
-        } catch (e) {
-          console.warn("❗ Could not fetch dentist", e);
-        }
-
-        return { ...appointment, dentistName, patientName };
-      }));
-
-      setRecords(appointmentsWithProfiles);
+      // Names are now included in the backend response
+      setRecords(res.data);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }
@@ -223,6 +202,7 @@ function ManageAppointment() {
       setLoading(false);
     };
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, role, userId]);
 
   const handleCancelAppointment = async (id) => {
