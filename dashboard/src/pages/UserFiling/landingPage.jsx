@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -82,6 +82,9 @@ const dentalServices = [
 
 function LandingPage() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
   // Redirect if already authenticated
   React.useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -98,6 +101,22 @@ function LandingPage() {
       navigate('/login', { replace: true });
     }
   }, [navigate]);
+  
+  // Add new useEffect to fetch username
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    const storedUsername = sessionStorage.getItem('username');
+    const name = sessionStorage.getItem('name');
+    
+    if (token) {
+      setIsLoggedIn(true);
+      // Use the name if available, otherwise use username, otherwise use "User"
+      setUsername(name || storedUsername || "User");
+    } else {
+      setIsLoggedIn(false);
+      setUsername('');
+    }
+  }, []);
 
 
   const refs = {
@@ -227,37 +246,41 @@ function LandingPage() {
               <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')} color="inherit">
                 {mode === 'dark' ? <Brightness7Icon sx={{ color: '#fff' }} /> : <Brightness4Icon sx={{ color: '#fff' }} />}
               </IconButton>
+              
+              {/* Login button - only show if not logged in */}
+              {!isLoggedIn && (
+                <Button
+                  onClick={() => navigate('/login', { replace: true })}
+                  className="mint-navbar-btn"
+                  sx={{
+                    bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
+                    color: '#1eb2a6',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    fontSize: 14,
+                    boxShadow: 1,
+                    mx: 0.5,
+                    minWidth: 90,
+                    minHeight: 44,
+                    border: mode === 'dark' ? '1.5px solid #1eb2a6' : 'none',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      bgcolor: mode === 'light' ? '#b2ebe7' : 'rgba(30,178,166,0.22)',
+                      color: '#159a8a',
+                      boxShadow: 4,
+                      transform: 'scale(1.07)',
+                    },
+                    '&:active': {
+                      bgcolor: mode === 'light' ? '#b2ebe7' : 'rgba(30,178,166,0.32)',
+                    },
+                  }}
+                >
+                  Login
+                </Button>
+              )}
+              
+              {/* Updated user button with username display */}
               <Button
-                onClick={() => {
-                  navigate('/login', { replace: true });
-                }}
-                className="mint-navbar-btn"
-                sx={{
-                  bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
-                  color: '#1eb2a6',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  fontSize: 14,
-                  boxShadow: 1,
-                  mx: 0.5,
-                  minWidth: 90,
-                  minHeight: 44,
-                  border: mode === 'dark' ? '1.5px solid #1eb2a6' : 'none',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    bgcolor: mode === 'light' ? '#b2ebe7' : 'rgba(30,178,166,0.22)',
-                    color: '#159a8a',
-                    boxShadow: 4,
-                    transform: 'scale(1.07)',
-                  },
-                  '&:active': {
-                    bgcolor: mode === 'light' ? '#b2ebe7' : 'rgba(30,178,166,0.32)',
-                  },
-                }}
-              >
-                Login
-              </Button>
-              <IconButton
                 className="mint-navbar-btn"
                 onClick={() => {
                   const token = sessionStorage.getItem('authToken');
@@ -272,18 +295,26 @@ function LandingPage() {
                     navigate('/login', { replace: true });
                   }
                 }}
+                startIcon={<AccountCircleIcon />}
                 sx={{
                   bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
                   color: '#1eb2a6',
                   fontWeight: 600,
                   borderRadius: 2,
-                  fontSize: 22,
+                  fontSize: { xs: 13, sm: 14 },
                   boxShadow: 1,
                   mx: 0.5,
-                  minWidth: 44,
+                  px: 2,
                   minHeight: 44,
                   border: mode === 'dark' ? '1.5px solid #1eb2a6' : 'none',
                   transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: { xs: 120, sm: 200 },
                   '&:hover': {
                     bgcolor: mode === 'light' ? '#b2ebe7' : 'rgba(30,178,166,0.22)',
                     color: '#159a8a',
@@ -295,8 +326,8 @@ function LandingPage() {
                   },
                 }}
               >
-                <AccountCircleIcon fontSize="inherit" />
-              </IconButton>
+                {isLoggedIn ? username : 'Account'}
+              </Button>
             </Box>
           </Box>
         </Box>
