@@ -6,7 +6,8 @@ const {
   editProfile,
   getAllDentists,
   getDentistByDentistId,
-  getNameByDentistId
+  getNameByDentistId,
+  getDentistById
 } = require('../controllers/dentistController');
 
 const router = express.Router();
@@ -30,6 +31,7 @@ router.delete('/profile/:userId', deleteProfile);
 router.get('/profile/dentist/:dentistId', getDentistByDentistId);
 // Get dentist name by dentistId
 router.get('/name/:dentistId', getNameByDentistId);
-// Get dentist name by dentistId
+// Get dentist by id for frontend use
+router.get('/get/:id', getDentistById);
+
 module.exports = router;
-    

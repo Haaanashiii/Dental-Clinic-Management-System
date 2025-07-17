@@ -40,7 +40,7 @@ function ManageRecord() {
   const [zoomImage, setZoomImage] = useState(null);
   const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const rowsPerPage = 10;
+  const rowsPerPage = 7;
 
   const fetchRecords = useCallback(async () => {
     try {

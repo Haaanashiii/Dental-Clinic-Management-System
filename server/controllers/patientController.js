@@ -181,11 +181,9 @@ exports.deleteProfile = async (req, res) => {
 exports.getNameByPatientId = async (req, res) => {
   try {
     const patient = await Patient.findOne({ patientId: req.params.patientId });
-
     if (!patient) {
       return res.status(404).json({ name: 'Unknown' });
     }
-
     res.json({ name: patient.name });
   } catch (err) {
     console.error('Error fetching patient name:', err);

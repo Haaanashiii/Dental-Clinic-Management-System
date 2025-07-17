@@ -2,7 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const processImage = require('../middleware/resizeImageMiddleware');
-const { createProfile, getProfile, deleteProfile, editProfile,getNameByPatientId} = require('../controllers/patientController');
+const { createProfile, getProfile, deleteProfile, editProfile,getNameByPatientId, getPatientById} = require('../controllers/patientController');
 const router = express.Router();
 
 // Multer setup for handling file uploads
@@ -21,5 +21,6 @@ router.put('/profile/:userId', editProfile);
 router.delete('/profile/:userId', deleteProfile);
 
 router.get('/name/:patientId', getNameByPatientId);
+
 
 module.exports = router;

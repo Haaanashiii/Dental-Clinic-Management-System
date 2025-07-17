@@ -175,8 +175,13 @@ function ManageAppointment() {
       } else if (role === 'dentist' && loadedDentistId) {
         res = await api.get(`/appointment/status/${status}/dentist/${loadedDentistId}`);
       }
-      // Names are now included in the backend response
-      setRecords(res.data);
+      // Fetch names for all appointments
+      const appointmentsWithNames = await Promise.all(res.data.map(async (appointment) => {
+        const patientName = await getPatientName(appointment.patientId);
+        const dentistName = await getDentistName(appointment.dentistId);
+        return { ...appointment, patientName, dentistName };
+      }));
+      setRecords(appointmentsWithNames);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }
@@ -285,13 +290,35 @@ function ManageAppointment() {
     setPage(newPage);
   };
 
+  // Helper to fetch patient name directly from backend
+  const getPatientName = async (patientId) => {
+    if (!patientId) return "Unknown";
+    try {
+      const res = await api.get(`/patient/name/${patientId}`);
+      return res.data?.name || "Unknown";
+    } catch {
+      return "Unknown";
+    }
+  };
+
+  // Helper to fetch dentist name directly from backend
+  const getDentistName = async (dentistId) => {
+    if (!dentistId) return "Unknown";
+    try {
+      const res = await api.get(`/dentist/name/${dentistId}`);
+      return res.data?.name || "Unknown";
+    } catch {
+      return "Unknown";
+    }
+  };
+
   const displayedRecords = records.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <div className="ManageAppointment-dashboard">
       <ClientSidebar />
       <motion.div 
-        className="profile-container" // Changed from ManageAppointment-content
+        className="profile-container"
         variants={contentVariants}
         initial="initial"
         animate="animate"
@@ -369,38 +396,78 @@ function ManageAppointment() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {displayedRecords.map((appointment) => (
-                      <StyledTableRow key={appointment.appointmentId}>
-                        <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
-                        <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
-                        <StyledTableCell>{appointment.patientName || "Unknown"}</StyledTableCell>
-                        <StyledTableCell>{appointment.dentistName || "Unknown"}</StyledTableCell>
-                        <StyledTableCell>
-                          <StatusBadge status={appointment.status} />
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          {statusFilter === 'pending' && (
-                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                    {displayedRecords.map((appointment) => {
+                      const patientId = appointment.patientId;
+                      const dentistId = appointment.dentistId;
+                      return (
+                        <StyledTableRow key={appointment.appointmentId}>
+                          <StyledTableCell>{new Date(appointment.appointmentDate).toLocaleDateString()}</StyledTableCell>
+                          <StyledTableCell>{dayjs(appointment.appointmentTime, 'HH:mm').format('hh:mm A')}</StyledTableCell>
+                          <StyledTableCell>{appointment.patientName || 'Unknown'}</StyledTableCell>
+                          <StyledTableCell>{appointment.dentistName || 'Unknown'}</StyledTableCell>
+                          <StyledTableCell>
+                            <StatusBadge status={appointment.status} />
+                          </StyledTableCell>
+                          <StyledTableCell>
+                            {statusFilter === 'pending' && (
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                <Button 
+                                  variant="contained"
+                                  size="small"
+                                  startIcon={<CheckIcon />}
+                                  sx={{
+                                    backgroundColor: '#4caf50',
+                                    color: 'white',
+                                    minWidth: '100px',
+                                    '&:hover': {
+                                      backgroundColor: '#45a049'
+                                    }
+                                  }}
+                                  onClick={() => handleApproveAppointment(appointment.appointmentId)}
+                                >
+                                  Approve
+                                </Button>
+                                <Button 
+                                  variant="contained"
+                                  size="small"
+                                  startIcon={<CancelIcon />}
+                                  sx={{
+                                    backgroundColor: '#f44336',
+                                    color: 'white',
+                                    minWidth: '90px',
+                                    '&:hover': {
+                                      backgroundColor: '#d32f2f'
+                                    }
+                                  }}
+                                  onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            )}
+                            {statusFilter === 'confirmed' && (
                               <Button 
                                 variant="contained"
                                 size="small"
-                                startIcon={<CheckIcon />}
+                                startIcon={<RateReviewIcon />}
                                 sx={{
-                                  backgroundColor: '#4caf50',
+                                  backgroundColor: '#2196f3',
                                   color: 'white',
                                   minWidth: '100px',
                                   '&:hover': {
-                                    backgroundColor: '#45a049'
+                                    backgroundColor: '#1976d2'
                                   }
                                 }}
-                                onClick={() => handleApproveAppointment(appointment.appointmentId)}
+                                onClick={() => handleReviewAppointment(appointment)}
                               >
-                                Approve
+                                Review
                               </Button>
+                            )}
+                            {statusFilter === 'cancelled' && (
                               <Button 
                                 variant="contained"
                                 size="small"
-                                startIcon={<CancelIcon />}
+                                startIcon={<DeleteIcon />}
                                 sx={{
                                   backgroundColor: '#f44336',
                                   color: 'white',
@@ -409,51 +476,15 @@ function ManageAppointment() {
                                     backgroundColor: '#d32f2f'
                                   }
                                 }}
-                                onClick={() => handleCancelAppointment(appointment.appointmentId)}
+                                onClick={() => handleDeleteAppointment(appointment.appointmentId)}
                               >
-                                Cancel
+                                Delete
                               </Button>
-                            </div>
-                          )}
-                          {statusFilter === 'confirmed' && (
-                            <Button 
-                              variant="contained"
-                              size="small"
-                              startIcon={<RateReviewIcon />}
-                              sx={{
-                                backgroundColor: '#2196f3',
-                                color: 'white',
-                                minWidth: '100px',
-                                '&:hover': {
-                                  backgroundColor: '#1976d2'
-                                }
-                              }}
-                              onClick={() => handleReviewAppointment(appointment)}
-                            >
-                              Review
-                            </Button>
-                          )}
-                          {statusFilter === 'cancelled' && (
-                            <Button 
-                              variant="contained"
-                              size="small"
-                              startIcon={<DeleteIcon />}
-                              sx={{
-                                backgroundColor: '#f44336',
-                                color: 'white',
-                                minWidth: '90px',
-                                '&:hover': {
-                                  backgroundColor: '#d32f2f'
-                                }
-                              }}
-                              onClick={() => handleDeleteAppointment(appointment.appointmentId)}
-                            >
-                              Delete
-                            </Button>
-                          )}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    ))}
+                            )}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>

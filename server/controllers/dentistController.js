@@ -222,3 +222,14 @@ exports.getNameByDentistId = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+// Get dentist by ID
+exports.getDentistById = async (req, res) => {
+  try {
+    const dentist = await Dentist.findOne({ dentistId: req.params.id });
+    if (!dentist) return res.status(404).json({ message: 'Dentist not found' });
+    res.json(dentist);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
