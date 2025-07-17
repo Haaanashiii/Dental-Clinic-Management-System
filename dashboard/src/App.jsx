@@ -174,9 +174,11 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             </AnimatedContent>
         } />
           <Route path="/ViewAudit" element={
+             isAuthenticated && ( userRole === "dentist") ? (
             <AnimatedContent hasSidebar={true}>
               <ViewAudit />
             </AnimatedContent>
+            ) : <Navigate to="/login" />
         } />
         {/* Redirect to landing if not found */}
         <Route path="*" element={<Navigate to="/LandingPage" />} />

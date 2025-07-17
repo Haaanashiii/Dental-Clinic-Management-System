@@ -94,6 +94,7 @@ function UserDashboard() {
   const [confirmedDates, setConfirmedDates] = useState([]);
   const [confirmedAppointments, setConfirmedAppointments] = useState([]);
   const [warning, setWarning] = useState("");
+  const [booking, setBooking] = useState(false);
 
   const userId = sessionStorage.getItem("userId");
   const role = sessionStorage.getItem("role");
@@ -244,6 +245,7 @@ function UserDashboard() {
 
   const handleSubmitAppointment = async () => {
     setWarning("");
+    if (booking) return; // Prevent double submit
     if (!selectedDentist) {
       setWarning("Please select a dentist.");
       return;
@@ -260,10 +262,12 @@ function UserDashboard() {
       setWarning("You cannot set an appointment in the past. Please choose a future date and time.");
       return;
     }
+    setBooking(true);
     // Check for double-booking (1hr slot)
     const slotAvailable = await isSlotAvailable(selectedDentist, appointmentDate, appointmentTime);
     if (!slotAvailable) {
       alert("This time slot is already taken for this dentist. Please choose another time (1 hour per session).");
+      setBooking(false);
       return;
     }
     try {
@@ -281,6 +285,8 @@ function UserDashboard() {
       setStatusFilter('pending');
     } catch (err) {
       console.error("Failed to create appointment:", err);
+    } finally {
+      setBooking(false);
     }
   };
 
@@ -602,8 +608,9 @@ function UserDashboard() {
                   bgcolor: '#1c444d',
                   '&:hover': { bgcolor: '#153239' } 
                 }}
+                disabled={booking}
               >
-                Book Appointment
+                {booking ? 'Booking...' : 'Book Appointment'}
               </Button>
             </DialogActions>
           </Dialog>

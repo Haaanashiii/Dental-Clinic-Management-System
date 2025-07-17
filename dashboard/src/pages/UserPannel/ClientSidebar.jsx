@@ -131,10 +131,10 @@ function ClientDashboard({ setIsAuthenticated }) {
     },
      {
       key: '9',
-      icon: <TeamOutlined />, // Changed icon to TeamOutlined for Audit logs
-      label: 'Audit Logs', // Changed label to Audit Logs
+      icon: <TeamOutlined />, 
+      label: 'Audit Logs', 
       onClick: () => navigate('/ViewAudit'),
-      hidden: role !== 'staff' && role !== 'dentist',
+      hidden: role !== 'dentist',
     },
     {
       key: '10',
