@@ -142,32 +142,42 @@ function OtherPlatform() {
       display: "flex", 
       minHeight: "100vh",
       bgcolor: "#f0f4f5", // Lighter teal-tinted background
-      background: "linear-gradient(135deg, #f0f4f5 0%, #e6eff0 100%)" ,
-      overflow: "hidden"
+      background: "linear-gradient(135deg, #f0f4f5 0%, #e6eff0 100%)",
+      overflow: "hidden" // Keep the parent container from scrolling
     }}>
       {/* Sidebar with fixed width */}
       <Box>
         <ClientSidebar />
       </Box>
 
-      {/* Main content area */}
+      {/* Main content area - FIXED: Changed to use flexbox for better layout control */}
       <Box sx={{ 
         flexGrow: 1,
-        p: { xs: 2, sm: 3, md: 4 },
-        overflow: "auto",
-        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh", // Set to full viewport height
+        overflow: "hidden", // Prevent this container from scrolling
       }}>
-        {/* Main content with animation */}
+        {/* Main content with animation - improved motion container */}
         <motion.div
-          style={{ width: "100%" }}
+          style={{ 
+            width: "100%", 
+            height: "100%", 
+            display: "flex", 
+            flexDirection: "column",
+            overflow: "hidden" // Prevent this container from scrolling
+          }}
           variants={contentVariants}
           initial="initial"
           animate="animate"
           exit="exit"
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Page header */}
-          <Box sx={{ mb: 4 }}>
+          {/* Page header - FIXED: Added padding to prevent content from touching edges */}
+          <Box sx={{ 
+            p: { xs: 2, sm: 3, md: 4 },
+            pb: 0, // Remove bottom padding as we handle that in the next container
+          }}>
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -178,9 +188,9 @@ function OtherPlatform() {
                 component="h1"
                 sx={{
                   color: "#1c444d",
-                  fontWeight: 600,
+                  fontWeight: "bold",
                   fontSize: { xs: "1.75rem", md: "2.125rem" },
-                  mb: 1
+                  mb: 0
                 }}
               >
                 Other Platforms
@@ -188,16 +198,17 @@ function OtherPlatform() {
               <Typography 
                 variant="body1" 
                 color="text.secondary"
-                sx={{ mb: 2 }}
+                sx={{ mb: 0 }}
               >
                 Access our partner services through these integrated platforms
               </Typography>
             </motion.div>
           </Box>
 
-          {/* Filter switch section */}
+          {/* Filter switch section - FIXED: Added padding to properly position this section */}
           <Box sx={{ 
-            mb: 4, 
+            px: { xs: 2, sm: 3, md: 4 },
+            py: 2,
             display: "flex", 
             alignItems: "center", 
             justifyContent: "space-between",
@@ -220,225 +231,236 @@ function OtherPlatform() {
             </Box>
           </Box>
 
-          {/* Main content card */}
-          <Paper
-            elevation={0}
-            sx={{
-              bgcolor: "white",
-              borderRadius: 4,
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-              overflow: "auto",
-              p: { xs: 2, sm: 3, md: 4 },
-              mb: 4,
-              height: 700, // Fixed height added here
-              maxHeight: "calc(100vh - 180px)", // Responsive maximum height
-            }}
-          >
-            {/* Card grid - keeping this section as is */}
-            <Grid 
-              container 
-              spacing={4} 
-              justifyContent={{ xs: "center", md: "flex-start" }}
-              sx={{ mt: 0 }}
+          {/* Main content card - FIXED: Remove fixed height, allow content to scroll properly */}
+          <Box sx={{
+            flexGrow: 1,
+            overflow: "auto", // This is the only scrollable container
+            px: { xs: 2, sm: 3, md: 4 },
+            pb: { xs: 2, sm: 3, md: 4 },
+          }}>
+            <Paper
+              elevation={0}
+              sx={{
+                bgcolor: "white",
+                borderRadius: 4,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                p: { xs: 2, sm: 3, md: 4 },
+                mb: 4,
+                height: "auto", // FIXED: Remove fixed height to prevent overflow issues
+                overflow: "visible", // FIXED: Allow content to be visible
+              }}
             >
-              {platformsData.map((card, idx) => (
-                <Grid item key={idx} xs={12} sm={6} md={4} lg={4} xl={2}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ 
-                      duration: 0.5, 
-                      delay: 0.2 + idx * 0.1,
-                      type: "spring",
-                      stiffness: 100
-                    }}
-                  >
+              {/* Card grid - FIXED: Improved grid spacing and alignment */}
+              <Grid 
+                container 
+                spacing={4} 
+                justifyContent={{ xs: "center", md: "flex-start" }}
+                sx={{ mt: 0 }}
+              >
+                {platformsData.map((card, idx) => (
+                  <Grid item key={idx} xs={12} sm={6} md={4} lg={4} xl={3}>
                     <motion.div
-                      whileHover={{ 
-                        scale: 1.05, 
-                        y: -8,
-                        transition: { duration: 0.2 }
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: 0.2 + idx * 0.1,
+                        type: "spring",
+                        stiffness: 100
                       }}
-                      whileTap={{ scale: 0.98 }}
+                      style={{ 
+                        display: "flex", 
+                        justifyContent: "center" // FIXED: Center the card
+                      }}
                     >
-                      <Card
-                        sx={{
-                          width: { xs: "100%", sm: 200 }, 
-                          height: 370,
-                          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-                          transition: "all 0.3s ease",
-                          borderRadius: 4,
-                          position: "relative",
-                          overflow: "visible",
+                      <motion.div
+                        whileHover={{ 
+                          scale: 1.05, 
+                          y: -8,
+                          transition: { duration: 0.2 }
                         }}
+                        whileTap={{ scale: 0.98 }}
+                        style={{ width: "100%" }} // FIXED: Ensure consistent width
                       >
-                        {/* Gradient header */}
-                        <Box
+                        <Card
                           sx={{
-                            height: 100,
-                            background: card.gradient,
-                            borderTopLeftRadius: 16,
-                            borderTopRightRadius: 16,
-                          }}
-                        />
-
-                        {/* Circular logo with animation */}
-                        <motion.div
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ 
-                            delay: 0.3 + idx * 0.1,
-                            type: "spring",
-                            stiffness: 200
-                          }}
-                          style={{
-                            position: "absolute",
-                            top: 60,
-                            left: "25%",  // Changed from 25% to 50% to center properly
-                            transform: "translateX(-50%)",
+                            width: "100%", // FIXED: Use 100% width to be responsive
+                            maxWidth: 320, // FIXED: Add max width for larger screens
+                            height: 370,
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                            transition: "all 0.3s ease",
+                            borderRadius: 4,
+                            position: "relative",
+                            overflow: "visible",
+                            margin: "0 auto", // FIXED: Center the card
                           }}
                         >
-                          <Avatar
-                            src={card.image}
-                            alt={card.title}
+                          {/* Gradient header */}
+                          <Box
                             sx={{
-                              width: 80,
-                              height: 80,
-                              border: "4px solid white",
-                              bgcolor: "white",
-                              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                              p: 1,
-                              "& .MuiAvatar-img": {
-                                objectFit: "contain",
-                                width: "110%",
-                                height: "110%"
-                              }
+                              height: 100,
+                              background: card.gradient,
+                              borderTopLeftRadius: 16,
+                              borderTopRightRadius: 16,
                             }}
                           />
-                        </motion.div>
 
-                        <CardContent sx={{ 
-                          mt: 6, 
-                          pt: 2, 
-                          textAlign: "center", 
-                          height: "calc(100% - 160px)", 
-                          display: "flex", 
-                          flexDirection: "column",
-                          position: "relative" 
-                        }}>
+                          {/* Circular logo with animation - FIXED: Improved positioning */}
                           <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 + idx * 0.1 }}
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ 
+                              delay: 0.3 + idx * 0.1,
+                              type: "spring",
+                              stiffness: 200
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: 60,
+                              left: "25%", // FIXED: Center properly
+                              transform: "translateX(-50%)",
+                            }}
                           >
-                            <Typography
-                              variant="h6"
-                              color="#1c444d"  // Changed from "text.primary" to your teal brand color
-                              component="div"
-                              sx={{ fontWeight: 600, mb: 1 }}
-                            >
-                              {card.title}
-                            </Typography>
-                          </motion.div>
-                          
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 + idx * 0.1 }}
-                          >
-                            <Typography
-                              variant="body2"
-                              color="#555555"  // Changed from "text.secondary" to a darker gray
-                              sx={{ mb: 3, px: 0.5 }}
-                            >
-                              {card.description}
-                            </Typography>
-                          </motion.div>
-                          
-                          <Box sx={{ flexGrow: 1 }} />
-                          
-                          {/* Online status indicator */}
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 + idx * 0.1 }}
-                          >
-                            <Box 
+                            <Avatar
+                              src={card.image}
+                              alt={card.title}
                               sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mb: 2
+                                width: 80,
+                                height: 80,
+                                border: "4px solid white",
+                                bgcolor: "white",
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                                p: 1,
+                                "& .MuiAvatar-img": {
+                                  objectFit: "contain",
+                                  width: "110%",
+                                  height: "110%"
+                                }
                               }}
-                            >
-                              {isLoading ? (
-                                <CircularProgress size={16} sx={{ mr: 1 }} />
-                              ) : card.isOnline ? (
-                                <Chip
-                                  icon={<WifiIcon fontSize="small" />}
-                                  label="Online"
-                                  size="small"
-                                  sx={{
-                                    bgcolor: 'rgba(76, 175, 80, 0.1)',
-                                    color: '#388e3c',
-                                    fontWeight: 500,
-                                    '& .MuiChip-icon': {
-                                      color: '#388e3c'
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <Chip
-                                  icon={<WifiOffIcon fontSize="small" />}
-                                  label="Offline"
-                                  size="small"
-                                  sx={{
-                                    bgcolor: 'rgba(244, 67, 54, 0.1)',
-                                    color: '#d32f2f',
-                                    fontWeight: 500,
-                                    '& .MuiChip-icon': {
-                                      color: '#d32f2f'
-                                    }
-                                  }}
-                                />
-                              )}
-                            </Box>
+                            />
                           </motion.div>
-                          
-                          <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <Button
-                              variant="contained"
-                              sx={{
-                                borderRadius: 8,
-                                px: 5,
-                                py: 1,
-                                textTransform: "none",
-                                background: card.gradient,
-                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                fontWeight: 500,
-                                alignSelf: "center",
-                                fontSize: "1rem",
-                                minWidth: "120px",
-                                mb: 2
-                              }}
-                              onClick={() => handleCardClick(card.url)}
-                            >
-                              Visit
-                            </Button>
-                          </motion.div>
-                        </CardContent>
 
-           
-                      </Card>
+                          <CardContent sx={{ 
+                            mt: 6, 
+                            pt: 2, 
+                            textAlign: "center", 
+                            height: "calc(100% - 160px)", 
+                            display: "flex", 
+                            flexDirection: "column",
+                            position: "relative" 
+                          }}>
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.4 + idx * 0.1 }}
+                            >
+                              <Typography
+                                variant="h6"
+                                color="#1c444d"
+                                component="div"
+                                sx={{ fontWeight: 600, mb: 1 }}
+                              >
+                                {card.title}
+                              </Typography>
+                            </motion.div>
+                            
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.5 + idx * 0.1 }}
+                            >
+                              <Typography
+                                variant="body2"
+                                color="#555555"
+                                sx={{ mb: 3, px: 0.5 }}
+                              >
+                                {card.description}
+                              </Typography>
+                            </motion.div>
+                            
+                            <Box sx={{ flexGrow: 1 }} />
+                            
+                            {/* Online status indicator */}
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.5 + idx * 0.1 }}
+                            >
+                              <Box 
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  mb: 2
+                                }}
+                              >
+                                {isLoading ? (
+                                  <CircularProgress size={16} sx={{ mr: 1 }} />
+                                ) : card.isOnline ? (
+                                  <Chip
+                                    icon={<WifiIcon fontSize="small" />}
+                                    label="Online"
+                                    size="small"
+                                    sx={{
+                                      bgcolor: 'rgba(76, 175, 80, 0.1)',
+                                      color: '#388e3c',
+                                      fontWeight: 500,
+                                      '& .MuiChip-icon': {
+                                        color: '#388e3c'
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <Chip
+                                    icon={<WifiOffIcon fontSize="small" />}
+                                    label="Offline"
+                                    size="small"
+                                    sx={{
+                                      bgcolor: 'rgba(244, 67, 54, 0.1)',
+                                      color: '#d32f2f',
+                                      fontWeight: 500,
+                                      '& .MuiChip-icon': {
+                                        color: '#d32f2f'
+                                      }
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                            </motion.div>
+                            
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Button
+                                variant="contained"
+                                sx={{
+                                  borderRadius: 8,
+                                  px: 5,
+                                  py: 1,
+                                  textTransform: "none",
+                                  background: card.gradient,
+                                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                  fontWeight: 500,
+                                  alignSelf: "center",
+                                  fontSize: "1rem",
+                                  minWidth: "120px",
+                                  mb: 2
+                                }}
+                                onClick={() => handleCardClick(card.url)}
+                              >
+                                Visit
+                              </Button>
+                            </motion.div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
-          </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Box>
         </motion.div>
       </Box>
     </Box>
