@@ -67,7 +67,7 @@ const cardData = [
   {
     title: "PNB",
     image: PNBImg,
-    url: "http://192.168.9.23:5173/",
+    url: "http://pnb-client.vercel.app/",
     gradient: "linear-gradient(135deg, #F2994A, #F2C94C)",
     description: "Banking services platform"
   },

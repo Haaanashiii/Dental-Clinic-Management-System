@@ -119,7 +119,7 @@ function UserRecords() {
     setPaySuccess("");
     try {
       const response = await api.post(
-        'http://192.168.9.23:4000/api/Philippine-National-Bank/business-integration/customer/pay-business',
+        'http://pbp-server.vercel.app/api/Philippine-National-Bank/business-integration/customer/pay-business',
         {
           customerAccountNumber: payForm.fromAccountNumber,
           toBusinessAccount: "842-6772-365-4863",

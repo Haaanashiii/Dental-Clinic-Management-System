@@ -86,7 +86,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageProfilePage />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/Profile" element={
@@ -94,7 +94,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageProfilePage />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/UserRecords" element={
@@ -102,7 +102,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <UserRecords />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
 
         {/* Admin Panel - pages with sidebars */}
@@ -111,7 +111,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <AdminDashboard />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/ManageDentist" element={
@@ -119,7 +119,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageDentist />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/ManageStaff" element={
@@ -127,7 +127,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageStaff />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/ManageUser" element={
@@ -135,7 +135,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageUser />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/ManageRecord" element={
@@ -143,7 +143,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageRecord />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         
         <Route path="/ManageAppointment" element={
@@ -151,7 +151,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ManageAppointment />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
 
         <Route path="/OtherPlatform" element={
@@ -159,14 +159,14 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <OtherPlatform />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
          <Route path="/AdminDashboard" element={
           isAuthenticated && (userRole === "staff" || userRole === "dentist") ? (
             <AnimatedContent hasSidebar={true}>
               <AdminDashboard />
             </AnimatedContent>
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/LandingPage" />
         } />
         <Route path="/LandingPage" element={
             <AnimatedContent hasSidebar={true}>
@@ -178,7 +178,7 @@ function AnimatedRoutes({ isAuthenticated, userRole, setIsAuthenticated, setUser
             <AnimatedContent hasSidebar={true}>
               <ViewAudit />
             </AnimatedContent>
-            ) : <Navigate to="/login" />
+            ) : <Navigate to="/LandingPage" />
         } />
         {/* Redirect to landing if not found */}
         <Route path="*" element={<Navigate to="/LandingPage" />} />
