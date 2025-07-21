@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
 import jollibeeImg from "../../assets/Jollibee.png";
-import ITBYTES from '../../assets/ITBYTES.png';
+import itBytesImg from '../../assets/ITBYTES.png';
 import NationalBImg from "../../assets/NationalB.jpeg";
 import BlendedImg from "../../assets/Blended.png";
 import TaraLabaImg from "../../assets/taraLaba.png";
@@ -59,7 +59,7 @@ const cardData = [
   },
   {
     title: "IT Bytes",
-    image: ITbytesImg,
+    image: itBytesImg,
     url: "http://192.168.9.4:5173/",
     gradient: "linear-gradient(135deg, #1D976C, #93F9B9)",
     description: "Tech product marketplace"
