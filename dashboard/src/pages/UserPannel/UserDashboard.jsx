@@ -266,7 +266,7 @@ function UserDashboard() {
     // Check for double-booking (1hr slot)
     const slotAvailable = await isSlotAvailable(selectedDentist, appointmentDate, appointmentTime);
     if (!slotAvailable) {
-      alert("This time slot is already taken for this dentist. Please choose another time (1 hour per session).");
+      setWarning("This time slot is already taken for this dentist. Please choose another time (1 hour per session). ");
       setBooking(false);
       return;
     }
@@ -285,6 +285,7 @@ function UserDashboard() {
       setStatusFilter('pending');
     } catch (err) {
       console.error("Failed to create appointment:", err);
+      setWarning("Failed to create appointment. Please try again later.");
     } finally {
       setBooking(false);
     }

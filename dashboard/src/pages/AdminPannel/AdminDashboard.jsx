@@ -738,7 +738,7 @@ function AdminDashboard() {
                       <BarChart 
                         data={appointmentTimeData} 
                         margin={{ top: 20, right: 30, left: 20, bottom: 40 }} // Increased bottom margin
-                        barSize={36}
+                        barSize={100} // Thicker bars
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
                         <XAxis 
