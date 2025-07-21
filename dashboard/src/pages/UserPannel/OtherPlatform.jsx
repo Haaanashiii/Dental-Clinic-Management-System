@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ClientSidebar from "./ClientSidebar";
 import jollibeeImg from "../../assets/Jollibee.png";
-import ITbytesImg from "../../assets/ITBYTES.png";
+import ITBYTES from '../../assets/ITBYTES.png';
 import NationalBImg from "../../assets/NationalB.jpeg";
 import BlendedImg from "../../assets/Blended.png";
 import TaraLabaImg from "../../assets/taraLaba.png";
