@@ -22,7 +22,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { Visibility, VisibilityOff, EmailOutlined, LockOutlined, KeyOutlined, VpnKeyOutlined } from "@mui/icons-material";
-import "./LoginPage.css";
+import "./Loginpage.css";
 import LogoColored from "../assets/LOGO-COLORED.png";
 import DentalLogo from "../assets/DentalLogo.png";
 
