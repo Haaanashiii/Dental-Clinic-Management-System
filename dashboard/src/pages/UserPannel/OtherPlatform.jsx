@@ -53,14 +53,14 @@ const cardData = [
   {
     title: "TaraLaba",
     image: TaraLabaImg,
-    url: "http://192.168.9.27:5173/",
+    url: "http://tara-laba.vercel.app/",
     gradient: "linear-gradient(135deg, #00B4DB, #0083B0)",
     description: "Laundry service booking"
   },
   {
     title: "IT Bytes",
     image: itBytesImg,
-    url: "http://192.168.9.4:5173/",
+    url: "http://it-bytes-ui.vercel.app/",
     gradient: "linear-gradient(135deg, #1D976C, #93F9B9)",
     description: "Tech product marketplace"
   },
