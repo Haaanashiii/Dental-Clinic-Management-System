@@ -60,7 +60,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 450px;
+  width: min(450px, calc(100vw - 24px));
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -214,6 +214,16 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .ManageDentist-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ManageDentist-content {
+    padding: 18px;
+  }
+
   .profile-container {
     padding: 15px;
   }
@@ -252,5 +262,14 @@
   /* Make action buttons stack on very small screens */
   .ManageDentist-table .MuiTableCell-body .MuiIconButton-root {
     margin: 2px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-cancel-btn,
+  .modal-submit-btn {
+    width: 100%;
   }
 }

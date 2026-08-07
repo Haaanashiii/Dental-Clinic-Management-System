@@ -4,8 +4,6 @@ const User = require('../models/user.models');
 const Patient = require('../models/patient.models');
 const Audit = require('../models/audit.models'); // Add Audit model for direct logging
 const axios = require('axios');
-const { LOCAL_IP } = require('../config/localIP');
-const { SERVER_PORT } = require('../index');
 const { writeAuditLog } = require('../utils/auditLogHelper');
 
 exports.createAppointment = async (req, res) => {

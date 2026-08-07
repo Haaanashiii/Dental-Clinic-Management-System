@@ -45,7 +45,7 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
       const signUpResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, userFormWithRole);
 
       if (signUpResponse.data.success) {
-        navigate("/login");
+        navigate("/sign-in");
       } else {
         setError(signUpResponse.data.message || "Signup failed.");
       }
@@ -154,7 +154,7 @@ const SignUpPage = ({ setIsAuthenticated, setUserRole }) => {
           
           <div className="links-container">
             <span>Already have an account? </span>
-            <a href="/login" className="signup-link">Login here</a>
+            <a href="/sign-in" className="signup-link">Login here</a>
           </div>
         </div>
         

@@ -212,3 +212,53 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+@media (max-width: 768px) {
+  .ClientSidebar {
+    position: relative;
+    top: 0;
+    width: 100% !important;
+    height: auto;
+    min-height: auto;
+  }
+
+  .ClientSidebar .ant-menu {
+    width: 100%;
+  }
+
+  .sidebar-content {
+    height: auto;
+  }
+
+  .logout-button-container {
+    padding: 12px 16px 16px;
+  }
+
+  .logout-button,
+  .collapse-button {
+    width: 100%;
+  }
+
+  .user-info-container {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .logo-container {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    height: 56px;
+    padding: 12px;
+  }
+
+  .ClientSidebar .ant-menu-item {
+    height: 44px;
+    line-height: 44px;
+  }
+
+  .username,
+  .user-role {
+    font-size: 12px;
+  }
+}

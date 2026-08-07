@@ -4,6 +4,7 @@
 /* Universal selector to ensure Poppins is used everywhere */
 * {
   font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
 }
 
 :root {
@@ -37,6 +38,12 @@ body {
   padding: 0;
   min-width: 320px;
   font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 a {

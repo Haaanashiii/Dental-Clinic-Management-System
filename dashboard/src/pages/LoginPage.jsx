@@ -172,7 +172,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
               headers: { Authorization: `Bearer ${token}` },
             });
             if (profileRes.data && profileRes.data.userId) {
-              navigate("/");
+              navigate("/dashboard");
             } else {
               navigate("/ManageProfilePage");
             }
@@ -229,7 +229,7 @@ function LoginPage({ setIsAuthenticated, setUserRole }) {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (profileRes.data && profileRes.data.userId) {
-            navigate("/");
+            navigate("/dashboard");
           } else {
             navigate("/ManageProfilePage");
           }

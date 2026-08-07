@@ -1,7 +1,5 @@
 const Records = require('../models/records.models');
 const axios = require('axios');
-const { LOCAL_IP } = require('../config/localIP');
-const { SERVER_PORT } = require('../index');
 const Audit = require('../models/audit.models'); // Add Audit model for direct logging
 const { writeAuditLog } = require('../utils/auditLogHelper');
 

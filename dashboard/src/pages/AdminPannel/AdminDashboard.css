@@ -158,6 +158,23 @@
   .chart-container {
     min-height: 250px;
   }
+
+  .admin-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .admin-dashboard-boxes {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .admin-dashboard-box,
+  .admin-dashboard-card {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -175,6 +192,19 @@
   
   .dashboard-subtitle {
     font-size: 1rem;
+  }
+
+  .admin-dashboard-Body,
+  .admin-dashboard-content {
+    padding: 18px;
+  }
+
+  .dashboard-header {
+    padding: 18px;
+  }
+
+  .dashboard-title {
+    font-size: clamp(1.35rem, 5vw, 1.75rem);
   }
 }
 

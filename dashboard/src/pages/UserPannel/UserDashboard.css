@@ -165,4 +165,42 @@
   .calendar-section {
     flex-direction: column;
   }
+
+  .user-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .dashboard-table-container {
+    max-height: none;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 430px) {
+  .profile-container {
+    padding: 14px;
+  }
+
+  .profile-header,
+  .appointments-section {
+    padding: 16px;
+  }
+
+  .profile-welcome {
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
+  }
+
+  .profile-date {
+    font-size: 14px;
+  }
+
+  .filter-buttons {
+    flex-wrap: wrap;
+  }
+
+  .filter-buttons button {
+    flex: 1 1 calc(50% - 10px);
+  }
 }

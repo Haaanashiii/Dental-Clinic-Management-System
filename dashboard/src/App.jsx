@@ -263,22 +263,24 @@ function App() {
         <Suspense fallback={<div style={{textAlign:'center',marginTop:40}}>Loading...</div>}>
           <LoadingOverlay />
           <Routes>
-            <Route path="/" element={isAuthenticated ? <UserDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/LandingPage" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/LandingPage" element={<Navigate to="/" replace />} />
+            <Route path="/sign-in" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
+            <Route path="/login" element={<Navigate to="/sign-in" replace />} />
             <Route path="/SignUpPage" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
-            <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage onLogout={memoizedLogout} /> ) : ( <Navigate to="/LandingPage" />)}/>
-            <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/OtherPlatform" element={isAuthenticated ? <OtherPlatform onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/AdminDashboard" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <AdminDashboard onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ManageDentist" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageDentist onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ManageStaff" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageStaff onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="/ViewAudit" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ViewAudit onLogout={memoizedLogout} /> : <Navigate to="/LandingPage" />} />
-            <Route path="*" element={<Navigate to="/LandingPage" />} />
+            <Route path="/dashboard" element={isAuthenticated && userRole === "patient" ? <UserDashboard onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageProfilePage" element={isAuthenticated ? (<ManageProfilePage onLogout={memoizedLogout} /> ) : ( <Navigate to="/sign-in" />)}/>
+            <Route path="/Profile" element={isAuthenticated && userRole === "patient" ? <ManageProfilePage onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/UserRecords" element={isAuthenticated && userRole === "patient" ? <UserRecords onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/OtherPlatform" element={isAuthenticated ? <OtherPlatform onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/AdminDashboard" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <AdminDashboard onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageDentist" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageDentist onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageStaff" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageStaff onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageUser" element={isAuthenticated && (userRole === "dentist" || userRole === "staff") ? <ManageUser onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageRecord" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageRecord onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ManageAppointment" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ManageAppointment onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="/ViewAudit" element={isAuthenticated && (userRole === "staff" || userRole === "dentist") ? <ViewAudit onLogout={memoizedLogout} /> : <Navigate to="/sign-in" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

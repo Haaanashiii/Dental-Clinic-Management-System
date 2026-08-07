@@ -1,0 +1,66 @@
+html, body {
+	overflow-x: hidden;
+}
+
+.landing-page-shell {
+	width: 100%;
+	overflow-x: hidden;
+}
+
+.landing-page-shell img {
+	max-width: 100%;
+	height: auto;
+}
+
+.landing-page-contact-bar {
+	width: 100%;
+}
+
+.landing-page-navbar-wrap,
+.landing-page-navbar,
+#home,
+#about,
+#services,
+.landing-page-services-separator,
+footer {
+	width: 100%;
+}
+
+.landing-page-navbar {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.landing-page-services-grid {
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.landing-page-navbar {
+		border-radius: 0 0 20px 20px;
+	}
+
+	#home {
+		border-bottom-left-radius: 32px;
+		border-bottom-right-radius: 32px;
+	}
+
+	#services {
+		margin-top: 4rem;
+	}
+}
+
+@media (max-width: 430px) {
+	.landing-page-contact-bar {
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+
+	.landing-page-navbar {
+		border-radius: 0 0 16px 16px;
+	}
+
+	#home {
+		padding-top: 2rem;
+	}
+}

@@ -30,7 +30,7 @@ function ClientDashboard({ setIsAuthenticated }) {
   const getDefaultSelectedKey = () => {
     const path = location.pathname;
 
-    if (path === '/') return '1';
+    if (path === '/dashboard') return '1';
     if (path.includes('ManageProfilePage')) return '2';
     if (path.includes('ManageUser')) return '3';
     if (path.includes('ManageDentist')) return '4';
@@ -54,7 +54,7 @@ function ClientDashboard({ setIsAuthenticated }) {
   const handleLogout = () => {
     sessionStorage.clear();
     if (setIsAuthenticated) setIsAuthenticated(false);
-    navigate('/LandingPage');
+    navigate('/');
   };
 
   // Get current user info
@@ -74,7 +74,7 @@ function ClientDashboard({ setIsAuthenticated }) {
       label: 'Home',
       onClick: () => {
         if (role === 'patient') {
-          navigate('/');
+          navigate('/dashboard');
         } else {
           navigate('/AdminDashboard');
         }
@@ -155,7 +155,7 @@ function ClientDashboard({ setIsAuthenticated }) {
         width={200}
         trigger={null} // This removes the default trigger that causes delay
       >
-        <div className="logo-container" onClick={() => navigate('/LandingPage')} style={{ cursor: 'pointer' }}>
+        <div className="logo-container" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <img
             src={logo}
             alt="Dental Clinic Logo"

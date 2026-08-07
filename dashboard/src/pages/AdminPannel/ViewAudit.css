@@ -56,7 +56,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 450px;
+  width: min(450px, calc(100vw - 24px));
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -196,12 +196,28 @@
 }
 
 @media (max-width: 768px) {
+  .audit-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .audit-content {
+    padding: 18px;
+  }
+
   .audit-profile-container {
     padding: 20px;
   }
   .audit-profile-header, 
   .audit-profile-content {
     padding: 20px;
+  }
+
+  .audit-table .MuiTableCell-body,
+  .audit-table .MuiTableCell-head {
+    padding: 10px 14px;
+    font-size: 13px;
   }
 }
 
@@ -212,5 +228,14 @@
   .audit-profile-header, 
   .audit-profile-content {
     padding: 15px;
+  }
+
+  .audit-modal-footer {
+    flex-direction: column;
+  }
+
+  .audit-modal-cancel-btn,
+  .audit-modal-submit-btn {
+    width: 100%;
   }
 }

@@ -205,6 +205,12 @@
     margin-top: 20px;
     max-width: 100%;
   }
+
+  .ManageRecord-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 @media (max-width: 768px) {
@@ -216,6 +222,15 @@
   .profile-content {
     padding: 20px;
   }
+
+  .RecordContent {
+    padding: 20px;
+  }
+
+  .MoreInfoCard {
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 500px) {
@@ -226,5 +241,10 @@
   .profile-header, 
   .profile-content {
     padding: 15px;
+  }
+
+  .RecordImage {
+    width: 80px;
+    height: 80px;
   }
 }

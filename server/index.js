@@ -3,7 +3,6 @@ require("express-async-errors");
 
 const express = require("express");
 const cors = require("cors");
-const os = require("os");
 
 const errorHandler = require("./middleware/errorHandler.js");
 
@@ -21,8 +20,28 @@ const connectDB = require("./config/connection.js");
 
 const app = express();
 
+const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.trim() : "";
+const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (frontendUrl && origin === frontendUrl) {
+      return callback(null, true);
+    }
+
+    if (localOriginPattern.test(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: false,
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -42,29 +61,9 @@ app.use("/audit", auditRoute);
 // Error handler
 app.use(errorHandler);
 
-// Function to get local LAN IP
-function getLocalIP() {
-  const nets = os.networkInterfaces();
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      if (net.family === "IPv4" && !net.internal) {
-        return net.address;
-      }
-    }
-  }
-  return "localhost";
-}
-
 // Start server
 const PORT = process.env.PORT || 5137;
-const IP = getLocalIP();
-
-// Export for use in controllers
-module.exports.SERVER_PORT = PORT;
-module.exports.SERVER_IP = IP;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(` Server running at:`);
-  console.log(`    Local:    http://localhost:${PORT}`);
-  console.log(`    Network:  http://${IP}:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

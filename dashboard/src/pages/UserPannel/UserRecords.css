@@ -163,6 +163,12 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .UserRecord-dashboard {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
   .profile-container {
     padding: 20px;
   }
@@ -170,6 +176,14 @@
   .profile-header, 
   .profile-content {
     padding: 20px;
+  }
+
+  .RecordContent {
+    padding: 20px;
+  }
+
+  .RecordTableList h1 {
+    font-size: 1.5rem;
   }
 }
 
@@ -181,5 +195,14 @@
   .profile-header, 
   .profile-content {
     padding: 15px;
+  }
+
+  .RecordImage {
+    width: 80px;
+    height: 80px;
+  }
+
+  .MuiTableCell-root {
+    padding: 8px 10px;
   }
 }

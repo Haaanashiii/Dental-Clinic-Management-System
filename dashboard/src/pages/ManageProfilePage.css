@@ -185,13 +185,25 @@
 
 /* Responsive adjustments */
 @media (max-width: 1200px) {
-  /* Remove this as we're using column layout by default */
-  /* .profile-content {
-    flex-direction: column;
-  } */
+  .profile-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-form .form-group:nth-of-type(1),
+  .profile-form .form-group:nth-of-type(2),
+  .profile-form .form-group:nth-of-type(3),
+  .profile-form .form-group:nth-of-type(4),
+  .profile-form .form-group:nth-of-type(5),
+  .form-group.full-width {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 768px) {
+  .ManageProfilePage {
+    flex-direction: column;
+  }
+
   .profile-avatar-section {
     flex-direction: column;
     align-items: flex-start;
@@ -235,6 +247,10 @@
   
   .modal-box {
     width: 90%;
+  }
+
+  .profile-form {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -2,9 +2,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: linear-gradient(-45deg, #1c444d, #ffffff, #1c444d);
   background-size: 400% 400%;
   animation: moveBackground 15s ease infinite;
@@ -12,7 +13,7 @@
 }
 
 .LoginMain .LoginContent {
-  width: 900px;
+  width: min(900px, calc(100% - 32px));
   display: flex;
   background: white;
   border-radius: 16px;
@@ -21,12 +22,13 @@
   z-index: 1;
   position: relative;
   overflow: hidden;
+  flex-wrap: wrap;
 }
 
 /* Left panel - refined spacing and layout */
 .login-form-panel {
   flex: 1;
-  padding: 50px;
+  padding: clamp(28px, 4vw, 50px);
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -35,6 +37,7 @@
 /* Right panel - cleaner design */
 .welcome-panel {
   width: 380px;
+  flex: 0 1 380px;
   background: linear-gradient(135deg, #1c444d 0%, #16363f 100%);
   display: flex;
   align-items: center;
@@ -515,6 +518,81 @@
   
   .login-header {
     margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .LoginMain {
+    align-items: flex-start;
+    padding: 16px 0;
+  }
+
+  .LoginMain .LoginContent {
+    width: calc(100% - 24px);
+    border-radius: 14px;
+  }
+
+  .welcome-panel {
+    min-height: 160px;
+    padding: 28px 20px;
+  }
+
+  .login-form-panel {
+    padding: 24px 20px;
+  }
+
+  .login-header h2 {
+    font-size: 24px;
+  }
+
+  .login-subtitle {
+    font-size: 14px;
+  }
+
+  .LoginMain .MuiOutlinedInput-root {
+    height: 50px;
+  }
+
+  .login-button {
+    height: 46px;
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .LoginMain .LoginContent {
+    width: calc(100% - 16px);
+  }
+
+  .login-form-panel {
+    padding: 20px 16px;
+  }
+
+  .welcome-panel {
+    min-height: 140px;
+    padding: 22px 16px;
+  }
+
+  .welcome-content h1 {
+    font-size: 24px;
+  }
+
+  .welcome-content p {
+    font-size: 14px;
+  }
+
+  .LoginMain .MuiOutlinedInput-root {
+    height: 48px;
+  }
+
+  .login-button {
+    width: 100%;
+  }
+
+  .remember-forgot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 

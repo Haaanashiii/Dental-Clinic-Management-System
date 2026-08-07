@@ -85,23 +85,6 @@ function LandingPage() {
   const [username, setUsername] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
-  // Redirect if already authenticated
-  React.useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
-    const role = sessionStorage.getItem('role');
-    const currentPath = window.location.pathname;
-    if (currentPath === '/LandingPage') return; // Don't redirect if already on LandingPage
-    if (token && role) {
-      if (role === 'patient') {
-        navigate('/', { replace: true });
-      } else if (role === 'dentist' || role === 'staff') {
-        navigate('/ManageAppointment', { replace: true });
-      }
-    } else {
-      navigate('/login', { replace: true });
-    }
-  }, [navigate]);
-  
   // Add new useEffect to fetch username
   useEffect(() => {
     const token = sessionStorage.getItem('authToken');
@@ -165,15 +148,15 @@ function LandingPage() {
   return (
     <ThemeProvider theme={theme}>
       {/* Main wrapper Box for the entire page */}
-      <Box sx={{ width: '100vw', maxWidth: '100%', overflowX: 'hidden', bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh' }}>
+      <Box className="landing-page-shell" sx={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh' }}>
         {/* Top Contact Bar */}
-        <Box sx={{ backgroundColor: 'background.paper', py: 2, px: 4 }}>
-          <Grid container alignItems="center" justifyContent="center" spacing={2}>
-            <Grid item>
-              <img src={DentalLogo} alt="Logo" style={{ height: 70 }} />
+        <Box className="landing-page-contact-bar" sx={{ backgroundColor: 'background.paper', py: { xs: 1.5, md: 2 }, px: { xs: 1.5, sm: 3, md: 4 } }}>
+          <Grid container alignItems="center" justifyContent="center" rowSpacing={1} columnSpacing={2} sx={{ width: '100%', mx: 'auto' }}>
+            <Grid item xs={12} sm="auto" sx={{ display: 'flex', justifyContent: 'center' }}>
+              <img src={DentalLogo} alt="Logo" style={{ height: 'clamp(44px, 8vw, 70px)', width: 'auto', maxWidth: '100%' }} />
             </Grid>
             {branches.map((branch, index) => (
-              <Grid item key={index} sx={{ display: 'flex', alignItems: 'center', mx: 2 }}>
+              <Grid item key={index} xs={12} sm="auto" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mx: { xs: 0, sm: 1.5, md: 2 }, textAlign: { xs: 'center', md: 'left' }, flexWrap: 'wrap' }}>
                 <Avatar sx={{ bgcolor: 'transparent', color: 'gold', mr: 1 }}>
                   <PhoneIcon />
                 </Avatar>
@@ -191,27 +174,29 @@ function LandingPage() {
         </Box>
 
         {/* Main Navbar */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', backgroundColor: 'transparent', position: 'relative', width: '100vw' }}>
+        <Box className="landing-page-navbar-wrap" sx={{ display: 'flex', justifyContent: 'center', backgroundColor: 'transparent', position: 'relative', width: '100%' }}>
           <Box
+            className="landing-page-navbar"
             sx={{
               backgroundColor: '#1eb2a6',
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection: { xs: 'column', sm: 'row' },
               alignItems: 'center',
               justifyContent: 'center',
-              px: { xs: 2, sm: 6 },
+              flexWrap: { xs: 'nowrap', sm: 'nowrap' },
+              gap: { xs: 1, sm: 0.5 },
+              px: { xs: 1, sm: 3, md: 6 },
               py: 1,
               borderRadius: '0 0 24px 24px',
-              maxWidth: { xs: '99vw', sm: '900px', md: '1200px' },
-              width: { xs: '99vw', sm: '80vw', md: '70vw' },
+              maxWidth: 'min(1200px, 96vw)',
+              width: 'min(1200px, 96vw)',
               boxShadow: '0 12px 50px 0 rgba(30,178,166,0.18)',
               position: 'relative',
               zIndex: 30,
-              top: -32,
+              top: { xs: -18, sm: -24, md: -32 },
             }}
           >
-            {/* Centered Navigation */}
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
               {sections.map((section) => (
                 <Button
                   key={section.id}
@@ -221,13 +206,14 @@ function LandingPage() {
                     bgcolor: '#fff',
                     color: '#1eb2a6',
                     fontWeight: 600,
-                    px: 1.5,
-                    py: 0.3,
+                    px: { xs: 1, sm: 1.5 },
+                    py: { xs: 0.8, sm: 0.6 },
                     borderRadius: 2,
-                    fontSize: 13,
+                    fontSize: { xs: 12, sm: 13 },
                     boxShadow: 1,
                     mx: 0.5,
-                    minWidth: 90,
+                    minWidth: { xs: '100%', sm: 90 },
+                    flex: { xs: '1 1 100%', sm: '0 0 auto' },
                     transition: 'all 0.2s',
                     '&:hover': {
                       bgcolor: '#b2ebe7',
@@ -242,7 +228,7 @@ function LandingPage() {
               ))}
             </Box>
             {/* Right: Theme toggle and Profile/Login as separate profile */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { xs: 0, md: 2 }, mt: { xs: 0.5, sm: 0 }, flexWrap: 'wrap', justifyContent: 'center', width: { xs: '100%', sm: 'auto' } }}>
               <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')} color="inherit">
                 {mode === 'dark' ? <Brightness7Icon sx={{ color: '#fff' }} /> : <Brightness4Icon sx={{ color: '#fff' }} />}
               </IconButton>
@@ -250,17 +236,18 @@ function LandingPage() {
               {/* Login button - only show if not logged in */}
               {!isLoggedIn && (
                 <Button
-                  onClick={() => navigate('/login', { replace: true })}
+                  onClick={() => navigate('/sign-in', { replace: true })}
                   className="mint-navbar-btn"
                   sx={{
                     bgcolor: mode === 'light' ? '#fff' : 'rgba(30,178,166,0.10)',
                     color: '#1eb2a6',
                     fontWeight: 600,
                     borderRadius: 2,
-                    fontSize: 14,
+                    fontSize: { xs: 12, sm: 14 },
                     boxShadow: 1,
                     mx: 0.5,
-                    minWidth: 90,
+                    minWidth: { xs: 'calc(50% - 8px)', sm: 90 },
+                    flex: { xs: '1 1 calc(50% - 8px)', sm: '0 0 auto' },
                     minHeight: 44,
                     border: mode === 'dark' ? '1.5px solid #1eb2a6' : 'none',
                     transition: 'all 0.2s',
@@ -287,12 +274,12 @@ function LandingPage() {
                   const role = sessionStorage.getItem('role');
                   if (token && role) {
                     if (role === 'patient') {
-                      navigate('/', { replace: true });
+                      navigate('/dashboard', { replace: true });
                     } else {
                       navigate('/ManageAppointment', { replace: true });
                     }
                   } else {
-                    navigate('/login', { replace: true });
+                    navigate('/sign-in', { replace: true });
                   }
                 }}
                 startIcon={<AccountCircleIcon />}
@@ -304,8 +291,10 @@ function LandingPage() {
                   fontSize: { xs: 13, sm: 14 },
                   boxShadow: 1,
                   mx: 0.5,
-                  px: 2,
+                  px: { xs: 1.5, sm: 2 },
                   minHeight: 44,
+                  minWidth: { xs: 'calc(50% - 8px)', sm: 120 },
+                  flex: { xs: '1 1 calc(50% - 8px)', sm: '0 0 auto' },
                   border: mode === 'dark' ? '1.5px solid #1eb2a6' : 'none',
                   transition: 'all 0.2s',
                   display: 'flex',
@@ -344,20 +333,20 @@ function LandingPage() {
             alignItems: 'center',
             justifyContent: 'center',
             px: { xs: 2, md: 8 },
-            py: { xs: 10, md: 14 },
-            minHeight: { xs: '70vh', md: '80vh' },
+            py: { xs: 7, sm: 8, md: 14 },
+            minHeight: { xs: 'auto', md: '80vh' },
             borderBottomLeftRadius: '50% 15%',
             borderBottomRightRadius: '50% 15%',
             position: 'relative',
             zIndex: 10,
             boxShadow: '0 8px 32px 0 rgba(0,0,0,0.12)',
-            top: -90,
+            top: { xs: -20, sm: -40, md: -90 },
             overflow: 'hidden',
           }}
         >
-          <Box sx={{ flex: 1, zIndex: 2, textAlign: 'center', pr: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          <Box sx={{ flex: 1, zIndex: 2, textAlign: 'center', pr: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', width: '100%', maxWidth: 760 }}>
             {/* Removed star icons and decorative logo */}
-            <Typography variant="h2" sx={{ fontWeight: 'bold', color: 'text.primary', mb: 2, lineHeight: 1.1, textAlign: 'center', fontSize: { xs: 34, md: 52 }, letterSpacing: 1 }}>
+            <Typography variant="h2" sx={{ fontWeight: 'bold', color: 'text.primary', mb: 2, lineHeight: 1.1, textAlign: 'center', fontSize: 'clamp(2.1rem, 5vw, 3.25rem)', letterSpacing: 1 }}>
               <span style={{
                 color: theme.palette.primary.main,
                 textShadow: mode === 'light'
@@ -371,10 +360,10 @@ function LandingPage() {
                 YOUR SMILE,
               </span> Our Passion!
             </Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 20, mb: 5, maxWidth: 560, mx: 'auto', textAlign: 'center', fontWeight: 500, letterSpacing: 0.5, textShadow: '0 1px 6px #fff' }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: 'clamp(1rem, 2.2vw, 1.25rem)', mb: { xs: 3, md: 5 }, maxWidth: 560, mx: 'auto', textAlign: 'center', fontWeight: 500, letterSpacing: 0.5, textShadow: '0 1px 6px #fff' }}>
               Welcome to our clinic, where your comfort and confidence come first. We make dental visits easy, modern, and even enjoyable—so you can smile brighter every day.
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center', mb: 4 }}>
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center', mb: 4, width: '100%' }}>
               <Button
                 variant="contained"
                 sx={{
@@ -384,13 +373,14 @@ function LandingPage() {
                   px: 3,
                   py: 1,
                   borderRadius: 4,
-                  fontSize: 15,
-                  minWidth: 120,
+                  fontSize: { xs: 13, sm: 15 },
+                  minWidth: { xs: 'calc(50% - 8px)', sm: 120 },
+                  flex: { xs: '1 1 calc(50% - 8px)', sm: '0 0 auto' },
                   boxShadow: '0 4px 16px 0 rgba(30,178,166,0.18)',
                   transition: 'all 0.2s',
                   '&:hover': { bgcolor: '#159a8a', transform: 'scale(1.07)' },
                 }}
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/sign-in')}
               >
                 Book an Appointment
               </Button>
@@ -403,8 +393,9 @@ function LandingPage() {
                   px: 3,
                   py: 1,
                   borderRadius: 4,
-                  fontSize: 15,
-                  minWidth: 120,
+                  fontSize: { xs: 13, sm: 15 },
+                  minWidth: { xs: 'calc(50% - 8px)', sm: 120 },
+                  flex: { xs: '1 1 calc(50% - 8px)', sm: '0 0 auto' },
                   ml: 1,
                   boxShadow: '0 2px 8px 0 rgba(30,178,166,0.10)',
                   transition: 'all 0.2s',
@@ -416,13 +407,13 @@ function LandingPage() {
               </Button>
             </Box>
           </Box>
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', mt: { xs: 6, md: 0 } }}>
+          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', mt: { xs: 4, md: 0 }, width: '100%' }}>
             {/* Decorative blurred blob background for depth */}
             <Box
               sx={{
                 position: 'absolute',
-                width: { xs: 260, md: 360 },
-                height: { xs: 260, md: 360 },
+                width: 'clamp(220px, 58vw, 360px)',
+                height: 'clamp(220px, 58vw, 360px)',
                 left: '50%',
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
@@ -443,8 +434,8 @@ function LandingPage() {
 
             {/* Main image: Tooth.png with outline and always visible in light mode */}
             <Box sx={{
-              width: { xs: 260, md: 360 },
-              height: { xs: 260, md: 360 },
+              width: 'clamp(220px, 58vw, 360px)',
+              height: 'clamp(220px, 58vw, 360px)',
               position: 'relative',
               zIndex: 1,
               display: 'flex',
@@ -502,24 +493,24 @@ function LandingPage() {
 
         {/* About & Services Section */}
         <Box sx={{
-          width: '100vw',
+          width: '100%',
           background: mode === 'light'
             ? 'linear-gradient(135deg, #1eb2a6 0%, #e0f7fa 100%)'
             : 'linear-gradient(135deg, #23272b 0%, #159a8a 100%)',
-          py: { xs: 12, md: 18 },
+          py: { xs: 8, md: 18 },
           px: 0,
           m: 0,
-          mt: { xs: -32, md: -28 }, // to move the page section
+          mt: { xs: -20, sm: -24, md: -28 }, // to move the page section
           zIndex: 1,
           position: 'relative',
-          minHeight: { xs: 480, md: 600 },
+          minHeight: { xs: 'auto', md: 600 },
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
         }}>
-          <Container maxWidth={false} disableGutters sx={{ width: '100vw', px: 0, m: 0 }}>
+          <Container maxWidth={false} disableGutters sx={{ width: '100%', px: 0, m: 0 }}>
             <Box sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
@@ -543,7 +534,8 @@ function LandingPage() {
                 borderRadius: 5,
                 boxShadow: '0 4px 32px 0 rgba(30,178,166,0.10)',
                 p: { xs: 3, md: 5 },
-                minWidth: 320,
+                minWidth: 0,
+                width: '100%',
                 maxWidth: 600,
                 position: 'relative',
                 mt: { xs: 4, md: 6 },
@@ -558,7 +550,7 @@ function LandingPage() {
                 <Typography sx={{ color: 'secondary.main', fontSize: 16, mb: 2, textAlign: { xs: 'center', md: 'left' }, maxWidth: 600 }}>
                   <b>Where Smiles Begin and Confidence Grows.</b> Our clinic in Solano, Nueva Vizcaya, is dedicated to providing comprehensive, patient-centered dental care in a modern, welcoming environment. Led by <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>Dr. Narceli C. Gallevo-Marzan</span> and <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>Dr. Roceli Faye G. Marzan-Atienza</span>, we offer a full spectrum of dental services for all ages.
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2, mt: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2, mt: 1, justifyContent: { xs: 'center', md: 'flex-start' } }}>
                   {['General Dentistry', 'Orthodontics', 'Prosthodontics', 'Endodontics', 'Restorative', 'Esthetic', 'Pediatric', 'X-ray Diagnostics'].map((service) => (
                     <Box
                       key={service}
@@ -569,7 +561,7 @@ function LandingPage() {
                         py: 0.7,
                         borderRadius: 3,
                         fontWeight: 700,
-                        fontSize: 15,
+                        fontSize: 'clamp(0.75rem, 1.6vw, 0.94rem)',
                         cursor: 'pointer',
                         boxShadow: '0 2px 8px 0 rgba(30,178,166,0.10)',
                         border: `1.5px solid ${mode === 'light' ? '#b2ebe7' : '#159a8a'}`,
@@ -590,8 +582,8 @@ function LandingPage() {
                   We blend expertise and compassion to deliver quality dental solutions in a friendly, state-of-the-art setting. Your healthy, beautiful smile is our mission—let us help you achieve it!
                 </Typography>
               </Box>
-              <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
-                <Avatar src={DentalLogo} alt="Logo" sx={{ width: 220, height: 220, bgcolor: 'transparent', boxShadow: 3, border: `5px solid ${theme.palette.primary.main}`, p: 1, background: mode === 'light' ? 'linear-gradient(135deg, #e0f7fa 60%, #fff 100%)' : 'linear-gradient(135deg, #23272b 60%, #159a8a 100%)' }} />
+              <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4, width: '100%' }}>
+                <Avatar src={DentalLogo} alt="Logo" sx={{ width: 'clamp(160px, 35vw, 220px)', height: 'clamp(160px, 35vw, 220px)', bgcolor: 'transparent', boxShadow: 3, border: `5px solid ${theme.palette.primary.main}`, p: 1, background: mode === 'light' ? 'linear-gradient(135deg, #e0f7fa 60%, #fff 100%)' : 'linear-gradient(135deg, #23272b 60%, #159a8a 100%)' }} />
               </Box>
             </Box>
           </Container>
@@ -600,14 +592,14 @@ function LandingPage() {
 
         {/* Services Section Separator (Oval) - now in whitespace between sections */}
         {/* This is the oval separator between About and Services sections. It visually separates the two sections */}
-        <Box sx={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: { xs: -4, md: -6 }, mb: { xs: 3, md: 4 }, zIndex: 3, position: 'relative', background: 'transparent' }}>
+        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', mt: { xs: -4, md: -6 }, mb: { xs: 3, md: 4 }, zIndex: 3, position: 'relative', background: 'transparent' }}>
           <Box
             sx={{
               // The oval's width, height, color, border, and shadow for subtle separation
-              width: { xs: '90vw', sm: 500, md: 700 },
+              width: { xs: '92vw', sm: 500, md: 700 },
               maxWidth: 900,
               minWidth: 220,
-              minHeight: { xs: 40, sm: 60, md: 70 },
+              minHeight: { xs: 36, sm: 60, md: 70 },
               px: { xs: 1, sm: 4, md: 6 },
               py: { xs: 1, sm: 2, md: 2.5 },
               bgcolor: 'background.paper',
@@ -632,7 +624,7 @@ function LandingPage() {
                   fontWeight: 800,
                   color: mode === 'light' ? 'primary.main' : 'text.primary',
                   letterSpacing: 1,
-                  fontSize: { xs: 20, sm: 24, md: 28 },
+                  fontSize: 'clamp(1.1rem, 3vw, 1.75rem)',
                   textShadow: mode === 'light' ? '0 1px 6px #fff' : '0 1px 6px #23272b',
                   mb: 0.5,
                 }}
@@ -661,11 +653,11 @@ function LandingPage() {
           ref={refs.services}
           id="services"
           sx={{
-            width: '100vw',
+            width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            my: 10, // Increased margin to push section further down
+            my: { xs: 6, md: 10 }, // Increased margin to push section further down
             px: { xs: 1, md: 4 },
           }}
         >
@@ -675,7 +667,7 @@ function LandingPage() {
               gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
               gap: { xs: 3, sm: 4, md: 5 },
               width: '100%',
-              maxWidth: 1200,
+              maxWidth: 'min(1200px, 100%)',
               justifyItems: 'center',
             }}
           >
@@ -701,7 +693,7 @@ function LandingPage() {
                   boxShadow: mode === 'light'
                     ? '0 4px 24px 0 rgba(30,178,166,0.10), 0 1.5px 12px 0 rgba(30,178,166,0.10)'
                     : '0 4px 24px 0 rgba(30,178,166,0.22), 0 1.5px 12px 0 rgba(30,178,166,0.18)',
-                  minHeight: 320,
+                  minHeight: { xs: 280, md: 320 },
                   maxWidth: 340,
                   width: '100%',
                   mx: 'auto',
@@ -733,8 +725,8 @@ function LandingPage() {
                 >
                   <Box
                     sx={{
-                      width: 90,
-                      height: 90,
+                      width: { xs: 72, sm: 80, md: 90 },
+                      height: { xs: 72, sm: 80, md: 90 },
                       bgcolor: mode === 'light' ? 'secondary.main' : 'primary.dark',
                       border: `4px solid ${theme.palette.primary.main}`,
                       borderRadius: '50%',
@@ -757,7 +749,7 @@ function LandingPage() {
                       mb: 1,
                       color: mode === 'dark' ? '#fff' : theme.palette.primary.main,
                       letterSpacing: 0.5,
-                      mt: 2.5,
+                      mt: { xs: 1.5, md: 2.5 },
                       textShadow: mode === 'dark'
                         ? '0 2px 8px #fff, 0 2px 8px #159a8a, 0 1px 12px #000'
                         : '0 2px 8px #b2ebe7',
@@ -769,7 +761,7 @@ function LandingPage() {
                   <Typography
                     sx={{
                       color: mode === 'dark' ? '#fff' : 'text.secondary',
-                      fontSize: 16,
+                      fontSize: 'clamp(0.95rem, 1.8vw, 1rem)',
                       mb: 2,
                     }}
                   >
@@ -803,7 +795,7 @@ function LandingPage() {
                 src={Logo2}
                 alt="Logo"
                 style={{
-                  height: 200, // much bigger
+                  height: 'clamp(120px, 26vw, 200px)', // much bigger
                   width: 'auto',
                   borderRadius: 0, // no border radius
                   background: 'none', // no background
@@ -818,7 +810,7 @@ function LandingPage() {
             </Box>
           </Box>
           {/* Center: Contact Info */}
-          <Box sx={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
             <Typography fontWeight="bold" sx={{ mb: 1 }}>Contact Us</Typography>
             <Typography fontWeight="bold" sx={{ fontSize: 15 }}>Branch Clinic</Typography>
             <Typography sx={{ fontSize: 15 }}>+0927-372-4929</Typography>
@@ -831,7 +823,7 @@ function LandingPage() {
             <Typography sx={{ fontSize: 15 }}>Address: 123 Smile Street, Tooth City</Typography>
           </Box>
           {/* Right: Links, Social, Cert */}
-          <Box sx={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'flex-start' }, textAlign: { xs: 'center', md: 'left' } }}>
             <Typography fontWeight="bold" sx={{ mb: 1 }}>Links</Typography>
             <Typography sx={{ fontSize: 15 }}>Home</Typography>
             <Typography sx={{ fontSize: 15 }}>About Us</Typography>
