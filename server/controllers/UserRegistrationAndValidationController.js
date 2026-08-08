@@ -5,6 +5,39 @@ const nodemailer = require('nodemailer');
 const { writeAuditLog } = require('../utils/auditLogHelper');
 const User = require("../models/user.models.js");
 
+function normalizeAccountStatus(status) {
+  if (typeof status !== "string") {
+    return "Pending";
+  }
+
+  const trimmedStatus = status.trim();
+  if (!trimmedStatus) {
+    return "Pending";
+  }
+
+  const normalizedStatus = trimmedStatus.toLowerCase();
+
+  switch (normalizedStatus) {
+    case "active":
+    case "approved":
+      return "Active";
+    case "pending":
+    case "approval pending":
+    case "awaiting approval":
+    case "awaiting_approval":
+      return "Pending";
+    case "deactivated":
+    case "inactive":
+    case "disabled":
+      return "Deactivated";
+    default:
+      return trimmedStatus;
+  }
+}
+
+exports.normalizeAccountStatus = normalizeAccountStatus;
+exports.isAccountStatusAllowedForLogin = (status) => normalizeAccountStatus(status) === "Active";
+
 // Register a new user
 exports.registerUser = async (req, res) => {
   try {
@@ -79,12 +112,18 @@ exports.loginUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const normalizedStatus = normalizeAccountStatus(user.status);
+
     // Check account status
-    if (user.status === "Pending") {
+    if (normalizedStatus === "Pending") {
       return res.status(403).json({ message: "Pending account" });
     }
-    if (user.status !== "Active") {
+    if (normalizedStatus !== "Active") {
       return res.status(403).json({ message: `Account status: ${user.status}` });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "Server misconfiguration: JWT_SECRET is missing" });
     }
 
     // Compare the password with the stored hashed password
@@ -243,16 +282,22 @@ exports.changeStatusUser = async (req, res) => {
     return res.status(400).json({ message: "Status is required in the request body" });
   }
 
+  const normalizedStatus = normalizeAccountStatus(status);
+  if (!["Active", "Deactivated", "Pending"].includes(normalizedStatus)) {
+    return res.status(400).json({ message: "Invalid status value" });
+  }
+
   try {
     const user = await User.findOne({ userId });    
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    if (user.status === status) {
-      return res.status(400).json({ message: `User account is already ${status}` });
+    const currentStatus = normalizeAccountStatus(user.status);
+    if (currentStatus === normalizedStatus) {
+      return res.status(400).json({ message: `User account is already ${normalizedStatus}` });
     }
     const before = { status: user.status };
-    user.status = status;
+    user.status = normalizedStatus;
     await user.save();
 
     // Audit log for user status change
@@ -276,7 +321,7 @@ exports.changeStatusUser = async (req, res) => {
     }
 
     // Auto-create profile on approval
-    if (status === "Active") {
+    if (normalizedStatus === "Active") {
       if (user.role === "patient") {
         const Patient = require("../models/patient.models.js");
         const existing = await Patient.findOne({ userId: user.userId });
@@ -414,7 +459,7 @@ exports.changeStatusUser = async (req, res) => {
               
               <p class="message">
                 Your account status has been updated to <strong>${status}</strong>.
-                ${status === 'Active' ? 'You can now log in to your account and use our services.' : ''}
+                ${normalizedStatus === 'Active' ? 'You can now log in to your account and use our services.' : ''}
               </p>
               
               <div class="divider"></div>
@@ -438,7 +483,7 @@ exports.changeStatusUser = async (req, res) => {
         from: '"MolarRecord Dental Clinic" <molarrecord0@gmail.com>',
         to: user.email,
         subject: 'Account Status Update - MolarRecord Dental Clinic',
-        text: `Hello ${user.username || ''},\n\nYour account status has been changed to: ${status.toUpperCase()}.\n\nIf you have questions, please contact +63 977 641 4655/+63 921 355 3335.`,
+        text: `Hello ${user.username || ''},\n\nYour account status has been changed to: ${normalizedStatus.toUpperCase()}.\n\nIf you have questions, please contact +63 977 641 4655/+63 921 355 3335.`,
         html: htmlTemplate
       };
       
@@ -449,7 +494,7 @@ exports.changeStatusUser = async (req, res) => {
       }
     }
 
-    res.status(200).json({ message: `User account status changed to ${status}` });
+    res.status(200).json({ message: `User account status changed to ${normalizedStatus}` });
   } catch (err) {
     console.error("Change status user error:", err);
     res.status(500).json({ message: "Error changing user status", error: err.message });
