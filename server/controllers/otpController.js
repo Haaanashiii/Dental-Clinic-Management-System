@@ -9,6 +9,39 @@ function getKey(email) {
   return email.toLowerCase();
 }
 
+function createOtpMailerTransport() {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const secure = process.env.SMTP_SECURE === "true" || process.env.SMTP_SECURE === "1";
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    const error = new Error("SMTP configuration is incomplete. Set SMTP_HOST, SMTP_USER, and SMTP_PASS on the server.");
+    error.code = "SMTP_CONFIG_ERROR";
+    throw error;
+  }
+
+  const transport = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+  });
+
+  transport.options = {
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+    from: process.env.SMTP_FROM || process.env.EMAIL_FROM || "Molar Record Dental Clinic <no-reply@example.com>",
+  };
+
+  return transport;
+}
+
+exports.createOtpMailerTransport = createOtpMailerTransport;
+
 exports.requestOtp = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Email is required" });
@@ -168,22 +201,26 @@ exports.requestOtp = async (req, res) => {
   </html>
   `;
 
-  // Send email
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'molarrecord0@gmail.com',
-      pass: 'sgzg nnup buqa onqt',   
-    },
-  });
+  let transporter;
+  try {
+    transporter = createOtpMailerTransport();
+  } catch (error) {
+    console.error("OTP mailer configuration error:", error);
+    return res.status(500).json({ message: "Email service is not configured on the server." });
+  }
 
-  await transporter.sendMail({
-    from: '"Molar Record Dental Clinic" <molarrecord0@gmail.com>', // Added name with email
-    to: email,
-    subject: 'Your Verification Code - MolarRecord Dental Clinic',
-    text: `Your verification code is: ${otp}. It will expire in 5 minutes.`, // Keep plain text as fallback
-    html: htmlTemplate // Add HTML version
-  });
+  try {
+    await transporter.sendMail({
+      from: transporter.options.from,
+      to: email,
+      subject: 'Your Verification Code - MolarRecord Dental Clinic',
+      text: `Your verification code is: ${otp}. It will expire in 5 minutes.`,
+      html: htmlTemplate
+    });
+  } catch (error) {
+    console.error("Failed to send verification email:", error);
+    return res.status(502).json({ message: "Could not send verification code. Please try again later." });
+  }
 
   res.json({ message: "OTP sent to email" });
 };
